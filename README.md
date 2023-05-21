@@ -1,4 +1,4 @@
-<div align=center>Map-Builder for <a href="https://github.com/PyFlat-Studios-JR/Plant-The-Bomb">Plant-The-Bomb</a></div>
+<h1 align=center>Map-Builder for <a href="https://github.com/PyFlat-Studios-JR/Plant-The-Bomb">Plant-The-Bomb</a></h1>
 
 # Credits:
 - Some textures are from <a href="https://de.freepik.com/">Freepik.com</a>
