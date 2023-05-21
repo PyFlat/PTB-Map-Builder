@@ -54,7 +54,7 @@
    </tr>
    <tr>
     <td>Wall</td>
-    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/04_wall.png)"></img></td>
+    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/04_wall.png"></img></td>
     <td>Can be blown up by the player and can drop items</td>
    </tr>
    <tr>
