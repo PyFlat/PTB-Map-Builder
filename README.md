@@ -50,7 +50,7 @@
   </tr>
   <tr>
     <td>Player</td>
-    <td><a href="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/00_%20player.png"></a></td>
+    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/00_%20player.png"></img></td>
     <td>The start position of the player</td>
    </tr>
 </table>
