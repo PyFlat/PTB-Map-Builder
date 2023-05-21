@@ -41,3 +41,16 @@
 |+Time-Bomb|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/09_time_bomb.png)](#readme)|Placeable item through which the player gets a time bomb in the inventory|
 |+Smoke-Granade|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/10_%20smoke_granade.png)](#readme)|Placeable item through which the player gets a smoke granade in the inventory (Useless)|
 |+Health|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/11_heart.png)](#readme)|Placeable item through which the player gets one more life|
+
+<table>
+  <tr>
+    <th>Block</th>
+    <th>Texture</th>
+    <th>Explanation</th>
+  </tr>
+  <tr>
+    <td>Player</td>
+    <td><a href="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/00_%20player.png"></a></td>
+    <td>The start position of the player</td>
+   </tr>
+</table>
