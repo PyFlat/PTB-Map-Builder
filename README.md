@@ -26,8 +26,7 @@
     - Each map must have one player and at least one opponent if you want to be able to win
 
 # Blocks:
-| Block | Texture | Explanation |
-|-------|---------|-------------|
-|Player |[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/00_%20player.png)](#readme)|             |
-|       |         |             |
-|       |         |             |
+| Block | Texture                                                                                                | Explanation |
+|-------|--------------------------------------------------------------------------------------------------------|-------------|
+|Player |[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/00_%20player.png)](#readme)|The start position of the player|
+|Endstone|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/01_endstone.png)](#readme)|Indestructible walls|
