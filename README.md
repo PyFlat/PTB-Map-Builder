@@ -4,15 +4,15 @@
 - Some textures are from <a href="https://de.freepik.com/">Freepik.com</a>
 
 # Control:
-1. Key: f
+1. Key: **f**
     - Load file
-2. Key: r
+2. Key: **r**
     - White texture (delete)
-3. Key: Ctrl+Z
+3. Key: **Ctrl+Z**
     - Undo changes (only working for one change)
-4. Key: Left click and Space
+4. Key: **Left click and Space**
     - Place a block
-5. Key: Right click
+5. Key: **Right click**
     - Open enemy window
 
 # Usage:
@@ -30,3 +30,14 @@
 |-------|--------------------------------------------------------------------------------------------------------|-------------|
 |Player |[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/00_%20player.png)](#readme)|The start position of the player|
 |Endstone|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/01_endstone.png)](#readme)|Indestructible walls|
+|Grass|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/02_grass.png)](#readme)|Grass (Useless)|
+|Water|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/03_water.png)](#readme)|The player can not run over it but the explosion reaches the other side|
+|Wall|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/04_wall.png)](#readme)|Can be blown up by the player and can drop items |
+|Ghost|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/07_%2Bghost.png)](#readme)|Gives you a random curse|
+|Enemy|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/12_enemy.png)](#readme)|Attacks the player, with right-click you can choose how many lives he has and if he does damage|
+|+Bomb|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/05_%2Bbomb.png)](#readme)|Placeable item through which the player can place multiple bombs simultaneously|
+|+Range|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/06_%2Bfire.png)](#readme)|Placeable item through which the player has a longer explosion range|
+|+Dynamite|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/08_dynamit.png)](#readme)|Placeable item through which the player gets a dynamite in the inventory|
+|+Time-Bomb|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/09_time_bomb.png)](#readme)|Placeable item through which the player gets a time bomb in the inventory|
+|+Smoke-Granade|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/10_%20smoke_granade.png)](#readme)|Placeable item through which the player gets a smoke granade in the inventory (Useless)|
+|+Health|[![](https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/11_heart.png)](#readme)|Placeable item through which the player gets one more life|
