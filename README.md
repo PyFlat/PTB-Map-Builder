@@ -23,7 +23,7 @@
 - With the red button you can delete everything
 - With the green button the map will be saved as temp.json in the same folder as the map builder
 - With f on the keyboard you can load a map
-- Each map must have one player and at least one opponent if you want to be able to win
+- Each map must have one player and at least one opponent if you want to be able to win (changes with update 1.3)
 
 # Blocks:
 <table>
