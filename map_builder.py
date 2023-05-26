@@ -8,6 +8,8 @@ from tkinter import ttk
 import copy
 from jsonload import *
 
+#Main Display
+
 class Display():
     def __init__(self):
         self.master = Tk()
