@@ -8,12 +8,10 @@ from tkinter import ttk
 import copy
 from jsonload import *
 
+
 class Display():
-    def __init__(self):
-        self.master = Tk()
-        self.master.geometry('580x500')
-        self.master.resizable(width = 0, height=0)
-        self.master.protocol("WM_DELETE_WINDOW", lambda: os._exit(0))
+    def __init__(self, master):
+        self.master = master
         self.top = None
         self.w = Canvas(self.master, bg="white")
         self.w.pack()
@@ -35,9 +33,13 @@ class Display():
             else:
                 x=45
                 l.place(x=x, y=(i*20), width=20, height=20)
+            if i == 12:
+                l.bind("<Button-3>", lambda ev: enemy_win())
                 
         self.move = Button(self.master, image = self.kreuz, border = 1, command=partial(bm.set_texture, "move"),state="disabled")
         self.move.place(x=15, y=400, width=20, height=20)
+        f = Button(self.master, bg = "blue", command=partial(bm.load_from_json))
+        f.place(x=45, y=400, width=20, height=20) 
         l = Button(self.master, bg = "orange", command=partial(bm.set_texture, "white"))
         l.place(x=15, y=460, width=20, height=20)
         c = Button(self.master, bg = "red", command=partial(bm.set_texture, "clear"))
@@ -49,24 +51,13 @@ class Display():
         else:
             self.ci = Button(self.master, image=bm.textures[bm.texture], border = 1)
         self.ci.place(x=15, y=430, width=20, height=20)
-
+    def test(self):
+        print("Rechtscklick")
     def update_frame(self):
         if isinstance(bm.texture, str):
-            try:
-                self.ci.config(bg="white", image ="")
-            except TclError:
-                pass
+            self.ci.config(bg="white", image ="")
         else:
-            try:
-                self.ci.config(image=bm.textures[bm.texture])
-            except TclError:
-                pass
-class window():
-    def __init__(self, width, height):
-        self.master = Tk()
-        self.master.geometry(str(width)+"x"+str(height))
-        self.master.resizable(width=0, height=0)
-        self.master.protocol("WM_DELETE_WINDOW", lambda: os._exit(0))
+            self.ci.config(image=bm.textures[bm.texture])
 class Blocks():
     update_list = []
     def __init__(self):
@@ -76,11 +67,20 @@ class Blocks():
         self.block = False
         self.last_blocks = []
         temp = []
+        self.enemy_damage = 1
+        self.enemy_health = 1
         for j in range(25):
             for i in range(25):
                 temp.append(None)
             self.blocks.append(temp)
             temp = []
+    def set_damage_health(self, damage, health):
+        if damage == "Kill-Aura-On":
+            damag = 2
+        elif damage == "Kill-Aura-Off":
+            damag = 1
+        self.enemy_damage = damag
+        self.enemy_health = health
     def set_texture(self, tex):
         if tex == "clear":
             for i in range(23):
@@ -193,6 +193,7 @@ class Blocks():
                     temp.append({"id":-1,"objectData":{}})
                 elif self.blocks[i][j].texture == 12:
                     health, mode = self.blocks[i][j].get_enemy()
+                    print(mode)
                     temp.append({"id":6,"objectData":{"health":health,"id2":mode,"extra1":0,"extra2":0}})
                 elif self.blocks[i][j].texture == 11:
                     temp.append({"id":5,"objectData":{"start":30,"fin":59}})
@@ -225,14 +226,19 @@ class Blocks():
         file = open("temp" + ".json", "w")
         file.write(json.dumps(Data))
         file.close()
+class window():
+    def __init__(self, width, height):
+        self.master = Tk()
+        self.master.geometry(str(width)+"x"+str(height))
+        self.master.resizable(width=0, height=0)
 class Block():
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.pix_x = round((self.x-10)/20)
         self.pix_y = round((self.y-10)/20)
-        self.health = 1
-        self.damage = 1
+        self.health = bm.enemy_health
+        self.damage = bm.enemy_damage
         self.texture = bm.texture
         self.obj = d.w.create_image(self.x, self.y, image = bm.textures[self.texture])
         d.w.lower(self.obj)
@@ -240,6 +246,7 @@ class Block():
             self.edit = True
         else:
             self.edit = False
+    
     def move(self, pos):
         d.w.moveto(self.obj, bm.get_pos()[0]*20, bm.get_pos()[1]*20)
     def get_block(self):
@@ -250,33 +257,42 @@ class Block():
 class enemy_win():
     exists = False
     def __init__(self):
+        self.general = False
         self.pos_x = bm.get_pos()[0]
         self.pos_y = bm.get_pos()[1]
         self.block = bm.blocks[self.pos_x][self.pos_y]
         if self.block == None or self.block.edit == False or enemy_win.exists == True:
-            return
+            if self.pos_x  == -3 and self.pos_y == 13 and enemy_win.exists == False:
+                self.general = True
+            else:
+                return
         self.enem_win = window(250, 150)
+        self.enem_win.master.protocol("WM_DELETE_WINDOW", partial(self.destroy, self.enem_win))
         enemy_win.exists = True
         self.l1 = Label(self.enem_win.master, text="Health", justify="center", font="Calibri 15")
         self.l1.place(x=0, y=0, width=250)
-        
         self.s1 = Scale(self.enem_win.master, from_=1, to=63, orient="horizontal")
         self.s1.place(x=0,y=25, width=250)
         self.l2 = Label(self.enem_win.master, text="Mode", justify="center", font="Calibri 15")
         self.l2.place(x=0, y=70, width=250)
         self.cbb = ttk.Combobox(self.enem_win.master, values=["Kill-Aura-On", "Kill-Aura-Off"], font="Calibri 15")
         self.cbb.place(x=0, y=95, width=250, height=30)
-        if self.block.damage == 1:
-            self.cbb.current(1)
-        elif self.block.damage == 2:
-            self.cbb.current(0)
-        self.b1 = Button(self.enem_win.master, text="Save", font="Calibri 15", command=lambda:[self.set_value(self.pos_x,
-                                                                                                              self.pos_y,
-                                                                                                              self.cbb.get(),
-                                                                                                              self.s1.get(),
-                                                                                                              self.enem_win)])
-        self.b1.place(x=0, y=125, width= 250, height=25)
-        self.s1.set(self.block.health)
+        if not self.general:
+            if self.block.damage == 1:
+                self.cbb.current(1)
+            elif self.block.damage == 2:
+                self.cbb.current(0)
+            self.b1 = Button(self.enem_win.master, text="Save", font="Calibri 15", command=lambda:[self.set_value(self.pos_x,self.pos_y,self.cbb.get(),self.s1.get(),self.enem_win)])
+            self.b1.place(x=0, y=125, width= 250, height=25)
+            self.s1.set(self.block.health)
+        else:
+            if bm.enemy_damage == 1:
+                self.cbb.current(1)
+            elif bm.enemy_damage == 2:
+                self.cbb.current(0)
+            self.b1 = Button(self.enem_win.master, text="Save", font="Calibri 15", command=lambda:[bm.set_damage_health(self.cbb.get(), self.s1.get()), self.destroy(self.enem_win)])
+            self.b1.place(x=0, y=125, width= 250, height=25)
+            self.s1.set(bm.enemy_health)
     def set_value(self, x,y, aura, health, win):
         if aura == "Kill-Aura-On":
             damag = 2
@@ -284,12 +300,25 @@ class enemy_win():
             damag = 1
         bm.blocks[x][y].damage = damag
         bm.blocks[x][y].health = health
+        self.destroy(win)
+    def destroy(self, win):
         enemy_win.exists = False
         win.master.destroy()
+        
+active = True    
+def on_close():
+    global active
+    active = False
+    master.quit()
+    master.destroy()
     
+master = Tk()
+master.geometry('580x500')
+master.resizable(width = 0, height=0)
+master.protocol("WM_DELETE_WINDOW", on_close)    
 bm = Blocks()
 bm.save()
-d = Display()
+d = Display(master)
 d.master.bind("<Button-1>",lambda ev: bm.place(-1,-1))
 d.master.bind("<space>",lambda ev: bm.place(-1,-1))
 d.master.bind("<B1-Motion>", lambda ev: bm.place(-1,-1))
@@ -305,10 +334,12 @@ for i in range(25):
     bm.place(0,i)
     bm.place(24,i)
     bm.place(i, 24)
-while True:
+
+while active:
     for block in Blocks.update_list:
         block.move(1)
     d.update_frame()
     d.master.update()
     d.master.update_idletasks()
     time.sleep(0.02)
+
