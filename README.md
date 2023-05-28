@@ -4,25 +4,28 @@
 - Some textures are from <a href="https://de.freepik.com/">Freepik.com</a>
 
 # Control:
-1. Key: **f**
-    - Load file
-2. Key: **r**
-    - White texture (delete)
-3. Key: **Ctrl+Z**
+1. Key: **Ctrl+Z**
     - Undo changes (only working for one change)
-4. Key: **Left click and Space**
-    - Place a block
-5. Key: **Right click**
+2. Key: **Left click and Right click**
+    - Place/Select a block
+3. Key: **Ctrl+Left click**
     - Open enemy window
+4. Key: **Space**
+    - Click the key while the mouse is over a block and hold the key
+    - Move to the new location and let the key go
+    - -> Block will be moved
+5. Key:**Ctrl+Left/Right click**
+    - Makes a straight line
 
 # Usage:
-- Select the texture on the left side 
+- Select the texture on the left side
+- You can left and right click to select two different blocks 
 - Click in the field to place a block
-- With the white texture you can delete blocks (orange button or r on the keyboard)
+- With the white texture you can delete blocks (orange button)
 - The block types are explained [here](#blocks)
 - With the red button you can delete everything
-- With the green button the map will be saved as temp.json in the same folder as the map builder
-- With f on the keyboard you can load a map
+- With the green button you can select where you want to save the map **(Attention: file must have extension .ptb to be able to use it later on)**
+- With the blue button you can load maps, both old *.json* and new *.ptb* files
 - Each map must have one player and at least one opponent if you want to be able to win (changes with update 1.3)
 
 # Blocks:
