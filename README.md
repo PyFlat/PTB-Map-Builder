@@ -79,7 +79,7 @@
    </tr>
    <tr>
     <td>+Health</td>
-    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/9_%2Bhealth.png"></img></td>
+    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/09_%2Bheart.png"></img></td>
     <td>Placeable item through which the player gets one more life</td>
    </tr>
    <tr>
