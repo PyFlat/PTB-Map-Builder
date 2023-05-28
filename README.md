@@ -69,17 +69,17 @@
    </tr>
    <tr>
     <td>+Dynamite</td>
-    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/07_dynamit.png"></img></td>
+    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/07_%2Bdynamit.png"></img></td>
     <td>Placeable item through which the player gets a dynamite in the inventory</td>
    </tr>
    <tr>
     <td>+Time-Bomb</td>
-    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/08_time_bomb.png"></img></td>
+    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/08_%2Btime_bomb.png"></img></td>
     <td>Placeable item through which the player gets a time bomb in the inventory</td>
    </tr>
    <tr>
     <td>+Health</td>
-    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/9_heart.png"></img></td>
+    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/9_%2Bheart.png"></img></td>
     <td>Placeable item through which the player gets one more life</td>
    </tr>
    <tr>
@@ -89,12 +89,12 @@
    </tr>
    <tr>
     <td>+Sword</td>
-    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/11_%20sword.png"></img></td>
+    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/11_%2Bsword.png"></img></td>
     <td>Bombs and dynamite do more damage to enemies but also to you</td>
    </tr>
    <tr>
     <td>+Atomic Bomb</td>
-    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/12_%20atomic_bomb.png"></img></td>
+    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/12_%2Batomic_bomb.png"></img></td>
     <td>Like Dynamite but bigger</td>
    </tr>
    <tr>
