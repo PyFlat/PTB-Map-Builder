@@ -20,6 +20,8 @@
 # Usage:
 - Select the texture on the left side
 - You can left and right click to select two different blocks 
+- Below the script button you can see your currently selected block
+- Texts and scripts will come in the next update
 - Click in the field to place a block
 - With the white texture you can delete blocks (orange button)
 - The block types are explained [here](#blocks)
