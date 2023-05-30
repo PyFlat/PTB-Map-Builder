@@ -14,7 +14,7 @@
     - Click the key while the mouse is over a block and hold the key
     - Move to the new location and let the key go
     - -> Block will be moved
-5. Key:**Ctrl+Left/Right click**
+5. Key: **Ctrl+Left/Right click**
     - Makes a straight line
 
 # Usage:
