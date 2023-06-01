@@ -28,7 +28,7 @@
 - With the red button you can delete everything
 - With the green button you can select where you want to save the map **(Attention: file must have extension .ptb to be able to use it later on)**
 - With the blue button you can load maps, both old *.json* and new *.ptb* files
-- Each map must have one player and at least one opponent if you want to be able to win (changes with update 1.3)
+- Each map must have one player and at least one opponent if you want to be able to win (changes with scripts in v1.3)
 
 # Blocks:
 <table>
