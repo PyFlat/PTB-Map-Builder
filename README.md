@@ -28,7 +28,7 @@
 - With the red button you can delete everything
 - With the green button you can select where you want to save the map **(Attention: file must have extension .ptb to be able to use it later on)**
 - With the blue button you can load maps, both old *.json* and new *.ptb* files
-- Each map must have one player and at least one opponent if you want to be able to win (changes with scripts in v1.3)
+- Each map must have one player and at least one opponent if you want to be able to win (changes with new scripts in update v1.3)
 
 # Blocks:
 <table>
@@ -107,5 +107,4 @@
     <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/13_shield.png"></img></td>
     <td>Your are immune against normal bombs, dynamite and enemy damage</td>
    </tr>
-   
 </table>
