@@ -340,3 +340,13 @@ class util():
     def transform_to_int(data):
         t = "0b" + data
         return int(t, 2)
+
+"""
+cmp = compressor()
+cmp.insert_normal(json.loads(open("test.json").read()),b"\x00\x05\x01\x01\x00\x0d","test\ntest\ntest")
+cmp.compress()
+dc = compressor()
+dc.insert_comp(cmp.result)
+dc.decompress()
+print(dc.get_data()[2])
+"""
