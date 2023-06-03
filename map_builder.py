@@ -8,8 +8,6 @@ from compiler import *
 from compressor import *
 import pathlib, os,easygui
 
-
-
 class Window():
     def __init__(self, width, height):
         self.master = Tk()
@@ -365,37 +363,25 @@ class BlockManager():
         for i in range(25):
             temp = []
             for j in range(25):
-                if self.blocks[i][j] == None:
-                    temp.append({"id":-1,"objectData":{}})
-                elif self.blocks[i][j].texture == 10:
-                    health, mode = self.blocks[i][j].get_enemy()
-                    temp.append({"id":6,"objectData":{"health":health,"id2":mode,"id1":1}})
-                elif self.blocks[i][j].texture == 9:
-                    temp.append({"id":5,"objectData":{"start":55,"fin":55}})
-                elif self.blocks[i][j].texture == 8:
-                    temp.append({"id":5,"objectData":{"start":150,"fin":150}})
-                elif self.blocks[i][j].texture == 7:
-                    temp.append({"id":5,"objectData":{"start":20,"fin":20}})
-                elif self.blocks[i][j].texture == 6:
-                    temp.append({"id":5,"objectData":{"start":900,"fin":900}})
-                elif self.blocks[i][j].texture == 5:
-                    temp.append({"id":5,"objectData":{"start":700,"fin":700}})
-                elif self.blocks[i][j].texture == 4:
-                    temp.append({"id":5,"objectData":{"start":450,"fin":450}})
-                elif self.blocks[i][j].texture == 11:
-                    temp.append({"id":5,"objectData":{"start":80,"fin":80}})
-                elif self.blocks[i][j].texture == 12:
-                    temp.append({"id":5,"objectData":{"start":0,"fin":0}})
-                elif self.blocks[i][j].texture == 13:
-                    temp.append({"id":5,"objectData":{"start":260,"fin":260}})
-                elif self.blocks[i][j].texture == 3:
-                    temp.append({"id":3,"objectData":{}})
-                elif self.blocks[i][j].texture == 2:
-                    temp.append({"id":4,"objectData":{}})
-                elif self.blocks[i][j].texture == 1:
-                    temp.append({"id":0,"objectData":{}})
-                elif self.blocks[i][j].texture == 0:
-                    temp.append({"id":2,"objectData":{}})
+                block = self.blocks[i][j]
+                texture = block.texture if block != None else None
+                ids = {4: 450, 5: 700, 6: 900, 7: 20, 8: 150, 9: 55, 11: 80, 12: 0, 13: 260}
+                if block is None:
+                    temp.append({"id": -1, "objectData": {}})
+                elif texture == 10:
+                    health, mode = block.get_enemy()
+                    temp.append({"id": 6, "objectData": {"health": health, "id2": mode, "id1": 1}})
+                elif texture in ids:
+                    start = ids[texture]
+                    temp.append({"id": 5, "objectData": {"start": start, "fin": start}})
+                elif texture == 3:
+                    temp.append({"id": 3, "objectData": {}})
+                elif texture == 2:
+                    temp.append({"id": 4, "objectData": {}})
+                elif texture == 1:
+                    temp.append({"id": 0, "objectData": {}})
+                elif texture == 0:
+                    temp.append({"id": 2, "objectData": {}})
             block_list.append(temp)
         return block_list
     def save_to_file(self):
