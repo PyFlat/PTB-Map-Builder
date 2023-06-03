@@ -140,8 +140,7 @@ class BlockManager():
         self.line_x = None
         self.line_y = None
         self.line_images = []
-        self.move_x_s = None
-        self.move_y_s = None
+        self.move_x_s = self.move_y_s = None
         self.mouse_x = None
         self.mouse_y = None
         self.mobj = None
@@ -152,7 +151,8 @@ class BlockManager():
         self.box_y = None
         self.comp = compiler()
     def get_texture(self, side = True):
-        tex = self.texture_left if side else self.texture_right; return tex
+        tex = self.texture_left if side else self.texture_right
+        return tex
     def set_texture(self, tex, side = True, *args):
         self.texture_left, self.texture_right = (tex, self.texture_right) if side else (self.texture_left, tex)
     def reset(self):
@@ -384,7 +384,13 @@ class BlockManager():
                     temp.append({"id": 2, "objectData": {}})
             block_list.append(temp)
         return block_list
+    def check_for_player(self):
+        for i in range(25):
+            for j in range(25):
+                if self.blocks[i][j] and self.blocks[i][j].texture == 0: return True
+        return False
     def save_to_file(self):
+        if not self.check_for_player(): messagebox.showerror("ERROR", "Player is missing"); return
         path = self.get_path()
         if path == None:
             return
@@ -405,16 +411,12 @@ class BlockManager():
 class Block():
     def __init__(self, x, y, dire):
         self.w = md.w
-        self.x = x
-        self.y = y
+        self.x, self.y = x,y
         self.health = bm.enemy_health
         self.damage = bm.enemy_damage
         self.texture = bm.get_texture(dire)
         self.obj = self.w.create_image(self.x, self.y, image = bm.textures[self.texture])
-        if self.texture == 10:
-            self.edit = True
-        else:
-            self.edit = False
+        self.edit = True if self.texture == 10 else False
     def move(self, x, y):
         self.w.moveto(self.obj, x=x,y=y) 
     def get_block(self):
@@ -426,8 +428,7 @@ class Script_Editor():
     running = False
     def __init__(self, blocks):
         self.bm = blocks
-        if Script_Editor.running:
-            return
+        if Script_Editor.running: return
         Script_Editor.running = True
         self.window = Window(600, 600)
         self.window.master.config(bg="#3c3c3c")
@@ -449,8 +450,7 @@ class Text_Editor():
     running = False
     def __init__(self, blocks):
         self.bm = blocks
-        if Text_Editor.running:
-            return
+        if Text_Editor.running: return
         Text_Editor.running = True
         self.window = Window(600, 600)
         self.window.master.config(bg="#3c3c3c")
