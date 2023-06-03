@@ -30,7 +30,6 @@
 - With the blue button you can load maps, both old *.json* and new *.ptb* files
 - Each map must have one player and at least one opponent if you want to be able to win (changes with new scripts in update v1.3)
 
-
 # Blocks:
 <table>
   <tr>
