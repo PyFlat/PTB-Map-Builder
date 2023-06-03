@@ -1,6 +1,14 @@
 import time
 
 
+class compilerError(Exception):
+    def __init__(self, msg="UNSPECIFIED", line=0, ecode=0):
+        super().__init__(msg)
+        self.ms = msg
+        self.line = line
+        self.ecode = ecode
+    def get(self):
+        return (self.line,self.ecode,self.ms)
 class log:
     def __init__(self) -> None:
         self.logs = []
@@ -19,8 +27,8 @@ class log:
 class util:
     def validateCommandLength(attrs, minlength, line):
         if len(attrs) < minlength:
-            raise IndexError(
-                f"Line {line} Compiler Error [002]: Short command. Expected >={minlength}, got {len(attrs)}"
+            raise compilerError(
+                f"Line {line} Compiler Error [002]: Short command. Expected >={minlength}, got {len(attrs)}", line, 2
             )
 
     def validateInteger(data, maxlength, line, logfile):
@@ -33,32 +41,32 @@ class util:
                     f"WARNING [{line}]: Used hex as integer conversion for {data}. This is not recommended."
                 )
             except ValueError:
-                raise TypeError(
-                    f"Line {line} Compiler Error [003]: Invalid integer Conversion of value {data}"
+                raise compilerError(
+                    f"Line {line} Compiler Error [003]: Invalid integer Conversion of value {data}", line, 3
                 )
         if i > maxlength:
-            raise ValueError(
-                f"Line {line} Compiler Error [004]: Maximum integer length exceeded. Exspected <= {maxlength}, got {i}"
+            raise compilerError(
+                f"Line {line} Compiler Error [004]: Maximum integer length exceeded. Exspected <= {maxlength}, got {i}", line, 4
             )
         if i < 0:
-            raise ValueError(
-                f"Line {line} Compiler Error [005]: Integer too small. Exspected >0, got {i}"
+            raise compilerError(
+                f"Line {line} Compiler Error [005]: Integer too small. Exspected >0, got {i}", line, 5
             )
         return i
 
     def validateEnum(data, enum, line, blacklisted=[]):
         if data not in enum:
-            raise ValueError(
-                f"Line {line} Compiler Error [001]: invalid Enum. Expected {enum}, got {data}."
+            raise compilerError(
+                f"Line {line} Compiler Error [001]: invalid Enum. Expected {enum}, got {data}.", line, 1
             )
         if data in blacklisted:
-            raise ValueError(
-                f"Line {line} Compiler Error [006]: Blacklisted value. The value {data} is blacklisted for {enum}. The blacklist is {blacklisted}"
+            raise compilerError(
+                f"Line {line} Compiler Error [006]: Blacklisted value. The value {data} is blacklisted for {enum}. The blacklist is {blacklisted}", line, 6
             )
         for i in range(len(enum)):
             if enum[i] == data:
                 return i
-        raise RuntimeError(f"Line {line} Compiler Error [999]: Impossible")
+        raise compilerError(f"Line {line} Compiler Error [999]: Impossible", line, 999)
 
     def byte(i: int, l: int):
         return i.to_bytes(l, "big")
@@ -87,6 +95,11 @@ class compiler:
             self.compile_jump,
             self.compile_flag,
             self.compile_tp,
+            self.compile_jump,
+            self.compile_downloadRAM,
+            self.compile_toMemory,
+            self.compile_toMemory,
+            self.compile_rand
         ]
         self.logfile = log()
 
@@ -150,6 +163,11 @@ class compiler:
             "jump": 17,
             "setFlag": 18,
             "tp": 19,
+            "jumpRelative": 20,
+            "createMemory": 21,
+            "loadToMemory": 22,
+            "loadFromMemory": 23,
+            "randomNumber": 24
         }
         try:
             return cm[cmd]
@@ -178,6 +196,11 @@ class compiler:
             "jump",
             "setFlag",
             "tp",
+            "jumpRelative",
+            "createMemory",
+            "loadToMemory",
+            "loadFromMemory",
+            "randomNumber"
         ]
         try:
             return cm[cmd]
@@ -206,6 +229,11 @@ class compiler:
             "jump {} lines if {}",
             "setFlag {} = {}",
             "tp to {} {}",
+            "jumpRelative {} lines if {}",
+            "createMemory at {}",
+            "loadToMemory at {} with index {} from {}",
+            "loadFromMemory at {} with index {} to {}",
+            "randomNumber from {} to {} => {}"
         ]
         try:
             return ms[cmd]
@@ -215,7 +243,7 @@ class compiler:
     def getEnum(self, cmd):
         ens = [
             None,
-            [None, "on_init", "on_step", "on_collect", "on_explode", "on_destroy"],
+            [None, "on_init", "on_step", "on_collect", "on_explode", "on_destroy","on_tick"],
             None,
             None,
             None,
@@ -251,6 +279,11 @@ class compiler:
             [None, ">", "<", "==", "<=", ">="],
             [None, "dop_items"],
             None,
+            None,
+            None,
+            None,
+            None,
+            None
         ]
         return ens[cmd]
 
@@ -276,6 +309,11 @@ class compiler:
             "**",
             "§*",
             "**",
+            "**",
+            "*",
+            "***",
+            "***",
+            "***"
         ]
         return cc[cmd]
 
@@ -416,7 +454,6 @@ class compiler:
         result += util.byte(j, 2)
         result += util.byte(c, 2)
         return result
-
     def compile_flag(self, attrs, line):
         util.validateCommandLength(attrs, 4, line)
         cmd = self.getCommandId(attrs[0])
@@ -443,7 +480,32 @@ class compiler:
         result += util.byte(x, 2)
         result += util.byte(y, 2)
         return result
-
+    def compile_downloadRAM(self, attrs, line):
+        util.validateCommandLength(attrs, 3, line)
+        adress = util.validateInteger(attrs[2],65535,line,self.logfile)
+        result = util.byte(self.getCommandId(attrs[0]),1)
+        result += util.byte(adress,2)
+        return result
+    def compile_toMemory(self, attrs,line):
+        util.validateCommandLength(attrs,8,line)
+        location = util.validateInteger(attrs[2],65535,line,self.logfile)
+        index = util.validateInteger(attrs[5],65535,line,self.logfile)
+        source = index = util.validateInteger(attrs[7],65535,line,self.logfile)
+        result = util.byte(self.getCommandId(attrs[0]),1)
+        result += util.byte(location, 2)
+        result += util.byte(index,2)
+        result += util.byte(source, 2)
+        return result
+    def compile_rand(self, attrs, line):
+        util.validateCommandLength(attrs,7,line)
+        _min = util.validateInteger(attrs[2],65535,line,self.logfile)
+        _max = util.validateInteger(attrs[4],65535,line,self.logfile)
+        stor = util.validateInteger(attrs[6],65535,line,self.logfile)
+        result = util.byte(self.getCommandId(attrs[0]),1)
+        result += util.byte(_min,2)
+        result += util.byte(_max,2)
+        result += util.byte(stor,2)
+        return result
     def compile(self, script: str, options="") -> bytes:
         self.logfile.add_log(f"Compiling started with options {options}")
         result = b"\x00"

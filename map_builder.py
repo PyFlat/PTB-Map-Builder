@@ -1,3 +1,5 @@
+import sys
+sys.dont_write_bytecode = True
 from tkinter import *
 from tkinter import messagebox
 from functools import partial
@@ -5,6 +7,8 @@ from jsonload import *
 from compiler import *
 from compressor import *
 import pathlib, os,easygui
+
+
 
 class Window():
     def __init__(self, width, height):
