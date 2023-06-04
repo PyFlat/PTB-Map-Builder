@@ -19,6 +19,8 @@
     - -> Block will be moved
 5. Key: **Ctrl+Left/Right click**
     - Makes a straight line
+6. Key: **Alt+Left/Right click**
+    - Lets you create a rectangle
 
 # Usage:
 - Select the texture on the left side
@@ -31,7 +33,9 @@
 - With the red button you can delete everything
 - With the green button you can select where you want to save the map **(Attention: file must have extension .ptb to be able to use it later on)**
 - With the blue button you can load maps, both old *.json* and new *.ptb* files
-- Each map must have one player and at least one opponent if you want to be able to win (changes with new scripts in update v1.3)
+
+# Scripting:
+- Comming Soon
 
 # Blocks:
 <table>
