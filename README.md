@@ -26,7 +26,6 @@
 - Select the texture on the left side
 - You can left and right click to select two different blocks 
 - Below the script button you can see your currently selected block
-- Texts and Scripts will be unlocked in the next update
 - Click in the field to place a block
 - With the white texture you can delete blocks (orange button)
 - The block types are explained [here](#blocks)
@@ -34,7 +33,7 @@
 - With the green button you can select where you want to save the map **(Attention: file must have extension .ptb to be able to use it later on)**
 - With the blue button you can load maps, both old *.json* and new *.ptb* files
 
-# Scripting:
+# Scripting Documentation:
 - Comming Soon
 
 # Blocks:
