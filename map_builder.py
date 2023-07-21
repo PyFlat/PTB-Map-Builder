@@ -1,12 +1,13 @@
 import sys
 sys.dont_write_bytecode = True
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from functools import partial
 from jsonload import *
 from compiler import *
 from compressor import *
-import pathlib, os,easygui
+import pathlib, os
+from varname.helpers import Wrapper
 
 class Window():
     def __init__(self, width, height):
@@ -323,13 +324,13 @@ class BlockManager():
         self.set_texture(self.last_texture)
     def get_path(self, fileopen = False):
         if fileopen:
-            path = easygui.fileopenbox(msg="Choose a PTB or JSON file to load", default="~/Downloads/", filetypes = ["*.ptb", "*.json"])
+            path = filedialog.askopenfilename(title="Choose a PTB or JSON file to load", initialdir="~/Downloads/", filetypes = [("PTB save files", "*.ptb"),("*Old* json save files","*.json")])
         else:
-            path = easygui.filesavebox(msg="Choose a Place to Save your Map", default="~/Downloads/*.ptb")
-            if path[-4:] != ".ptb":
-                path += ".ptb"
+            path = filedialog.asksaveasfilename(defaultextension=".ptb", title="Choose a Place to Save your Map", initialdir="~/Downloads/", filetypes = [("PTB save files", "*.ptb")])
         if path == None or ((path[-4:] == ".ptb") or ((path[-5:] == ".json") and fileopen)):
             return path
+        elif path == "":
+            return None
         messagebox.showerror("Error", "False File Format")
         return None
     def load_from_json(self):
@@ -404,6 +405,7 @@ class BlockManager():
             texts = self.texts[:-1]
         else:
             texts = None
+        print(texts)
         com = compressor()
         com.insert_normal(World, script, texts)
         com.compress()
@@ -433,13 +435,53 @@ class Script_Editor():
         self.window = Window(600, 600)
         self.window.master.config(bg="#3c3c3c")
         self.window.master.title("Scripts")
-        self.textfeld = Text(self.window.master, relief="flat", font="Calibri 20")
+        self.textfeld = Text(self.window.master, relief="flat", font="Calibri 20", bg="#1f1f1f", fg="white", insertbackground="white")
         self.textfeld.place(x=25, y=25, height=525, width=550)
+        self.textfeld.bind("<KeyRelease>", self.highlight_syntax)
         if self.bm.scripts != None:
             self.textfeld.insert("1.0",self.bm.scripts)
+        self.highlight_syntax()
         self.submit = Button(self.window.master,relief="flat", text="Submit",bg="orange",fg="white", font="Calibri 20", activeforeground="orange", activebackground="white", border = 0, command=lambda:[self.compile_text(),self.destroy()])
         self.submit.place(x=200, y=560, height=30, width=200)
         self.window.master.protocol("WM_DELETE_WINDOW", self.destroy)
+    def highlight_syntax(self, event=None):
+        dict = [
+            {"keywords" : ['on_init', 'on_collect', 'on_step', 'on_explode', "on_destroy", "on_tick"],
+            "color": "#dcdcaa",
+            "name": "trigger"
+            },
+            {"keywords" : ['@', "end", "win", "loose", "add", "subtract", "multiply", "divide", "set", "reset", "store", "set_item", "drawImage", "drawRect", "clear", "compare", "jump", "setFlag", "tp", "jumpRelative", "createMemory", "loadToMemory", "loadFromMemory", "randomNumber"],
+            "color": "#2667ca",
+            "name": "commands"
+            },
+            {"keywords" : ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+            "color": "#a7ce9b",
+            "name": "number"
+            },
+            {"keywords" : ['=>', "="],
+            "color": "#9cdcfe",
+            "name": "variables"
+            },
+            {"keywords": ["player.health"],
+            "color": "#c3602d",
+            "name": "player_set"}
+        ]
+        
+        for key in dict:
+            self.apply_highlight(key["name"], key["keywords"], key["color"])
+
+    def apply_highlight(self, name, keywords, color):
+        self.textfeld.tag_configure(name, foreground=color)
+        for keyword in keywords:
+            start = '1.0'
+            while True:
+                pos = self.textfeld.search(keyword, start, stopindex=END)
+                if not pos:
+                    break
+                end = f'{pos}+{len(keyword)}c'
+                self.textfeld.tag_add(name, pos, end)
+                start = end
+    
     def compile_text(self):
         self.bm.scripts = self.textfeld.get("1.0",END)
     def destroy(self):

@@ -321,7 +321,7 @@ class compiler:
         util.validateCommandLength(attrs, 5, line)
         cmd = self.getCommandId(attrs[0])
         result = util.byte(cmd, 1)
-        events = [None, "on_init", "on_step", "on_collect", "on_explode", "on_destroy"]
+        events = [None, "on_init", "on_step", "on_collect", "on_explode", "on_destroy", "on_tick"]
         i = util.validateEnum(attrs[1], events, line, [None])
         result += util.byte(i, 1)
         x = util.validateInteger(attrs[3], 255, line, self.logfile)
@@ -366,7 +366,7 @@ class compiler:
         return result
 
     def compile_get(self, attrs, line):
-        util.validateCommandLength(attrs, 5, line)
+        util.validateCommandLength(attrs, 4, line)
         cmd = self.getCommandId(attrs[0])
         result = util.byte(cmd, 1)
         values = [
