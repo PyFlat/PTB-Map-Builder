@@ -430,22 +430,98 @@ class Script_Editor():
     running = False
     def __init__(self, blocks):
         self.bm = blocks
+        self.current_word = ""
+        self.autocomplete_list = []
+        self.autocomplete_index = -1
         if Script_Editor.running: return
         Script_Editor.running = True
         self.window = Window(600, 600)
         self.window.master.config(bg="#3c3c3c")
         self.window.master.title("Scripts")
-        self.textfeld = Text(self.window.master, relief="flat", font="Calibri 20", bg="#1f1f1f", fg="white", insertbackground="white")
+        self.textfeld = Text(self.window.master, relief="flat", font="Calibri 20", bg="#1f1f1f", fg="white", insertbackground="white", undo=True)
         self.textfeld.place(x=25, y=25, height=525, width=550)
         self.textfeld.bind("<KeyRelease>", self.highlight_syntax)
+        self.textfeld.bind("<Control-BackSpace>", self.delete_whole_word)
+        self.textfeld.bind("<Tab>", self.on_tab_press)
+        self.textfeld.bind("<Down>", self.on_down_press)
+        self.textfeld.bind("<Up>", self.on_up_press)
         if self.bm.scripts != None:
             self.textfeld.insert("1.0",self.bm.scripts)
         self.highlight_syntax()
         self.submit = Button(self.window.master,relief="flat", text="Submit",bg="orange",fg="white", font="Calibri 20", activeforeground="orange", activebackground="white", border = 0, command=lambda:[self.compile_text(),self.destroy()])
         self.submit.place(x=200, y=560, height=30, width=200)
         self.window.master.protocol("WM_DELETE_WINDOW", self.destroy)
+        
+        
+    def check_autofill(self, event):
+        if event:
+            if event.keysym == "BackSpace":
+                return
+        self.update_autocomplete_list()
+        if self.autocomplete_list:
+            self.show_autocomplete_text()
+
+    def on_tab_press(self, event):
+        if self.autocomplete_list:
+            self.remove_autocomplete_text()
+            cursor_position = float(self.textfeld.index(INSERT))
+            start = cursor_position-(len(self.current_word)/10)
+            end = start+len(self.autocomplete_list[self.autocomplete_index])/10
+            self.textfeld.mark_set(INSERT, end)
+            return "break"
+
+    def on_down_press(self, event):
+        if self.autocomplete_list:
+            self.autocomplete_index = (self.autocomplete_index + 1) % len(self.autocomplete_list)
+            print(self.autocomplete_index)
+            self.show_autocomplete_text()
+
+    def on_up_press(self, event):
+        if self.autocomplete_list:
+            self.autocomplete_index = (self.autocomplete_index - 1) % len(self.autocomplete_list)
+            print(self.autocomplete_index)
+            self.show_autocomplete_text()
+
+    def update_autocomplete_list(self):
+        current_word = self.get_current_word()
+        if current_word != self.current_word and len(current_word)>0:
+            self.current_word = current_word
+            self.autocomplete_list = self.get_autocomplete_list(self.current_word)
+            self.remove_autocomplete_text()
+
+    def get_current_word(self):
+        cursor_position = self.textfeld.index(INSERT)
+        line, col = map(int, cursor_position.split('.'))
+        current_line_text = self.textfeld.get(f"{line}.0", f"{line}.end")
+        words = current_line_text.split()
+        if words:
+            current_word = words[min(col - 1, len(words) - 1)]
+            return current_word
+        return ""
+
+    def get_autocomplete_list(self, partial_word):
+        autocomplete_list = []
+        for keyword_set in self.keywords:
+            for keyword in keyword_set["keywords"]:
+                if keyword.startswith(partial_word):
+                    autocomplete_list.append(keyword)
+        return autocomplete_list
+
+    def show_autocomplete_text(self):
+        self.remove_autocomplete_text()
+        if self.autocomplete_list:
+            cursor_position = self.textfeld.index(INSERT)
+            options_text = self.autocomplete_list[self.autocomplete_index][len(self.current_word):]
+            self.textfeld.insert(INSERT, options_text)
+            self.textfeld.tag_add("sel", "insert - %dc" % len(options_text), INSERT)
+            self.textfeld.mark_set(INSERT, cursor_position)
+
+    def remove_autocomplete_text(self):
+        self.textfeld.tag_remove("sel", "1.0", "end")
+
+        
     def highlight_syntax(self, event=None):
-        dict = [
+        self.keywords = [
             {"keywords" : ['on_init', 'on_collect', 'on_step', 'on_explode', "on_destroy", "on_tick"],
             "color": "#dcdcaa",
             "name": "trigger"
@@ -454,7 +530,7 @@ class Script_Editor():
             "color": "#2667ca",
             "name": "commands"
             },
-            {"keywords" : ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+            {"keywords" : ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', "0"],
             "color": "#a7ce9b",
             "name": "number"
             },
@@ -462,13 +538,19 @@ class Script_Editor():
             "color": "#9cdcfe",
             "name": "variables"
             },
-            {"keywords": ["player.health"],
+            {"keywords": ["player.health", "player.bombs", "player.range", "player.dynamite", "player.timed_bombs", "player.damage", "player.nukes",],
             "color": "#c3602d",
             "name": "player_set"}
         ]
-        
-        for key in dict:
+        #self.check_autofill(event)
+        self.remove_all_highlights()
+        for key in self.keywords:
             self.apply_highlight(key["name"], key["keywords"], key["color"])
+
+    def remove_all_highlights(self):
+        for tag in self.textfeld.tag_names():
+            if tag != "sel":
+                self.textfeld.tag_remove(tag, '1.0', END)
 
     def apply_highlight(self, name, keywords, color):
         self.textfeld.tag_configure(name, foreground=color)
@@ -478,9 +560,57 @@ class Script_Editor():
                 pos = self.textfeld.search(keyword, start, stopindex=END)
                 if not pos:
                     break
-                end = f'{pos}+{len(keyword)}c'
-                self.textfeld.tag_add(name, pos, end)
-                start = end
+                next_char = self.textfeld.get(f'{pos}+{len(keyword)}c')
+                if next_char == " " or next_char == "\n":
+                    end = f'{pos}+{len(keyword)}c'
+                    self.textfeld.tag_add(name, pos, end)
+                start = f'{pos}+1c'
+                
+    def delete_whole_word(self, event):
+        # Get the current cursor position
+        # Get the current cursor position
+        cursor_position = self.textfeld.index(INSERT)
+
+        # Find the index of the previous whitespace character
+        start_index = self.textfeld.search(r'\s', cursor_position, backwards=True, regexp=True, stopindex="1.0")
+
+        # If no whitespace character is found, the whole word is selected to the beginning
+        if not start_index:
+            start_index = "1.0"
+
+        # Delete the selected word
+        self.textfeld.delete(start_index, cursor_position)
+
+    def apply_highlight(self, name, keywords, color):
+        self.textfeld.tag_configure(name, foreground=color)
+        for keyword in keywords:
+            start = '1.0'
+            while True:
+                pos = self.textfeld.search(keyword, start, stopindex=END)
+                if not pos:
+                    break
+                next_char = self.textfeld.get(f'{pos}+{len(keyword)}c')
+                if next_char == " " or next_char == "\n":
+                    end = f'{pos}+{len(keyword)}c'
+                    self.textfeld.tag_add(name, pos, end)
+                start = f'{pos}+1c'
+                
+    def delete_whole_word(self, event):
+        # Get the current cursor position
+        # Get the current cursor position
+        cursor_position = self.textfeld.index(INSERT)
+
+        # Find the index of the previous whitespace character
+        start_index = self.textfeld.search(r'\s', cursor_position, backwards=True, regexp=True, stopindex="1.0")
+
+        # If no whitespace character is found, the whole word is selected to the beginning
+        if not start_index:
+            start_index = "1.0"
+
+        # Delete the selected word
+        self.textfeld.delete(start_index, cursor_position)
+
+
     
     def compile_text(self):
         self.bm.scripts = self.textfeld.get("1.0",END)
