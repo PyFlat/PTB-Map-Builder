@@ -7,7 +7,7 @@ from jsonload import *
 from compiler import *
 from compressor import *
 import pathlib, os
-from varname.helpers import Wrapper
+
 
 class Window():
     def __init__(self, width, height):
