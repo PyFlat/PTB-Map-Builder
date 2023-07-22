@@ -432,7 +432,7 @@ class Script_Editor():
         self.bm = blocks
         self.current_word = ""
         self.autocomplete_list = []
-        self.autocomplete_index = -1
+        self.autocomplete_index = 0
         if Script_Editor.running: return
         Script_Editor.running = True
         self.window = Window(600, 600)
@@ -459,13 +459,15 @@ class Script_Editor():
                 return
         self.update_autocomplete_list()
         if self.autocomplete_list:
-            self.show_autocomplete_text()
+            if len(event.keysym) == 1:
+                self.show_autocomplete_text()
 
     def on_tab_press(self, event):
         if self.autocomplete_list:
             self.remove_autocomplete_text()
             cursor_position = float(self.textfeld.index(INSERT))
             start = cursor_position-(len(self.current_word)/10)
+            if start < 1: start = 1.0
             end = start+len(self.autocomplete_list[self.autocomplete_index])/10
             self.textfeld.mark_set(INSERT, end)
             return "break"
@@ -473,13 +475,11 @@ class Script_Editor():
     def on_down_press(self, event):
         if self.autocomplete_list:
             self.autocomplete_index = (self.autocomplete_index + 1) % len(self.autocomplete_list)
-            print(self.autocomplete_index)
             self.show_autocomplete_text()
 
     def on_up_press(self, event):
         if self.autocomplete_list:
             self.autocomplete_index = (self.autocomplete_index - 1) % len(self.autocomplete_list)
-            print(self.autocomplete_index)
             self.show_autocomplete_text()
 
     def update_autocomplete_list(self):
@@ -487,7 +487,6 @@ class Script_Editor():
         if current_word != self.current_word and len(current_word)>0:
             self.current_word = current_word
             self.autocomplete_list = self.get_autocomplete_list(self.current_word)
-            self.remove_autocomplete_text()
 
     def get_current_word(self):
         cursor_position = self.textfeld.index(INSERT)
@@ -508,7 +507,6 @@ class Script_Editor():
         return autocomplete_list
 
     def show_autocomplete_text(self):
-        self.remove_autocomplete_text()
         if self.autocomplete_list:
             cursor_position = self.textfeld.index(INSERT)
             options_text = self.autocomplete_list[self.autocomplete_index][len(self.current_word):]
@@ -542,12 +540,14 @@ class Script_Editor():
             "color": "#c3602d",
             "name": "player_set"}
         ]
-        #self.check_autofill(event)
-        self.remove_all_highlights()
+        self.check_autofill(event)
+        self.remove_all_highlights(event)
         for key in self.keywords:
             self.apply_highlight(key["name"], key["keywords"], key["color"])
 
-    def remove_all_highlights(self):
+    def remove_all_highlights(self, event=None):
+        if event and "Shift" in event.keysym:
+            return
         for tag in self.textfeld.tag_names():
             if tag != "sel":
                 self.textfeld.tag_remove(tag, '1.0', END)
