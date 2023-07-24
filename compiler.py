@@ -99,7 +99,8 @@ class compiler:
             self.compile_downloadRAM,
             self.compile_toMemory,
             self.compile_toMemory,
-            self.compile_rand
+            self.compile_rand,
+            self.compile_ptr
         ]
         self.logfile = log()
 
@@ -167,7 +168,8 @@ class compiler:
             "createMemory": 21,
             "loadToMemory": 22,
             "loadFromMemory": 23,
-            "randomNumber": 24
+            "randomNumber": 24,
+            "loadFromPointer": 25
         }
         try:
             return cm[cmd]
@@ -200,7 +202,8 @@ class compiler:
             "createMemory",
             "loadToMemory",
             "loadFromMemory",
-            "randomNumber"
+            "randomNumber",
+            "loadFromPointer"
         ]
         try:
             return cm[cmd]
@@ -233,7 +236,8 @@ class compiler:
             "createMemory at {}",
             "loadToMemory at {} with index {} from {}",
             "loadFromMemory at {} with index {} to {}",
-            "randomNumber from {} to {} => {}"
+            "randomNumber from {} to {} => {}",
+            "loadFromPointer at {} to {}"
         ]
         try:
             return ms[cmd]
@@ -283,6 +287,7 @@ class compiler:
             None,
             None,
             None,
+            None,
             None
         ]
         return ens[cmd]
@@ -313,7 +318,8 @@ class compiler:
             "*",
             "***",
             "***",
-            "***"
+            "***",
+            "**"
         ]
         return cc[cmd]
 
@@ -329,7 +335,15 @@ class compiler:
         result += util.byte(x, 1)
         result += util.byte(y, 1)
         return result
-
+    def compile_ptr(self, attrs, line):
+        util.validateCommandLength(attrs, 5, line)
+        cmd = self.getCommandId(attrs[0])
+        result = util.byte(cmd,1)
+        f = util.validateInteger(attrs[2],65535,line,self.logfile)
+        t = util.validateInteger(attrs[4],65535,line,self.logfile)
+        result += util.byte(f,2)
+        result += util.byte(t,2)
+        return result
     def compile_end(self, attrs, line):
         util.validateCommandLength(attrs, 1, line)
         cmd = self.getCommandId(attrs[0])
