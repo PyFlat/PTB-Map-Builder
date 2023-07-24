@@ -524,7 +524,7 @@ class Script_Editor():
             "color": "#dcdcaa",
             "name": "trigger"
             },
-            {"keywords" : ['@', "end", "win", "loose", "add", "subtract", "multiply", "divide", "set", "reset", "store", "set_item", "drawImage", "drawRect", "clear", "compare", "jump", "setFlag", "tp", "jumpRelative", "createMemory", "loadToMemory", "loadFromMemory", "randomNumber"],
+            {"keywords" : ['@', "end", "win", "loose", "add", "subtract", "multiply", "divide", "set", "reset", "store", "set_item", "drawImage", "drawRect", "clear", "compare", "jump", "setFlag", "tp", "jumpRelative", "createMemory", "loadToMemory", "loadFromMemory", "randomNumber", "loadFromPointer"],
             "color": "#2667ca",
             "name": "commands"
             },
@@ -540,7 +540,7 @@ class Script_Editor():
             "color": "#c3602d",
             "name": "player_set"}
         ]
-        self.check_autofill(event)
+        #self.check_autofill(event)
         self.remove_all_highlights(event)
         for key in self.keywords:
             self.apply_highlight(key["name"], key["keywords"], key["color"])
