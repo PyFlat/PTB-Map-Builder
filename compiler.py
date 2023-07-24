@@ -100,6 +100,7 @@ class compiler:
             self.compile_toMemory,
             self.compile_toMemory,
             self.compile_rand,
+            self.compile_ptr,
             self.compile_ptr
         ]
         self.logfile = log()
@@ -169,7 +170,8 @@ class compiler:
             "loadToMemory": 22,
             "loadFromMemory": 23,
             "randomNumber": 24,
-            "loadFromPointer": 25
+            "loadFromPointer": 25,
+            "storeToPointer": 26
         }
         try:
             return cm[cmd]
@@ -203,7 +205,8 @@ class compiler:
             "loadToMemory",
             "loadFromMemory",
             "randomNumber",
-            "loadFromPointer"
+            "loadFromPointer",
+            "storeToPointer"
         ]
         try:
             return cm[cmd]
@@ -237,7 +240,8 @@ class compiler:
             "loadToMemory at {} with index {} from {}",
             "loadFromMemory at {} with index {} to {}",
             "randomNumber from {} to {} => {}",
-            "loadFromPointer at {} to {}"
+            "loadFromPointer at {} to {}",
+            "storeToPointer value {} to {}"
         ]
         try:
             return ms[cmd]
@@ -288,6 +292,7 @@ class compiler:
             None,
             None,
             None,
+            None,
             None
         ]
         return ens[cmd]
@@ -319,6 +324,7 @@ class compiler:
             "***",
             "***",
             "***",
+            "**",
             "**"
         ]
         return cc[cmd]
