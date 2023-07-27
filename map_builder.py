@@ -567,18 +567,11 @@ class Script_Editor():
                 start = f'{pos}+1c'
                 
     def delete_whole_word(self, event):
-        # Get the current cursor position
-        # Get the current cursor position
         cursor_position = self.textfeld.index(INSERT)
 
-        # Find the index of the previous whitespace character
         start_index = self.textfeld.search(r'\s', cursor_position, backwards=True, regexp=True, stopindex="1.0")
-
-        # If no whitespace character is found, the whole word is selected to the beginning
         if not start_index:
             start_index = "1.0"
-
-        # Delete the selected word
         self.textfeld.delete(start_index, cursor_position)
 
     def apply_highlight(self, name, keywords, color):
@@ -595,29 +588,19 @@ class Script_Editor():
                     self.textfeld.tag_add(name, pos, end)
                 start = f'{pos}+1c'
                 
-    def delete_whole_word(self, event):
-        # Get the current cursor position
-        # Get the current cursor position
-        cursor_position = self.textfeld.index(INSERT)
 
-        # Find the index of the previous whitespace character
-        start_index = self.textfeld.search(r'\s', cursor_position, backwards=True, regexp=True, stopindex="1.0")
-
-        # If no whitespace character is found, the whole word is selected to the beginning
-        if not start_index:
-            start_index = "1.0"
-
-        # Delete the selected word
-        self.textfeld.delete(start_index, cursor_position)
-
-
-    
     def compile_text(self):
         self.bm.scripts = self.textfeld.get("1.0",END)
+        try: 
+            self.bm.comp.compile(self.bm.scripts)
+        except compilerError as e:
+            line, x, y = e.get()
+            print(line, x,y)
     def destroy(self):
         self.window.master.destroy()
         self.window.master.quit()
         Script_Editor.running = False
+        
 class Text_Editor():
     running = False
     def __init__(self, blocks):
