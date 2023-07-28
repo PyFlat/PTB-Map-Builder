@@ -390,12 +390,45 @@ class BlockManager():
             for j in range(25):
                 if self.blocks[i][j] and self.blocks[i][j].texture == 0: return True
         return False
+    def get_info(self):
+        dict = {
+                "enemys": {
+                    "damage": [],
+                    "no-damage": []
+                },
+                "items": {
+                    "bombs": 0,
+                    "exp": 0,
+                    "dynamite": 0,
+                    "time_bombs": 0,
+                    "nukes": 0,
+                    "health": 0,
+                    "damage": 0,
+                },
+                "blocks": 0
+                }
+        for row in self.blocks:
+            for block in row:
+                if not block: continue
+                match block.texture:
+                    case 10: dict["enemys"]["no-damage" if block.damage == 2 else "damage"].append(block.health)
+                    case 3: dict["blocks"] += 1
+                    case 4: dict["items"]["bombs"] += 1
+                    case 5: dict["items"]["exp"] += 1
+                    case 7: dict["items"]["dynamite"] += 1
+                    case 8: dict["items"]["time_bombs"] += 1
+                    case 9: dict["items"]["health"] += 1
+                    case 11: dict["items"]["damage"] += 1
+                    case 12: dict["items"]["nukes"] += 1
+        return dict
+    
     def save_to_file(self):
         if not self.check_for_player(): messagebox.showerror("ERROR", "Player is missing"); return
         path = self.get_path()
         if path == None:
             return
         block_list = self.get_json_block_data()
+        info = self.get_info()
         World = {"world":block_list}
         if self.scripts != None:
             script = self.comp.compile(self.scripts)
