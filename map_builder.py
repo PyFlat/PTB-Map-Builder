@@ -103,7 +103,6 @@ class MainDisplay():
         self.master.bind("<Control-B3-KeyPress>", lambda ev: self.bm.save())
         self.master.bind("<Alt-B1-KeyPress>", lambda ev: self.bm.save())
         self.master.bind("<Alt-B3-KeyPress>", lambda ev: self.bm.save())
-        self.master.bind("k", lambda ev: print(self.bm.get_pos()))
     def update_frame(self):
         if self.bm.get_texture() < 0:
             self.bl.config(bg="white", image ="")
@@ -438,7 +437,6 @@ class BlockManager():
             texts = self.texts[:-1]
         else:
             texts = None
-        print(texts)
         com = compressor()
         com.insert_normal(World, script, texts)
         com.compress()
