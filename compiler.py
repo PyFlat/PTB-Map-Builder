@@ -536,7 +536,7 @@ class compiler:
             cmd = self.getCommandId(attrs[0])
             if cmd == False:
                 if "--disable_comment_warnings" not in options:
-                    self.logfile.write_log(
+                    self.logfile.add_log(
                         f"WARNING Line {i} is not a valid command. Use --disable_comment_warnigns to remove this from the log."
                     )
                 continue
