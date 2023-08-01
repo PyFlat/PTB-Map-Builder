@@ -285,8 +285,8 @@ class compiler:
             None,
             None,
             [None, ">", "<", "==", "<=", ">="],
-            [None, "dop_items"],
             None,
+            [None, "drop_items"],
             None,
             None,
             None,
@@ -478,7 +478,7 @@ class compiler:
         util.validateCommandLength(attrs, 4, line)
         cmd = self.getCommandId(attrs[0])
         result = util.byte(cmd, 1)
-        values = [None, "dop_items"]
+        values = [None, "drop_items"]
         i = util.validateEnum(attrs[1], values, line, [None])
         result += util.byte(i, 1)
         v = util.validateInteger(attrs[3], 255, line, self.logfile)
