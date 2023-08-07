@@ -168,12 +168,8 @@ class BlockManager():
     def get_pos(self):
         abs_x = md.master.winfo_pointerx() - md.master.winfo_rootx()
         abs_y = md.master.winfo_pointery() - md.master.winfo_rooty()
-        abs_x_r = round(abs_x, -1) - 80
-        abs_y_r = round(abs_y, -1)
-        abs_x_r += 10 if abs_x_r % 20 == 0 else 0
-        abs_y_r += 10 if abs_y_r % 20 == 0 else 0
-        self.num_x = round((abs_x_r - 10) / 20)
-        self.num_y = round((abs_y_r - 10) / 20)
+        self.num_x =abs_x//20-4
+        self.num_y = abs_y//20
         return [self.num_x, self.num_y]
 
     def place(self, x, y, dire = True):
@@ -559,7 +555,7 @@ class Script_Editor():
             "color": "#2667ca",
             "name": "commands"
             },
-            {"keywords" : ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', "0"],
+            {"keywords" : ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"],
             "color": "#a7ce9b",
             "name": "number"
             },
