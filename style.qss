@@ -1,0 +1,59 @@
+*{
+	font-family: Calibri;
+}
+
+QWidget{
+    background-color: #242424
+}
+
+QPushButton{
+    text-align: left;
+    padding: 5 5 5 10;
+    font-family: Calibri;
+    font-size: 20px;
+    border: 2px solid white;
+    border-radius: 5px;
+    background-color: #1f6aa5;
+    color: white;
+}
+QPushButton:hover{
+    background-color: #144870;
+}
+QMenuBar{
+    font-size: 15px;
+    color: white;
+    margin-left: 5;
+}
+QMenu::item{
+	font-size: 12px;
+	color: white;
+	padding: 3 5 3 5;
+    margin: 3;
+    border-radius: 5px;
+}
+QMenuBar::item{
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    margin: 5 0 0 0;
+    padding: 5 10 5 10;
+}
+QMenu{
+    border: 2px solid #535353;
+}
+
+QMenu::separator{
+    background-color: white;
+    height: 1px;
+    margin: 0 5 0 5;
+}
+QMenu::item:selected, QMenuBar::item:selected{
+    background-color: #4a4a4a;
+}
+QPushButton#next_page_btn, QPushButton#prev_page_btn{
+	text-align: center;
+	padding: 5 0 5 0;
+}
+QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QPushButton#placeholder4{
+    border: none;
+    background-color: #242424
+}
