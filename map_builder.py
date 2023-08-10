@@ -936,7 +936,7 @@ class MainWindow(QMainWindow):
             button = getattr(self.ui, f"block_button_{i}")
             button.setEnabled(False)
         self.menuBar().setEnabled(False)
-        self.ui.next_page_btn.setDisabled(False)
+        self.ui.next_page_btn.setEnabled(False)
         self.ui.imagePainter.mousePressEvent = lambda event: self.get_coords_on_mouse_click()
     
     def get_coords_on_mouse_click(self):
@@ -947,7 +947,7 @@ class MainWindow(QMainWindow):
             button = getattr(self.ui, f"block_button_{i}")
             button.setEnabled(True)
         self.menuBar().setEnabled(True)
-        self.ui.next_page_btn.setDisabled(True)
+        self.ui.next_page_btn.setEnabled(True)
         
 class Block():
     def __init__(self, x,y,texture_id, block_id, damage, health):
@@ -985,6 +985,7 @@ class ScriptEditor(QDialog):
 
         self.setLayout(layout)
         self.exec()
+        
     def create_menu(self):
         menu = QMenuBar(self)
         
@@ -995,9 +996,9 @@ class ScriptEditor(QDialog):
         pick_coords_action.setShortcut("Ctrl+Shift+C")
         pick_coords_action.triggered.connect(lambda: self.pick_coordinates())
         tool_menu.addAction(pick_coords_action)
-        
         menu.addMenu(tool_menu)
         return menu
+    
     def pick_coordinates(self):
         self.hide()
         self.parent.pick_coords()
