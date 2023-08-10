@@ -93,6 +93,9 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
     </property>
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <widget class="QWidget" name="page">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <property name="spacing">
@@ -428,6 +431,9 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="shortcut">
+                  <string>Ctrl+Shift+E</string>
                  </property>
                 </widget>
                </item>

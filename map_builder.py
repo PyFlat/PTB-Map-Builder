@@ -704,7 +704,7 @@ class MainWindow(QMainWindow):
         
         self.ui = Ui_MainWindow() # Setup the Ui from the Designer
         self.ui.setupUi(self)
-                
+
         self.connect_menu()
         
         self.ui.stackedWidget_2.setCurrentIndex(0)
@@ -745,27 +745,47 @@ class MainWindow(QMainWindow):
             button = getattr(self.ui, f"block_button_{i}")
             idx = -1 if i == len(self.textures)-2 else i
             button.mousePressEvent = lambda event=False, index=idx: self.set_textures(event=event, idx=index)
-                            
+            
         self.ui.block_button_15.clicked.connect(self.reset_all)
         
-        self.ui.prev_page_btn.clicked.connect(lambda ev: self.switch_page(True))
-        self.ui.next_page_btn.clicked.connect(lambda ev: self.switch_page(False))
         
+        self.ui.prev_page_btn.clicked.connect(lambda: self.previous_page())
+        self.ui.next_page_btn.clicked.connect(lambda: self.next_page())
+        shortcut = QShortcut(QKeySequence("Ctrl+Shift+E"), self)
+        shortcut.activated.connect(lambda: self.set_textures(None, -1, True))
+        
+        shortcut = QShortcut(QKeySequence("Ctrl+1"), self)
+        shortcut.activated.connect(lambda: self.switch_to_page(0))
+        shortcut = QShortcut(QKeySequence("Ctrl+2"), self)
+        shortcut.activated.connect(lambda: self.switch_to_page(1))
+        shortcut = QShortcut(QKeySequence("Ctrl+3"), self)
+        shortcut.activated.connect(lambda: self.switch_to_page(2))
         
         self.show()
+
         
-    def switch_page(self, side):
-        if side:
-            self.ui.next_page_btn.setDisabled(False)
-            self.ui.stackedWidget_2.setCurrentIndex(self.ui.stackedWidget_2.currentIndex()-1)
-            if self.ui.stackedWidget_2.currentIndex() == 0:
-                self.ui.prev_page_btn.setDisabled(True)
-        else:
-            self.ui.prev_page_btn.setDisabled(False)
-            self.ui.stackedWidget_2.setCurrentIndex(self.ui.stackedWidget_2.currentIndex()+1)
-            if self.ui.stackedWidget_2.currentIndex() == self.ui.stackedWidget_2.count()-1:
-                self.ui.next_page_btn.setDisabled(True)
-                
+    def switch_to_page(self, page_index):
+        if 0 <= page_index < self.ui.stackedWidget_2.count():
+            self.ui.stackedWidget_2.setCurrentIndex(page_index)
+            self.update_button_states()
+
+    def previous_page(self):
+        current_index = self.ui.stackedWidget_2.currentIndex()
+        if current_index > 0:
+            self.ui.stackedWidget_2.setCurrentIndex(current_index - 1)
+        self.update_button_states()
+
+    def next_page(self):
+        current_index = self.ui.stackedWidget_2.currentIndex()
+        if current_index < self.ui.stackedWidget_2.count() - 1:
+            self.ui.stackedWidget_2.setCurrentIndex(current_index + 1)
+        self.update_button_states()
+
+    def update_button_states(self):
+        current_index = self.ui.stackedWidget_2.currentIndex()
+        self.ui.prev_page_btn.setEnabled(current_index > 0)
+        self.ui.next_page_btn.setEnabled(current_index < self.ui.stackedWidget_2.count() - 1)
+
     def place(self, x, y, texture_idx, god_mode=False, damage=None, health=None):
         if not god_mode:
             if x <= 0 or x >= 24 or y <= 0 or y >= 24:
@@ -824,7 +844,8 @@ class MainWindow(QMainWindow):
         return textures
     
     def set_textures(self, event, idx, side=None):
-        side = True if event.button() == Qt.LeftButton else False if not side else side
+        if event is not None:
+            side = True if event.button() == Qt.LeftButton else False
         if side: self.texture_left = idx
         else: self.texture_right = idx
     

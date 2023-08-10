@@ -354,6 +354,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
+        self.stackedWidget.setCurrentIndex(0)
         self.stackedWidget_2.setCurrentIndex(2)
 
 
@@ -404,6 +405,9 @@ class Ui_MainWindow(object):
         self.block_button_12.setText(QCoreApplication.translate("MainWindow", u"+ Nuclear", None))
         self.block_button_13.setText(QCoreApplication.translate("MainWindow", u" Shield", None))
         self.block_button_14.setText(QCoreApplication.translate("MainWindow", u"Delete", None))
+#if QT_CONFIG(shortcut)
+        
+#endif // QT_CONFIG(shortcut)
         self.block_button_15.setText(QCoreApplication.translate("MainWindow", u"Clear", None))
         self.block_button_16.setText(QCoreApplication.translate("MainWindow", u"Move", None))
         self.placeholder2.setText("")
