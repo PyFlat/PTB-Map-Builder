@@ -5,7 +5,10 @@
 QWidget{
     background-color: #242424
 }
-
+QTextEdit{
+    color: white;
+    font-size: 20px;
+}
 QPushButton{
     text-align: left;
     padding: 5 5 5 10;
@@ -18,6 +21,10 @@ QPushButton{
 }
 QPushButton:hover{
     background-color: #144870;
+}
+QPushButton#script_compile_dialog_btn{
+    text-align: center;
+    padding: 4 15 4 15;
 }
 QMenuBar{
     font-size: 15px;
@@ -52,6 +59,9 @@ QMenu::item:selected, QMenuBar::item:selected{
 QPushButton#next_page_btn, QPushButton#prev_page_btn{
 	text-align: center;
 	padding: 5 0 5 0;
+}
+QPushButton#next_page_btn:disabled, QPushButton#prev_page_btn:disabled{
+	border-color: #999999;
 }
 QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QPushButton#placeholder4{
     border: none;

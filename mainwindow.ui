@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>676</width>
-    <height>530</height>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -645,7 +645,7 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
     <property name="title">
      <string>Scripts</string>
     </property>
-    <addaction name="actionEdit"/>
+    <addaction name="actionEdit_Scripts"/>
    </widget>
    <widget class="QMenu" name="menuTexts">
     <property name="title">
@@ -714,9 +714,12 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
     <string>Edit One</string>
    </property>
   </action>
-  <action name="actionEdit">
+  <action name="actionEdit_Scripts">
    <property name="text">
-    <string>Edit</string>
+    <string>Edit Script</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+S</string>
    </property>
   </action>
   <action name="actionEdit_2">

@@ -698,6 +698,7 @@ class Utils():
         return path
 
 class MainWindow(QMainWindow):
+    coord_signal = Signal(int, int)
     def __init__(self):
         super().__init__()
         
@@ -718,7 +719,13 @@ class MainWindow(QMainWindow):
         self.texture_left = 0
         self.texture_right = 0
         
+        self.enemy_damage = 1
+        self.enemy_health = 1
+        
         self.player = None
+        
+        self.scripts = None
+        self.texts = None
         
         self.comp = compiler()
         
@@ -767,6 +774,8 @@ class MainWindow(QMainWindow):
         if self.blocks[x][y]: self.remove(x,y)
         if texture_idx == -1: return
         block_id = self.ui.imagePainter.add_image(self.textures[texture_idx], x*20, y*20)
+        damage = damage if damage is not None else self.enemy_damage
+        health = health if health is not None else self.enemy_health
         self.blocks[x][y] = Block(x,y,texture_idx, block_id, damage, health) if texture_idx not in (14,15) else None
         if texture_idx == 0: self.player = self.blocks[x][y]
 
@@ -778,6 +787,8 @@ class MainWindow(QMainWindow):
 
     def connect_menu(self):
         self.ui.actionOpen.triggered.connect(lambda: self.load_map_file())
+        self.ui.actionSave.triggered.connect(lambda: self.save_map_file())
+        self.ui.actionEdit_Scripts.triggered.connect(lambda: ScriptEditor(self))
 
     def remove(self, x, y):
         id = self.blocks[x][y].id
@@ -852,7 +863,7 @@ class MainWindow(QMainWindow):
         if not file_name: return
         self.reset_all()
         out = PtbLoad.load_ptb(file_name)
-        self.scripts = self.comp.decompile(out[1])
+        #self.scripts = self.comp.decompile(out[1])
         loaded_blocks = out[0]
         self.texts = out[2]
         for i, row in enumerate(loaded_blocks):
@@ -860,22 +871,142 @@ class MainWindow(QMainWindow):
                 if block_data is None: self.blocks[i][j] = None
                 elif isinstance(block_data, list): self.place(i, j, *block_data)
                 else: self.place(i, j, block_data)
-                    
 
+    def save_map_file(self):
+        if self.player is None: return
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save a PTB Map", "", "*.ptb")
+        if not file_name: return
+        block_list, info = self.get_combined_info()
+        world = {"world":block_list}
+        script = self.comp.compile(self.scripts) if not self.scripts is None else None
+        print(script)
+        texts = self.texts[:-1] if not self.texts is None else None
+        com = compressor()
+        com.insert_normal(world, script, texts)
+        com.compress()
+        com.save(file_name)
+
+    def get_combined_info(self):
+        block_list = []
+        ids = {4: 450, 5: 700, 6: 900, 7: 20, 8: 150, 9: 55, 11: 80, 12: 0, 13: 260}
+        item_keys= {4: "bombs", 5: "exp", 7: "dynamite", 8: "time_bombs", 9: "health", 11: "damage", 12: "nukes"}
+        info = {
+            "enemys": {"damage": [], "no-damage": []},
+            "items": {"bombs": 0, "exp": 0, "dynamite": 0, "time_bombs": 0, "nukes": 0, "health": 0, "damage": 0},
+            "blocks": 0
+        }
+
+        for i in range(25):
+            temp = []
+            for j in range(25):
+                block = self.blocks[i][j]
+                if not block:
+                    temp.append({"id": -1, "objectData": {}})
+                    continue
+                print(block.texture)
+                if block.texture == 10:
+                    health, mode = block.get_enemy()
+                    block_info = {"id": 6, "objectData": {"health": health, "id2": mode, "id1": 1}}
+                    info["enemys"]["no-damage" if block.damage == 2 else "damage"].append(health)
+                elif block.texture in ids:
+                    start = ids[block.texture]
+                    block_info = {"id": 5, "objectData": {"start": start, "fin": start}}
+                    if block.texture in item_keys: 
+                        item_key = item_keys[block.texture] 
+                        info["items"][item_key] += 1
+                elif block.texture == 3:
+                    block_info = {"id": 3, "objectData": {}}
+                    info["blocks"] += 1
+                elif block.texture == 2:
+                    block_info = {"id": 4, "objectData": {}}
+                elif block.texture == 1:
+                    block_info = {"id": 0, "objectData": {}}
+                elif block.texture == 0:
+                    block_info = {"id": 2, "objectData": {}}
+                else:
+                    print(block.texture)
+                
+                temp.append(block_info)
+            block_list.append(temp)
+    
+        return block_list, info
+
+    def pick_coords(self):
+        for i in range(len(self.textures)+1):
+            button = getattr(self.ui, f"block_button_{i}")
+            button.setEnabled(False)
+        self.menuBar().setEnabled(False)
+        self.ui.next_page_btn.setDisabled(False)
+        self.ui.imagePainter.mousePressEvent = lambda event: self.get_coords_on_mouse_click()
+    
+    def get_coords_on_mouse_click(self):
+        x,y = self.get_pos()
+        self.coord_signal.emit(x,y)
+        self.ui.imagePainter.mousePressEvent = self.mouse_click_event
+        for i in range(len(self.textures)+1):
+            button = getattr(self.ui, f"block_button_{i}")
+            button.setEnabled(True)
+        self.menuBar().setEnabled(True)
+        self.ui.next_page_btn.setDisabled(True)
+        
 class Block():
     def __init__(self, x,y,texture_id, block_id, damage, health):
         self.x = x
         self.y = y
         self.texture = texture_id
         self.id = block_id
-        self.health = damage
-        self.damage = health
+        self.health = damage if texture_id == 10 else None
+        self.damage = health if texture_id == 10 else None
         self.edit = True if self.texture == 10 else False
     def get_block(self):
         return self.texture
     def get_enemy(self):
         if self.texture == 10:
             return (self.health, self.damage)
+
+class ScriptEditor(QDialog):
+    def __init__(self, parent:MainWindow):
+        super().__init__(parent=parent)
+        self.parent = parent
+        self.setWindowTitle("Custom Dialog")
+        self.setFixedSize(500, 575)  # Set the window dimensions
+        
+        layout = QVBoxLayout()
+        
+        layout.setMenuBar(self.create_menu())
+
+        self.text_edit = QTextEdit()
+        layout.addWidget(self.text_edit)
+
+        compile_btn = QPushButton("OK")
+        compile_btn.setObjectName("script_compile_dialog_btn")
+        compile_btn.clicked.connect(self.accept)
+        layout.addWidget(compile_btn, alignment=Qt.AlignCenter)
+
+        self.setLayout(layout)
+        self.exec()
+    def create_menu(self):
+        menu = QMenuBar(self)
+        
+        tool_menu = QMenu(menu)
+        tool_menu.setTitle("Tools")
+        pick_coords_action = QAction(self)
+        pick_coords_action.setText("Pick Coordinates")
+        pick_coords_action.setShortcut("Ctrl+Shift+C")
+        pick_coords_action.triggered.connect(lambda: self.pick_coordinates())
+        tool_menu.addAction(pick_coords_action)
+        
+        menu.addMenu(tool_menu)
+        return menu
+    def pick_coordinates(self):
+        self.hide()
+        self.parent.pick_coords()
+        self.parent.coord_signal.connect(self.insert_coords)
+    def insert_coords(self, x, y):
+        self.show()
+        cursor = self.text_edit.textCursor()
+        cursor.insertText(f"{x} {y}")
+        self.parent.coord_signal.disconnect()
 
 if __name__ == "__main__":
     app = QApplication([])
