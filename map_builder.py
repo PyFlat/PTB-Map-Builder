@@ -2,6 +2,7 @@ import sys
 
 from MainWindow import Ui_MainWindow
 from CustomSyntaxHighlighter import CustomSyntaxHighlighter
+from src.CustomTextEdit import CustomTextEdit
 sys.dont_write_bytecode = True
 from tkinter import *
 from tkinter import messagebox, filedialog
@@ -15,6 +16,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
+import src.KEYWORDS
 
 # class Window():
 #     def __init__(self, width, height):
@@ -1003,8 +1005,8 @@ class ScriptEditor(QDialog):
         
         layout.setMenuBar(self.create_menu())
 
-        self.text_edit = QTextEdit()
-        highlighter = CustomSyntaxHighlighter(self.text_edit.document())
+        self.text_edit = CustomTextEdit(self.get_keywords())
+        CustomSyntaxHighlighter(self.text_edit.document())
         layout.addWidget(self.text_edit)
 
         compile_btn = QPushButton("OK")
@@ -1014,7 +1016,14 @@ class ScriptEditor(QDialog):
 
         self.setLayout(layout)
         self.exec()
-        
+    
+    def get_keywords(self):
+        ret = []
+        for keywordlist in src.KEYWORDS.keywords:
+            for keyword in keywordlist["keywords"]:
+                ret.append(keyword)
+        return ret
+    
     def create_menu(self):
         menu = QMenuBar(self)
         
