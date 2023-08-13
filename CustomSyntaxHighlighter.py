@@ -50,16 +50,23 @@ class CustomSyntaxHighlighter(QSyntaxHighlighter):
     def highlightBlock(self, text):
         self.setFormat(0, len(text), QTextCharFormat())  # Clear existing formatting
 
-        if not any(rule.match(text).hasMatch() for rule, _ in self.highlighting_rules):
+        has_valid_syntax = any(rule.match(text).hasMatch() for rule, _ in self.highlighting_rules)
+
+        if not has_valid_syntax:
             # Apply error format to non-matching text
             self.setFormat(0, len(text), self.error_format)
 
         for keywordlist in self.unique_keywords:
+            unique_format = QTextCharFormat()
+            unique_format.merge(keywordlist[1])  # Apply unique color
+            if not has_valid_syntax:
+                unique_format.merge(self.error_format)  # Merge with error format
+
             for keyword in keywordlist[0]:
                 index = text.find(keyword)
                 while index != -1:
-                    self.setFormat(index, len(keyword), keywordlist[1])
+                    self.setFormat(index, len(keyword), unique_format)
                     index = text.find(keyword, index + 1)
-                
-                
+
         self.setCurrentBlockState(0)
+
