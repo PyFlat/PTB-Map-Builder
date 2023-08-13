@@ -1,6 +1,7 @@
 import sys
 
 from MainWindow import Ui_MainWindow
+from CustomSyntaxHighlighter import CustomSyntaxHighlighter
 sys.dont_write_bytecode = True
 from tkinter import *
 from tkinter import messagebox, filedialog
@@ -704,7 +705,7 @@ class MainWindow(QMainWindow):
         
         self.ui = Ui_MainWindow() # Setup the Ui from the Designer
         self.ui.setupUi(self)
-
+        
         self.connect_menu()
         
         self.ui.stackedWidget_2.setCurrentIndex(0)
@@ -736,6 +737,9 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_title) # Update the title to the current mouse pos
         self.timer.start(10)
+        self.timer2 = QTimer(self)
+        self.timer2.timeout.connect(self.update_current_block)
+        self.timer2.start(25)
         self.drawing = False
         self.ui.imagePainter.mousePressEvent = self.mouse_click_event # Bind the Mouse Click
         self.ui.imagePainter.mouseMoveEvent = self.mouseMove # Bind Mouse Move
@@ -785,6 +789,9 @@ class MainWindow(QMainWindow):
         current_index = self.ui.stackedWidget_2.currentIndex()
         self.ui.prev_page_btn.setEnabled(current_index > 0)
         self.ui.next_page_btn.setEnabled(current_index < self.ui.stackedWidget_2.count() - 1)
+
+    def update_current_block(self):
+        self.ui.current_left_block.setPixmap(QPixmap(self.textures[self.texture_left]))
 
     def place(self, x, y, texture_idx, god_mode=False, damage=None, health=None):
         if not god_mode:
@@ -997,6 +1004,7 @@ class ScriptEditor(QDialog):
         layout.setMenuBar(self.create_menu())
 
         self.text_edit = QTextEdit()
+        highlighter = CustomSyntaxHighlighter(self.text_edit.document())
         layout.addWidget(self.text_edit)
 
         compile_btn = QPushButton("OK")

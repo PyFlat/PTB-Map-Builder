@@ -56,6 +56,7 @@ class Ui_MainWindow(object):
         self.widget_2 = QWidget(self.page)
         self.widget_2.setObjectName(u"widget_2")
         self.verticalLayout_5 = QVBoxLayout(self.widget_2)
+        self.verticalLayout_5.setSpacing(0)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.verticalLayout_5.setContentsMargins(-1, 0, -1, -1)
         self.stackedWidget_2 = QStackedWidget(self.widget_2)
@@ -293,6 +294,24 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.widget_3)
 
+        self.widget = QWidget(self.widget_2)
+        self.widget.setObjectName(u"widget")
+        self.horizontalLayout_2 = QHBoxLayout(self.widget)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.current_left_block = QLabel(self.widget)
+        self.current_left_block.setObjectName(u"current_left_block")
+
+        self.horizontalLayout_2.addWidget(self.current_left_block)
+
+        self.current_right_block = QLabel(self.widget)
+        self.current_right_block.setObjectName(u"current_right_block")
+
+        self.horizontalLayout_2.addWidget(self.current_right_block)
+
+
+        self.verticalLayout_5.addWidget(self.widget)
+
 
         self.horizontalLayout_4.addWidget(self.widget_2)
 
@@ -354,7 +373,6 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
         self.stackedWidget_2.setCurrentIndex(2)
 
 
@@ -405,9 +423,6 @@ class Ui_MainWindow(object):
         self.block_button_12.setText(QCoreApplication.translate("MainWindow", u"+ Nuclear", None))
         self.block_button_13.setText(QCoreApplication.translate("MainWindow", u" Shield", None))
         self.block_button_14.setText(QCoreApplication.translate("MainWindow", u"Delete", None))
-#if QT_CONFIG(shortcut)
-        
-#endif // QT_CONFIG(shortcut)
         self.block_button_15.setText(QCoreApplication.translate("MainWindow", u"Clear", None))
         self.block_button_16.setText(QCoreApplication.translate("MainWindow", u"Move", None))
         self.placeholder2.setText("")
@@ -416,6 +431,8 @@ class Ui_MainWindow(object):
         self.placeholder4.setText("")
         self.prev_page_btn.setText("")
         self.next_page_btn.setText("")
+        self.current_left_block.setText("")
+        self.current_right_block.setText("")
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuScripts.setTitle(QCoreApplication.translate("MainWindow", u"Scripts", None))
         self.menuTexts.setTitle(QCoreApplication.translate("MainWindow", u"Texts", None))

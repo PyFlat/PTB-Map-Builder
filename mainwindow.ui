@@ -21,7 +21,10 @@
 QWidget{
     background-color: #242424
 }
-
+QTextEdit{
+    color: white;
+    font-size: 20px;
+}
 QPushButton{
     text-align: left;
     padding: 5 5 5 10;
@@ -35,6 +38,14 @@ QPushButton{
 QPushButton:hover{
     background-color: #144870;
 }
+QPushButton#script_compile_dialog_btn{
+    text-align: center;
+    padding: 4 15 4 15;
+}
+QLabel{
+	font-size: 15px;
+	color: white;
+}
 QMenuBar{
     font-size: 15px;
     color: white;
@@ -43,8 +54,8 @@ QMenuBar{
 QMenu::item{
 	font-size: 12px;
 	color: white;
-	padding: 0 5 0 5;
-    margin: 5;
+	padding: 3 5 3 5;
+    margin: 3;
     border-radius: 5px;
 }
 QMenuBar::item{
@@ -68,6 +79,9 @@ QMenu::item:selected, QMenuBar::item:selected{
 QPushButton#next_page_btn, QPushButton#prev_page_btn{
 	text-align: center;
 	padding: 5 0 5 0;
+}
+QPushButton#next_page_btn:disabled, QPushButton#prev_page_btn:disabled{
+	border-color: #999999;
 }
 QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QPushButton#placeholder4{
     border: none;
@@ -93,9 +107,6 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
     </property>
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
       <widget class="QWidget" name="page">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <property name="spacing">
@@ -116,6 +127,9 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
         <item>
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="topMargin">
             <number>0</number>
            </property>
@@ -432,9 +446,6 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
                    <height>25</height>
                   </size>
                  </property>
-                 <property name="shortcut">
-                  <string>Ctrl+Shift+E</string>
-                 </property>
                 </widget>
                </item>
                <item>
@@ -578,6 +589,38 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
                   <width>32</width>
                   <height>32</height>
                  </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="current_left_block">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="current_right_block">
+                <property name="text">
+                 <string/>
                 </property>
                </widget>
               </item>
