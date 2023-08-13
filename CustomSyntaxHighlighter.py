@@ -2,7 +2,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-import RULES, src.KEYWORDS
+import src.RULES, src.KEYWORDS
 
 
 class CustomSyntaxHighlighter(QSyntaxHighlighter):
@@ -15,7 +15,7 @@ class CustomSyntaxHighlighter(QSyntaxHighlighter):
 
         self.highlighting_rules = []
 
-        for comm in RULES.COMMANDS:
+        for comm in src.RULES.COMMANDS:
             self.add_rule(comm, Qt.yellow)
 
         

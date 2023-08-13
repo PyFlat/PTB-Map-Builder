@@ -1,5 +1,7 @@
 import sys
 
+import PySide6.QtGui
+
 from MainWindow import Ui_MainWindow
 from CustomSyntaxHighlighter import CustomSyntaxHighlighter
 from src.CustomTextEdit import CustomTextEdit
@@ -16,7 +18,9 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-import src.KEYWORDS
+import src.KEYWORDS, src.RULES
+
+import re
 
 # class Window():
 #     def __init__(self, width, height):
@@ -620,7 +624,6 @@ import src.KEYWORDS
 #         self.window.master.destroy()
 #         self.window.master.quit()
 #         Script_Editor.running = False
-        
 # class Text_Editor():
 #     running = False
 #     def __init__(self, blocks):
@@ -817,7 +820,11 @@ class MainWindow(QMainWindow):
     def connect_menu(self):
         self.ui.actionOpen.triggered.connect(lambda: self.load_map_file())
         self.ui.actionSave.triggered.connect(lambda: self.save_map_file())
-        self.ui.actionEdit_Scripts.triggered.connect(lambda: ScriptEditor(self))
+        self.ui.actionEdit_Scripts.triggered.connect(lambda: self.start_script_editor())
+        
+    def start_script_editor(self):
+        sc = ScriptEditor(self, self.scripts)
+        self.scripts = sc.get_text()
 
     def remove(self, x, y):
         id = self.blocks[x][y].id
@@ -995,9 +1002,10 @@ class Block():
             return (self.health, self.damage)
 
 class ScriptEditor(QDialog):
-    def __init__(self, parent:MainWindow):
+    def __init__(self, parent:MainWindow, scripts):
         super().__init__(parent=parent)
         self.parent = parent
+        self.start_scripts = scripts
         self.setWindowTitle("Custom Dialog")
         self.setFixedSize(500, 575)  # Set the window dimensions
         
@@ -1007,16 +1015,34 @@ class ScriptEditor(QDialog):
 
         self.text_edit = CustomTextEdit(self.get_keywords())
         CustomSyntaxHighlighter(self.text_edit.document())
+        self.text_edit.setPlainText(self.start_scripts)
         layout.addWidget(self.text_edit)
 
-        compile_btn = QPushButton("OK")
+        compile_btn = QPushButton("Save")
         compile_btn.setObjectName("script_compile_dialog_btn")
-        compile_btn.clicked.connect(self.accept)
+        compile_btn.clicked.connect(self.try_compile)
         layout.addWidget(compile_btn, alignment=Qt.AlignCenter)
 
         self.setLayout(layout)
         self.exec()
-    
+    def closeEvent(self, event):
+        if self.text_edit.toPlainText() == self.start_scripts: 
+            self.accept()
+            self.text = self.start_scripts
+            return
+        message_box = QMessageBox(self.parent)
+        message_box.setWindowTitle("Syntax Error")
+        message_box.setText("Do you want to save the change you made?")
+        message_box.setIcon(QMessageBox.Warning)
+        message_box.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+        result = message_box.exec()
+        if result == QMessageBox.Save:
+            self.try_compile()
+            event.accept()
+        elif result == QMessageBox.Discard:
+            event.accept()
+        elif result == QMessageBox.Cancel:
+            event.ignore()
     def get_keywords(self):
         ret = []
         for keywordlist in src.KEYWORDS.keywords:
@@ -1046,6 +1072,37 @@ class ScriptEditor(QDialog):
         cursor = self.text_edit.textCursor()
         cursor.insertText(f"{x} {y}")
         self.parent.coord_signal.disconnect()
+
+    def check_for_syntax_errors(self, script):
+        lines = script.split("\n")
+        errors = []
+        for i, line in enumerate(lines):
+            ok = False
+            for rule in src.RULES.COMMANDS:
+                if re.match(rule, line):
+                    ok = True
+                    break
+            if not ok:
+                errors.append(i)
+        return errors
+
+    def try_compile(self):
+        complete_text = self.text_edit.toPlainText()
+        errors = self.check_for_syntax_errors(complete_text)
+        if errors != [] and complete_text != "":
+            message_box = QMessageBox(self.parent)
+            message_box.setWindowTitle("Syntax Error")
+            error_lines = '\n'.join([f"Line: {error+1}" for error in errors])
+            error_message = f"Syntax Error:\n{error_lines}"
+            message_box.setText(error_message)
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setStandardButtons(QMessageBox.Ok)
+            message_box.exec()
+        self.text = complete_text
+        self.accept()
+    def get_text(self):
+        return self.text
+        
 
 if __name__ == "__main__":
     app = QApplication([])
