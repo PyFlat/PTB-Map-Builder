@@ -708,7 +708,7 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
      <string>Enemys</string>
     </property>
     <addaction name="actionEdit_All"/>
-    <addaction name="actionAdit_One"/>
+    <addaction name="actionEdit_One"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuScripts"/>
@@ -758,7 +758,7 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
     <string>Edit All</string>
    </property>
   </action>
-  <action name="actionAdit_One">
+  <action name="actionEdit_One">
    <property name="text">
     <string>Edit One</string>
    </property>

@@ -22,73 +22,7 @@ import src.KEYWORDS, src.RULES
 
 import re
 
-# class Window():
-#     def __init__(self, width, height):
-#         self.master = Tk()
-#         self.master.geometry(str(width)+"x"+str(height))
-#         self.master.resizable(width=0, height=0)
-# class MainDisplay():
-#     def __init__(self, block_manager):
-#         self.bm = block_manager
-#         self.window = Window(580, 500)
-#         self.master = self.window.master
-#         self.top = None
-#         self.active = True
-#         self.w = Canvas(self.master, highlightthickness=0)
-#         self.w.pack()
-#         self.w.place(x=80, y=0, width=500, height=500)
-#         self.path = str(pathlib.Path(__file__).parent.absolute()) + "/textures/"
-#         self.files = os.listdir(self.path)
-#         self.addpath = "textures/"
-#         f = Button(self.master, bg = "blue", command=partial(self.bm.load_from_json))
-#         f.place(x=15, y=430, width=20, height=20) 
-#         l = Button(self.master, bg = "orange", command=partial(self.bm.set_texture, -1))
-#         l.place(x=15, y=460, width=20, height=20)
-#         l.bind("<Button-3>", lambda ev: self.bm.set_texture(-1, False))
-#         c = Button(self.master, bg = "red", command=partial(self.bm.reset))
-#         c.place(x=45, y=460, width=20, height=20)
-#         editor = Button(self.master, text="Scripts", bg="black", fg="white", command=partial(Script_Editor, self.bm))
-#         editor.place(x=15, y=370, width=50, height=20)
-#         editor = Button(self.master, text="Texts", bg="black", fg="white", command=partial(Text_Editor, self.bm))
-#         editor.place(x=15, y=340, width=50, height=20)
-#         save = Button(self.master, bg = "green", command=partial(self.bm.save_to_file))
-#         save.place(x=45, y=430, width=20, height=20)
-#         self.bl = Button(self.master, bg="white", border = 0)
-#         self.bl.place(x=15, y=400, width=20, height=20)
-#         self.br = Button(self.master, bg="white", border = 0)
-#         self.br.place(x=45, y=400, width=20, height=20)
-#         self.load_images_background()
-#         self.create_buttons()
-#         self.master.protocol("WM_DELETE_WINDOW", self.on_close)
-#     def load_images_background(self):
-#         for i in range(0, len(self.files)):
-#             self.bm.textures.append(PhotoImage(file=self.addpath + self.files[i]))
-#         for i in range(23):
-#             for j in range(23):
-#                 if (i%2==0 and j%2==0) or (i%2!=0 and j%2!=0):
-#                     self.w.create_image((i+1)*20+10, (j+1)*20+10, image = self.bm.textures[14])
-#                 else:
-#                     self.w.create_image((i+1)*20+10, (j+1)*20+10, image = self.bm.textures[15])
-#     def create_buttons(self):
-#         for i in range(len(self.bm.textures)-2):
-#             l = Button(self.master, image=self.bm.textures[i], border=1,command=partial(self.bm.set_texture, i))
-#             l.bind("<Button-3>", partial(self.bm.set_texture, i, False))
-#             if i %2==0:
-#                 x=15
-#                 l.place(x=x, y=(i*20)+20, width=20, height=20)
-#             else:
-#                 x=45
-#                 l.place(x=x, y=(i*20), width=20, height=20)
-#             if i == 10:
-#                 l.bind("<Shift-Button-1>", lambda ev: Enemy_Editor(True))
-#     def place_bedrock(self):
-#         self.bm.set_texture(1)
-#         for i in range(25):
-#             self.bm.place(i, 0)
-#             self.bm.place(0,i)
-#             self.bm.place(24,i)
-#             self.bm.place(i, 24)
-#         self.bm.set_texture(-1)
+
 #     def bind_buttons(self):
 #         self.master.bind("<space>", lambda ev: self.bm.start_move())
 #         self.master.bind("<KeyRelease-space>", lambda ev: self.bm.stop_move())
@@ -450,180 +384,7 @@ import re
 #         com.insert_normal(World, script, texts)
 #         com.compress()
 #         com.save(path)
-# class Script_Editor():
-#     running = False
-#     def __init__(self, blocks):
-#         self.bm = blocks
-#         self.current_word = ""
-#         self.autocomplete_list = []
-#         self.autocomplete_index = 0
-#         if Script_Editor.running: return
-#         Script_Editor.running = True
-#         self.window = Window(600, 600)
-#         self.window.master.config(bg="#3c3c3c")
-#         self.window.master.title("Scripts")
-#         self.textfeld = Text(self.window.master, relief="flat", font="Calibri 20", bg="#1f1f1f", fg="white", insertbackground="white", undo=True)
-#         self.textfeld.place(x=25, y=25, height=525, width=550)
-#         self.textfeld.bind("<KeyRelease>", self.highlight_syntax)
-#         self.textfeld.bind("<Control-BackSpace>", self.delete_whole_word)
-#         self.textfeld.bind("<Tab>", self.on_tab_press)
-#         self.textfeld.bind("<Down>", self.on_down_press)
-#         self.textfeld.bind("<Up>", self.on_up_press)
-#         if self.bm.scripts != None:
-#             self.textfeld.insert("1.0",self.bm.scripts)
-#         self.highlight_syntax()
-#         self.submit = Button(self.window.master,relief="flat", text="Submit",bg="orange",fg="white", font="Calibri 20", activeforeground="orange", activebackground="white", border = 0, command=lambda:[self.compile_text(),self.destroy()])
-#         self.submit.place(x=200, y=560, height=30, width=200)
-#         self.window.master.protocol("WM_DELETE_WINDOW", self.destroy)
-        
-        
-#     def check_autofill(self, event):
-#         if event:
-#             if event.keysym == "BackSpace":
-#                 return
-#         self.update_autocomplete_list()
-#         if self.autocomplete_list:
-#             if len(event.keysym) == 1:
-#                 self.show_autocomplete_text()
 
-#     def on_tab_press(self, event):
-#         if self.autocomplete_list:
-#             self.remove_autocomplete_text()
-#             cursor_position = float(self.textfeld.index(INSERT))
-#             start = cursor_position-(len(self.current_word)/10)
-#             if start < 1: start = 1.0
-#             end = start+len(self.autocomplete_list[self.autocomplete_index])/10
-#             self.textfeld.mark_set(INSERT, end)
-#             return "break"
-
-#     def on_down_press(self, event):
-#         if self.autocomplete_list:
-#             self.autocomplete_index = (self.autocomplete_index + 1) % len(self.autocomplete_list)
-#             self.show_autocomplete_text()
-
-#     def on_up_press(self, event):
-#         if self.autocomplete_list:
-#             self.autocomplete_index = (self.autocomplete_index - 1) % len(self.autocomplete_list)
-#             self.show_autocomplete_text()
-
-#     def update_autocomplete_list(self):
-#         current_word = self.get_current_word()
-#         if current_word != self.current_word and len(current_word)>0:
-#             self.current_word = current_word
-#             self.autocomplete_list = self.get_autocomplete_list(self.current_word)
-
-#     def get_current_word(self):
-#         cursor_position = self.textfeld.index(INSERT)
-#         line, col = map(int, cursor_position.split('.'))
-#         current_line_text = self.textfeld.get(f"{line}.0", f"{line}.end")
-#         words = current_line_text.split()
-#         if words:
-#             current_word = words[min(col - 1, len(words) - 1)]
-#             return current_word
-#         return ""
-
-#     def get_autocomplete_list(self, partial_word):
-#         autocomplete_list = []
-#         for keyword_set in self.keywords:
-#             for keyword in keyword_set["keywords"]:
-#                 if keyword.startswith(partial_word):
-#                     autocomplete_list.append(keyword)
-#         return autocomplete_list
-
-#     def show_autocomplete_text(self):
-#         if self.autocomplete_list:
-#             cursor_position = self.textfeld.index(INSERT)
-#             options_text = self.autocomplete_list[self.autocomplete_index][len(self.current_word):]
-#             self.textfeld.insert(INSERT, options_text)
-#             self.textfeld.tag_add("sel", "insert - %dc" % len(options_text), INSERT)
-#             self.textfeld.mark_set(INSERT, cursor_position)
-
-#     def remove_autocomplete_text(self):
-#         self.textfeld.tag_remove("sel", "1.0", "end")
-
-        
-#     def highlight_syntax(self, event=None):
-#         self.keywords = [
-#             {"keywords" : ['on_init', 'on_collect', 'on_step', 'on_explode', "on_destroy", "on_tick"],
-#             "color": "#dcdcaa",
-#             "name": "trigger"
-#             },
-#             {"keywords" : ['@', "end", "win", "loose", "add", "subtract", "multiply", "divide", "set", "reset", "store", "set_item", "drawImage", "drawRect", "clear", "compare", "jump", "setFlag", "tp", "jumpRelative", "createMemory", "loadToMemory", "loadFromMemory", "randomNumber", "loadFromPointer"],
-#             "color": "#2667ca",
-#             "name": "commands"
-#             },
-#             {"keywords" : ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"],
-#             "color": "#a7ce9b",
-#             "name": "number"
-#             },
-#             {"keywords" : ['=>', "="],
-#             "color": "#9cdcfe",
-#             "name": "variables"
-#             },
-#             {"keywords": ["player.health", "player.bombs", "player.range", "player.dynamite", "player.timed_bombs", "player.damage", "player.nukes",],
-#             "color": "#c3602d",
-#             "name": "player_set"}
-#         ]
-#         #self.check_autofill(event)
-#         self.remove_all_highlights(event)
-#         for key in self.keywords:
-#             self.apply_highlight(key["name"], key["keywords"], key["color"])
-
-#     def remove_all_highlights(self, event=None):
-#         if event and "Shift" in event.keysym:
-#             return
-#         for tag in self.textfeld.tag_names():
-#             if tag != "sel":
-#                 self.textfeld.tag_remove(tag, '1.0', END)
-
-#     def apply_highlight(self, name, keywords, color):
-#         self.textfeld.tag_configure(name, foreground=color)
-#         for keyword in keywords:
-#             start = '1.0'
-#             while True:
-#                 pos = self.textfeld.search(keyword, start, stopindex=END)
-#                 if not pos:
-#                     break
-#                 next_char = self.textfeld.get(f'{pos}+{len(keyword)}c')
-#                 if next_char == " " or next_char == "\n":
-#                     end = f'{pos}+{len(keyword)}c'
-#                     self.textfeld.tag_add(name, pos, end)
-#                 start = f'{pos}+1c'
-                
-#     def delete_whole_word(self, event):
-#         cursor_position = self.textfeld.index(INSERT)
-
-#         start_index = self.textfeld.search(r'\s', cursor_position, backwards=True, regexp=True, stopindex="1.0")
-#         if not start_index:
-#             start_index = "1.0"
-#         self.textfeld.delete(start_index, cursor_position)
-
-#     def apply_highlight(self, name, keywords, color):
-#         self.textfeld.tag_configure(name, foreground=color)
-#         for keyword in keywords:
-#             start = '1.0'
-#             while True:
-#                 pos = self.textfeld.search(keyword, start, stopindex=END)
-#                 if not pos:
-#                     break
-#                 next_char = self.textfeld.get(f'{pos}+{len(keyword)}c')
-#                 if next_char == " " or next_char == "\n":
-#                     end = f'{pos}+{len(keyword)}c'
-#                     self.textfeld.tag_add(name, pos, end)
-#                 start = f'{pos}+1c'
-                
-
-#     def compile_text(self):
-#         self.bm.scripts = self.textfeld.get("1.0",END)
-#         try: 
-#             self.bm.comp.compile(self.bm.scripts)
-#         except compilerError as e:
-#             line, x, y = e.get()
-#             print(line, x,y)
-#     def destroy(self):
-#         self.window.master.destroy()
-#         self.window.master.quit()
-#         Script_Editor.running = False
 # class Text_Editor():
 #     running = False
 #     def __init__(self, blocks):
@@ -647,56 +408,7 @@ import re
 #         self.window.master.destroy()
 #         self.window.master.quit()
 #         Text_Editor.running = False
-# class Enemy_Editor():
-#     running = False
-#     def __init__(self, gen):
-#         self.general = gen
-#         self.pos_x, self.pos_y = bm.get_pos()
-#         self.block = bm.blocks[self.pos_x][self.pos_y]
-#         if ((self.block == None or self.block.edit == False) and (self.general == False)) or Enemy_Editor.running:
-#             return
-#         Enemy_Editor.running = True
-#         self.enem_win = Window(250, 150)
-#         self.enem_win.master.protocol("WM_DELETE_WINDOW", partial(self.destroy, self.enem_win))
-#         self.l1 = Label(self.enem_win.master, text="Health:", justify="center", font="Calibri 15")
-#         self.l1.place(x=0, y=0, width=250)
-#         self.e1 = Entry(self.enem_win.master)
-#         self.e1.place(x=0,y=35,width=250)
-#         self.l2 = Label(self.enem_win.master, text="Damage:", justify="center", font="Calibri 15")
-#         self.l2.place(x=0, y=60, width=250)
-#         self.var = IntVar(self.enem_win.master)
-#         self.b1 = Button(self.enem_win.master, text="Save", font="Calibri 15", command=lambda:[self.set_value()])
-#         self.b1.place(x=0, y=125, width= 250, height=25)
-#         self.radio_1  = Radiobutton(self.enem_win.master, text="OFF", variable=self.var, value=1)
-#         self.radio_1.place(x=0, y=95, width=125)
-#         self.radio_2 = Radiobutton(self.enem_win.master, text="ON", variable=self.var, value=2)
-#         self.radio_2.place(x=125, y=95, width=125)
-#         if not self.general:
-#             self.var.set(self.block.damage)
-#             self.set_health(self.block.health)
-#         else:
-#             self.var.set(bm.enemy_damage)
-#             self.set_health(bm.enemy_health)
-#     def set_health(self, health):
-#         self.e1.delete(1)
-#         self.e1.insert(1, health)
-#     def set_value(self):
-#         health = self.e1.get()
-#         if not health.isdigit() or int(health) <= 0:
-#             health = 1
-#         else:
-#             health = int(health)
-#         if self.general:
-#             bm.enemy_damage = self.var.get()
-#             bm.enemy_health = health
-#         else:
-#             bm.blocks[self.pos_x][self.pos_y].damage = self.var.get()
-#             bm.blocks[self.pos_x][self.pos_y].health = health
-#         self.destroy()
-#     def destroy(self, *args):
-#         Enemy_Editor.running = False
-#         self.enem_win.master.destroy()
-        
+    
 class Utils():
     def get_abs_path(relative_path):
         base_path = getattr(sys,'_MEIPASS',os.path.dirname(os.path.abspath(__file__)))
@@ -725,7 +437,7 @@ class MainWindow(QMainWindow):
         self.texture_left = 0
         self.texture_right = 0
         
-        self.enemy_damage = 1
+        self.enemy_damage = False
         self.enemy_health = 1
         
         self.player = None
@@ -821,10 +533,88 @@ class MainWindow(QMainWindow):
         self.ui.actionOpen.triggered.connect(lambda: self.load_map_file())
         self.ui.actionSave.triggered.connect(lambda: self.save_map_file())
         self.ui.actionEdit_Scripts.triggered.connect(lambda: self.start_script_editor())
+        self.ui.actionEdit_One.triggered.connect(lambda: self.edit_enemy())
+        self.ui.actionEdit_All.triggered.connect(lambda: self.show_every_block())
         
     def start_script_editor(self):
         sc = ScriptEditor(self, self.scripts)
         self.scripts = sc.get_text()
+        
+    def edit_enemy(self):
+        self.show_only_enemy_blocks()
+        self.set_builder_items_enabled(False)
+        self.ui.imagePainter.mousePressEvent = self.edit_enemy_event
+    
+    def end_edit_enemy(self):
+        self.show_every_block()
+        self.set_builder_items_enabled(True)
+        self.ui.imagePainter.mousePressEvent = self.mouse_click_event
+    
+    def edit_enemy_event(self, event):
+        x,y = self.get_pos()
+        if self.blocks[x][y] is None: return
+        if self.blocks[x][y].get_block() == 10:
+            health, damage = self.blocks[x][y].get_enemy()
+            health, damage = self.enemy_edit_messagebox(health, damage)
+            self.blocks[x][y].set_enemy(int(health), damage)
+            self.end_edit_enemy()
+
+    def enemy_edit_messagebox(self, health:int, damage:bool):
+        messagebox = QDialog(self)
+        messagebox.setObjectName("enemy_edit_msgbox")
+        layout = QVBoxLayout()
+        
+        main_widget = QStackedWidget()
+        
+        page1_layout = QVBoxLayout()
+        label = QLabel("Set the enemy's health")
+        page1_layout.addWidget(label)
+        line_edit = QLineEdit()
+        line_edit.setText(str(health))
+        line_edit.setValidator(QIntValidator())
+        page1_layout.addWidget(line_edit)
+        next_button = QPushButton("Next")
+        next_button.clicked.connect(lambda: main_widget.setCurrentIndex(1))
+        page1_layout.addWidget(next_button)
+        
+        main_widget.addWidget(QWidget()) 
+        main_widget.addWidget(QWidget())
+        
+        main_widget.widget(0).setLayout(page1_layout)
+
+        page2_layout = QVBoxLayout()
+        checkbox = QCheckBox("Enemy Damage")
+        checkbox.setChecked(damage)
+        page2_layout.addWidget(checkbox)
+        page2_layout2 = QHBoxLayout()
+        last_button = QPushButton("Back")
+        last_button.clicked.connect(lambda: main_widget.setCurrentIndex(0))
+        page2_layout2.addWidget(last_button)
+        ok_button = QPushButton("OK")
+        ok_button.clicked.connect(lambda: messagebox.accept())
+        page2_layout2.addWidget(ok_button)
+        page2_layout.addLayout(page2_layout2)
+        main_widget.widget(1).setLayout(page2_layout)
+
+        layout.addWidget(main_widget)
+        messagebox.setLayout(layout)
+
+        main_widget.setCurrentIndex(0)
+
+        messagebox.exec()
+        return (line_edit.text(), checkbox.isChecked())
+        
+    def show_only_enemy_blocks(self):
+        for blocklists in self.blocks:
+            for block in blocklists:
+                if block is not None and block.get_block() != 10 and block.get_block() != 1:
+                    self.ui.imagePainter.set_image_visibility(block.get_id(), False)
+    
+    def show_every_block(self):
+        for blocklists in self.blocks:
+            for block in blocklists:
+                if block is not None and block.get_block() != 10 and block.get_block() != 1:
+                    self.ui.imagePainter.set_image_visibility(block.get_id(), True)
 
     def remove(self, x, y):
         id = self.blocks[x][y].id
@@ -906,7 +696,8 @@ class MainWindow(QMainWindow):
         for i, row in enumerate(loaded_blocks):
             for j, block_data in enumerate(row):
                 if block_data is None: self.blocks[i][j] = None
-                elif isinstance(block_data, list): self.place(i, j, *block_data)
+                elif isinstance(block_data, list): 
+                    self.place(i, j, texture_idx=block_data[0], health=block_data[1], damage=block_data[2])
                 else: self.place(i, j, block_data)
 
     def save_map_file(self):
@@ -968,23 +759,23 @@ class MainWindow(QMainWindow):
     
         return block_list, info
 
-    def pick_coords(self):
+    def set_builder_items_enabled(self, enabled:bool):
         for i in range(len(self.textures)+1):
             button = getattr(self.ui, f"block_button_{i}")
-            button.setEnabled(False)
-        self.menuBar().setEnabled(False)
-        self.ui.next_page_btn.setEnabled(False)
+            button.setEnabled(enabled)
+        self.menuBar().setEnabled(enabled)
+        self.ui.next_page_btn.setEnabled(enabled)
+        self.ui.prev_page_btn.setEnabled(enabled)
+
+    def pick_coords(self):
+        self.set_builder_items_enabled(False)
         self.ui.imagePainter.mousePressEvent = lambda event: self.get_coords_on_mouse_click()
     
     def get_coords_on_mouse_click(self):
         x,y = self.get_pos()
         self.coord_signal.emit(x,y)
         self.ui.imagePainter.mousePressEvent = self.mouse_click_event
-        for i in range(len(self.textures)+1):
-            button = getattr(self.ui, f"block_button_{i}")
-            button.setEnabled(True)
-        self.menuBar().setEnabled(True)
-        self.ui.next_page_btn.setEnabled(True)
+        self.set_builder_items_enabled(True)
         
 class Block():
     def __init__(self, x,y,texture_id, block_id, damage, health):
@@ -992,22 +783,28 @@ class Block():
         self.y = y
         self.texture = texture_id
         self.id = block_id
-        self.health = damage if texture_id == 10 else None
-        self.damage = health if texture_id == 10 else None
+        self.health = health if texture_id == 10 else None
+        self.damage = damage if texture_id == 10 else None
         self.edit = True if self.texture == 10 else False
     def get_block(self):
         return self.texture
+    def get_id(self):
+        return self.id
     def get_enemy(self):
         if self.texture == 10:
             return (self.health, self.damage)
+    def set_enemy(self, health, damage):
+        if self.texture == 10:
+            self.health = health
+            self.damage = damage
 
 class ScriptEditor(QDialog):
     def __init__(self, parent:MainWindow, scripts):
         super().__init__(parent=parent)
         self.parent = parent
-        self.start_scripts = scripts
+        self.start_scripts = "" if scripts is None else scripts
         self.setWindowTitle("Custom Dialog")
-        self.setFixedSize(500, 575)  # Set the window dimensions
+        self.setFixedSize(500, 575)
         
         layout = QVBoxLayout()
         

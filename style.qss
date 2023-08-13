@@ -9,6 +9,21 @@ QPlainTextEdit{
     color: white;
     font-size: 20px;
 }
+QLineEdit{
+    color: white;
+    font-size: 20px;
+    qproperty-alignment: AlignCenter;
+    outline: none;
+    border: 2px solid #1f6aa5;
+    border-radius: 5px;
+}
+QDialog#enemy_edit_msgbox QLabel{
+    color: white;
+    font-size: 20px;
+}
+QDialog#enemy_edit_msgbox QPushButton{
+    text-align: center;
+}
 QListView {
     background-color: rgb(50, 50, 50);  /* Set the background color */
     color: rgb(200, 200, 200);  /* Set the text color */

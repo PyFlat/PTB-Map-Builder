@@ -31,8 +31,8 @@ class Ui_MainWindow(object):
         self.actionOpen.setObjectName(u"actionOpen")
         self.actionEdit_All = QAction(MainWindow)
         self.actionEdit_All.setObjectName(u"actionEdit_All")
-        self.actionAdit_One = QAction(MainWindow)
-        self.actionAdit_One.setObjectName(u"actionAdit_One")
+        self.actionEdit_One = QAction(MainWindow)
+        self.actionEdit_One.setObjectName(u"actionEdit_One")
         self.actionEdit_Scripts = QAction(MainWindow)
         self.actionEdit_Scripts.setObjectName(u"actionEdit_Scripts")
         self.actionEdit_2 = QAction(MainWindow)
@@ -369,7 +369,7 @@ class Ui_MainWindow(object):
         self.menuTexts.addAction(self.actionEdit_2)
         self.menuTexts.addAction(self.actionEdit_Texts)
         self.menuEnemys.addAction(self.actionEdit_All)
-        self.menuEnemys.addAction(self.actionAdit_One)
+        self.menuEnemys.addAction(self.actionEdit_One)
 
         self.retranslateUi(MainWindow)
 
@@ -401,7 +401,7 @@ class Ui_MainWindow(object):
         self.actionOpen.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+O", None))
 #endif // QT_CONFIG(shortcut)
         self.actionEdit_All.setText(QCoreApplication.translate("MainWindow", u"Edit All", None))
-        self.actionAdit_One.setText(QCoreApplication.translate("MainWindow", u"Edit One", None))
+        self.actionEdit_One.setText(QCoreApplication.translate("MainWindow", u"Edit One", None))
         self.actionEdit_Scripts.setText(QCoreApplication.translate("MainWindow", u"Edit Script", None))
 #if QT_CONFIG(shortcut)
         self.actionEdit_Scripts.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+S", None))
