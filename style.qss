@@ -62,7 +62,7 @@ QMessageBox QLabel{
     color: white;
 }
 QMessageBox QPushButton{
-    padding: 5;
+    padding: 5 10 5 10;
     text-align: center;
 }
 

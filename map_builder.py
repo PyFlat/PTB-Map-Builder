@@ -4,7 +4,7 @@ sys.dont_write_bytecode = True
 from src.MainWindow import Ui_MainWindow
 from src.CustomSyntaxHighlighter import CustomSyntaxHighlighter
 from src.CustomTextEdit import CustomTextEdit
-from src.PtbLoad import PtbLoad
+from src.PtbLoad import PtbLoader
 from src.compiler import *
 from src.compressor import *
 import src.KEYWORDS, src.RULES
@@ -437,6 +437,8 @@ class MainWindow(QMainWindow):
         self.scripts = None
         self.texts = None
         
+        self.current_project = None
+        
         self.comp = compiler()
         
         self.build_background() # Create The Grass Background
@@ -459,7 +461,7 @@ class MainWindow(QMainWindow):
             idx = -1 if i == len(self.textures)-2 else i
             button.mousePressEvent = lambda event=False, index=idx: self.set_textures(event=event, idx=index)
             
-        self.ui.block_button_15.clicked.connect(self.reset_all)
+        self.ui.block_button_15.clicked.connect(self.reset_all_button)
         
         
         self.ui.prev_page_btn.clicked.connect(lambda: self.previous_page())
@@ -478,7 +480,12 @@ class MainWindow(QMainWindow):
         self.set_textures(None, -1, False)
         
         self.show()
-
+        
+    def reset_all_button(self):
+        qms = QMessageBox(QMessageBox.Warning, "Warning", "Warning, do you really want to reset?", QMessageBox.Yes | QMessageBox.No, self)
+        ret = qms.exec()
+        if ret == QMessageBox.Yes:
+            self.reset_all()
         
     def switch_to_page(self, page_index):
         if 0 <= page_index < self.ui.stackedWidget_2.count():
@@ -530,6 +537,7 @@ class MainWindow(QMainWindow):
     def connect_menu(self):
         self.ui.actionOpen.triggered.connect(lambda: self.load_map_file())
         self.ui.actionSave.triggered.connect(lambda: self.save_map_file())
+        self.ui.actionSave_As.triggered.connect(lambda: self.save_map_file(True))
         self.ui.actionEdit_Scripts.triggered.connect(lambda: ScriptEditor(self, self.scripts))
         self.ui.actionEdit_One.triggered.connect(lambda: self.edit_enemy())
         self.ui.actionEdit_All.triggered.connect(lambda: self.edit_enemy_defaults())
@@ -689,22 +697,30 @@ class MainWindow(QMainWindow):
     def load_map_file(self):
         file_name, _ = QFileDialog.getOpenFileName(self, "Load a PTB Map", "", "*.ptb")
         if not file_name: return
+        self.current_project = file_name
         self.reset_all()
-        out = PtbLoad.load_ptb(file_name)
+        out = PtbLoader().load_file(file_name)
         #self.scripts = self.comp.decompile(out[1])
         loaded_blocks = out[0]
         self.texts = out[2]
         for i, row in enumerate(loaded_blocks):
             for j, block_data in enumerate(row):
-                if block_data is None: self.blocks[i][j] = None
+                if block_data is None: 
+                    self.blocks[i][j] = None
                 elif isinstance(block_data, list): 
                     self.place(i, j, texture_idx=block_data[0], health=block_data[1], damage=block_data[2])
                 else: self.place(i, j, block_data)
 
-    def save_map_file(self):
-        if self.player is None: return
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save a PTB Map", "", "*.ptb")
-        if not file_name: return
+    def save_map_file(self, saveAs = False):
+        if self.player is None: 
+            QMessageBox(QMessageBox.Warning, "Warning", "Warning: No player set!\nSet a player to save.", QMessageBox.Ok, self).exec()
+            return
+        if not saveAs and self.current_project is not None: 
+            file_name=self.current_project
+        else:
+            file_name, _ = QFileDialog.getSaveFileName(self, "Save a PTB Map", "", "*.ptb")
+            if not file_name: return
+        self.current_project = file_name
         block_list, info = self.get_combined_info()
         world = {"world":block_list}
         script = self.comp.compile(self.scripts) if not self.scripts is None else None
@@ -734,9 +750,7 @@ class MainWindow(QMainWindow):
                     continue
                 if block.texture == 10:
                     health, mode = block.get_enemy()
-                    print(mode)
                     mode = 1 if mode == False else 2
-                    print(mode)
                     block_info = {"id": 6, "objectData": {"health": health, "id2": mode, "id1": 1}}
                     info["enemys"]["no-damage" if block.damage == 2 else "damage"].append(health)
                 elif block.texture in ids:

@@ -51,7 +51,6 @@ class compressor():
                     print("[WARNING] Could not find or load texts")
         else:
             print("[ERROR] Unrecognizable File Format")
-        print("Loaded File: " + file)
     def insert_normal(self, world, scripts=None,texts=None):
         if scripts == None:
             scripts = b"\x00\x0d"
@@ -281,7 +280,6 @@ class compressor():
                 if byte_block_text_and_script[i+2] == 0:
                     texts.append(ctext)
                     ctext = ""
-                    print("LOL",texts)
                     script_first = i+2
                     break
                 texts.append(ctext)
