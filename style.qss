@@ -46,16 +46,24 @@ QDialog#enemy_edit_msgbox QPushButton{
     padding-left: 5px;
 }
 QListView {
-    background-color: rgb(50, 50, 50);  /* Set the background color */
-    color: rgb(200, 200, 200);  /* Set the text color */
-    border: 1px solid rgb(100, 100, 100);  /* Add border to the popup */
+    background-color: rgb(50, 50, 50);
+    color: rgb(200, 200, 200);
+    border: 1px solid rgb(100, 100, 100); 
+    outline: none;
+}
+QListView#text_edit{
+    font-size: 17px;
+}
+QDialog#text_edit_dialog QPushButton{
+    text-align: center;
+    padding-left: 5px;
 }
 QListView::item {
     padding: 5px;
 }
 QListView::item:selected {
-    background-color: rgb(100, 100, 100);  /* Set the background color for selected item */
-    color: rgb(255, 255, 255);  /* Set the text color for selected item */
+    background-color: rgb(100, 100, 100);
+    color: rgb(255, 255, 255); 
 }
 QMessageBox QLabel{
     font-size: 20px;

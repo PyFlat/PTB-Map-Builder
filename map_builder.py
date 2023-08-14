@@ -8,6 +8,7 @@ from src.PtbLoad import PtbLoader
 from src.compiler import *
 from src.compressor import *
 import src.KEYWORDS, src.RULES
+from src.ListEditDialog import ListEditDialog
 
 import pathlib, os,re
 
@@ -42,28 +43,6 @@ from PySide6.QtCore import *
 #         self.master.bind("<Control-B3-KeyPress>", lambda ev: self.bm.save())
 #         self.master.bind("<Alt-B1-KeyPress>", lambda ev: self.bm.save())
 #         self.master.bind("<Alt-B3-KeyPress>", lambda ev: self.bm.save())
-#     def update_frame(self):
-#         if self.bm.get_texture() < 0:
-#             self.bl.config(bg="white", image ="")
-#         else:
-#             self.bl.config(image=self.bm.textures[self.bm.get_texture()])
-#         if self.bm.get_texture(False) < 0:
-#             self.br.config(bg="white", image="")
-#         else:
-#             self.br.config(image=self.bm.textures[self.bm.get_texture(False)])
-#     def mainloop(self):
-#         while self.active:
-#             for block in self.bm.update_list:
-#                 block.move(1)
-#             x, y = self.bm.get_pos()
-#             self.master.title(f"PTB-Map-Builder | (x: {x}, y: {y})")
-#             self.update_frame()
-#             self.master.update()
-#             self.master.update_idletasks()
-#     def on_close(self):
-#         self.active = False
-#         self.master.quit()
-#         self.master.destroy()
 # class BlockManager():
 #     def __init__(self):
 #         self.update_list = []
@@ -89,48 +68,6 @@ from PySide6.QtCore import *
 #         self.box_x = None
 #         self.box_y = None
 #         self.comp = compiler()
-#     def get_texture(self, side = True):
-#         tex = self.texture_left if side else self.texture_right
-#         return tex
-#     def set_texture(self, tex, side = True, *args):
-#         self.texture_left, self.texture_right = (tex, self.texture_right) if side else (self.texture_left, tex)
-#     def reset(self):
-#         self.texts = self.scripts = None
-#         for i in range(23):
-#             for j in range(23):
-#                 if self.blocks[i+1][j+1] != None:
-#                     self.delete(i+1, j+1)
-#         self.set_texture(-1);self.set_texture(-1, False)
-#     def delete(self, x, y, item = None):
-#         if item is None: md.w.delete(self.blocks[x][y].obj); self.blocks[x][y] = None
-#         else: md.w.delete(item)
-#     def get_pos(self):
-#         abs_x = md.master.winfo_pointerx() - md.master.winfo_rootx()
-#         abs_y = md.master.winfo_pointery() - md.master.winfo_rooty()
-#         self.num_x =abs_x//20-4
-#         self.num_y = abs_y//20
-#         return [self.num_x, self.num_y]
-
-#     def place(self, x, y, dire = True):
-#         num_x, num_y = self.get_pos()
-#         if x >= 0:
-#             num_x = x
-#         if y >= 0:
-#             num_y = y
-#         if (num_x > 23 or num_x < 1 or num_y < 1 or num_y > 23) and not (num_x == x and num_y== y): return
-#         if self.blocks[num_x][num_y]:self.delete(num_x, num_y)
-#         texture = self.get_texture(dire)
-#         if texture == 0:
-#             for i, j in [(i, j) for i in range(25) for j in range(25) if self.blocks[i][j] and self.blocks[i][j].texture == 0]:
-#                 self.delete(i, j)
-#         elif texture < 0:
-#             return
-#         if self.blocks[num_x][num_y]:
-#             self.delete(num_x, num_y)
-#         b = Block(num_x * 20 + 10, num_y * 20 + 10, dire)
-#         self.blocks[num_x][num_y] = b
-#         del b
-
 #     def start_move(self):
 #         x,y = self.get_pos()
 #         if self.move_x_s == None or self.move_y_s == None:
@@ -237,169 +174,13 @@ from PySide6.QtCore import *
 #         if fin:
 #             self.x_stable = self.line_x = None
 #             self.check_x = self.check_y = True
-#     def save(self):
-#         self.last_blocks = []
-#         for x in range(len(self.blocks)):
-#             temp = []
-#             for elem in self.blocks[x]:
-#                 temp.append(elem)
-#             self.last_blocks.append(temp)
-#         self.last_texture = self.get_texture()
-#     def load(self):
-#         self.reset()
-#         for i in range(25):
-#             for j in range(25):
-#                 if self.last_blocks[i][j]:
-#                     self.set_texture(self.last_blocks[i][j].texture)
-#                     self.place(i,j)
-#                     if self.get_texture() == 10:
-#                         self.blocks[i][j].damage = self.last_blocks[i][j].damage
-#                         self.blocks[i][j].health = self.last_blocks[i][j].health
-#         self.set_texture(self.last_texture)
-#     def get_path(self, fileopen = False):
-#         if fileopen:
-#             path = filedialog.askopenfilename(title="Choose a PTB or JSON file to load", initialdir="~/Downloads/", filetypes = [("PTB save files", "*.ptb"),("*Old* json save files","*.json")])
-#         else:
-#             path = filedialog.asksaveasfilename(defaultextension=".ptb", title="Choose a Place to Save your Map", initialdir="~/Downloads/", filetypes = [("PTB save files", "*.ptb")])
-#         if path == None or ((path[-4:] == ".ptb") or ((path[-5:] == ".json") and fileopen)):
-#             return path
-#         elif path == "":
-#             return None
-#         messagebox.showerror("Error", "False File Format")
-#         return None
-#     def load_from_json(self):
-#         path = self.get_path(fileopen = True)
-#         if path == None:
-#             return
-#         self.reset()
-#         if path[-4:] == ".ptb":
-#             out = ptbload.load_ptb(path)
-#             self.scripts = self.comp.decompile(out[1])
-#         elif path[-5:] == ".json":
-#             out = jsonload.load_json(path)
-#         new_blocks = out[0]
-#         self.texts = out[2]
-#         for i in range(25):
-#             for j in range(25):
-#                 if new_blocks[i][j] == None:
-#                     self.blocks[i][j] = None
-#                 elif isinstance(new_blocks[i][j], list):
-#                     block = new_blocks[i][j]
-#                     self.set_texture(block[0])
-#                     self.place(i,j)
-#                     self.blocks[i][j].health = block[1]
-#                     self.blocks[i][j].damage = block[2]
-#                 else:
-#                     self.set_texture(new_blocks[i][j])
-#                     self.place(i,j)
-#         self.set_texture(-1, True)
-#     def get_json_block_data(self):
-#         block_list = []
-#         for i in range(25):
-#             temp = []
-#             for j in range(25):
-#                 block = self.blocks[i][j]
-#                 texture = block.texture if block != None else None
-#                 ids = {4: 450, 5: 700, 6: 900, 7: 20, 8: 150, 9: 55, 11: 80, 12: 0, 13: 260}
-#                 if block is None:
-#                     temp.append({"id": -1, "objectData": {}})
-#                 elif texture == 10:
-#                     health, mode = block.get_enemy()
-#                     temp.append({"id": 6, "objectData": {"health": health, "id2": mode, "id1": 1}})
-#                 elif texture in ids:
-#                     start = ids[texture]
-#                     temp.append({"id": 5, "objectData": {"start": start, "fin": start}})
-#                 elif texture == 3:
-#                     temp.append({"id": 3, "objectData": {}})
-#                 elif texture == 2:
-#                     temp.append({"id": 4, "objectData": {}})
-#                 elif texture == 1:
-#                     temp.append({"id": 0, "objectData": {}})
-#                 elif texture == 0:
-#                     temp.append({"id": 2, "objectData": {}})
-#             block_list.append(temp)
-#         return block_list
-#     def check_for_player(self):
-#         for i in range(25):
-#             for j in range(25):
-#                 if self.blocks[i][j] and self.blocks[i][j].texture == 0: return True
-#         return False
-#     def get_info(self):
-#         dict = {
-#                 "enemys": {
-#                     "damage": [],
-#                     "no-damage": []
-#                 },
-#                 "items": {
-#                     "bombs": 0,
-#                     "exp": 0,
-#                     "dynamite": 0,
-#                     "time_bombs": 0,
-#                     "nukes": 0,
-#                     "health": 0,
-#                     "damage": 0,
-#                 },
-#                 "blocks": 0
-#                 }
-#         for row in self.blocks:
-#             for block in row:
-#                 if not block: continue
-#                 match block.texture:
-#                     case 10: dict["enemys"]["no-damage" if block.damage == 2 else "damage"].append(block.health)
-#                     case 3: dict["blocks"] += 1
-#                     case 4: dict["items"]["bombs"] += 1
-#                     case 5: dict["items"]["exp"] += 1
-#                     case 7: dict["items"]["dynamite"] += 1
-#                     case 8: dict["items"]["time_bombs"] += 1
-#                     case 9: dict["items"]["health"] += 1
-#                     case 11: dict["items"]["damage"] += 1
-#                     case 12: dict["items"]["nukes"] += 1
-#         return dict
-    
-#     def save_to_file(self):
-#         if not self.check_for_player(): messagebox.showerror("ERROR", "Player is missing"); return
-#         path = self.get_path()
-#         if path == None:
-#             return
-#         block_list = self.get_json_block_data()
-#         info = self.get_info()
-#         World = {"world":block_list}
-#         if self.scripts != None:
-#             script = self.comp.compile(self.scripts)
-#         else:
-#             script = None
-#         if self.texts != None:
-#             texts = self.texts[:-1]
-#         else:
-#             texts = None
-#         com = compressor()
-#         com.insert_normal(World, script, texts)
-#         com.compress()
-#         com.save(path)
 
-# class Text_Editor():
-#     running = False
-#     def __init__(self, blocks):
-#         self.bm = blocks
-#         if Text_Editor.running: return
-#         Text_Editor.running = True
-#         self.window = Window(600, 600)
-#         self.window.master.config(bg="#3c3c3c")
-#         self.window.master.title("Texts")
-#         self.textfeld = Text(self.window.master, relief="flat", font="Calibri 20")
-#         self.textfeld.place(x=25, y=25, height=525, width=550)
-#         if self.bm.texts != None:
-#             text = self.bm.texts
-#             text = "\n".join(text)
-#             self.textfeld.insert("1.0",text)
-#         self.submit = Button(self.window.master,relief="flat", text="Submit",bg="orange",fg="white", font="Calibri 20", activeforeground="orange", activebackground="white", border = 0, command=lambda:[self.destroy()])
-#         self.submit.place(x=200, y=560, height=30, width=200)
-#         self.window.master.protocol("WM_DELETE_WINDOW", self.destroy)
-#     def destroy(self):
-#         self.bm.texts = self.textfeld.get("1.0",END)
-#         self.window.master.destroy()
-#         self.window.master.quit()
-#         Text_Editor.running = False
+
+
+
+
+
+
     
 class Utils():
     def get_abs_path(relative_path):
@@ -481,6 +262,12 @@ class MainWindow(QMainWindow):
         
         self.show()
         
+    def add_new_text(self):
+        listbox = ListEditDialog(self, self.texts)
+        listbox.exec()
+        texts = listbox.get_texts()
+        self.texts = None if texts == [] else texts
+    
     def reset_all_button(self):
         qms = QMessageBox(QMessageBox.Warning, "Warning", "Warning, do you really want to reset?", QMessageBox.Yes | QMessageBox.No, self)
         ret = qms.exec()
@@ -541,6 +328,7 @@ class MainWindow(QMainWindow):
         self.ui.actionEdit_Scripts.triggered.connect(lambda: ScriptEditor(self, self.scripts))
         self.ui.actionEdit_One.triggered.connect(lambda: self.edit_enemy())
         self.ui.actionEdit_All.triggered.connect(lambda: self.edit_enemy_defaults())
+        self.ui.actionEdit_Texts.triggered.connect(lambda: self.add_new_text())
         
     def set_script_text(self, text):
         self.scripts = text
@@ -700,7 +488,7 @@ class MainWindow(QMainWindow):
         self.current_project = file_name
         self.reset_all()
         out = PtbLoader().load_file(file_name)
-        #self.scripts = self.comp.decompile(out[1])
+        self.scripts = self.comp.decompile(out[1])
         loaded_blocks = out[0]
         self.texts = out[2]
         for i, row in enumerate(loaded_blocks):
@@ -724,7 +512,7 @@ class MainWindow(QMainWindow):
         block_list, info = self.get_combined_info()
         world = {"world":block_list}
         script = self.comp.compile(self.scripts) if not self.scripts is None else None
-        texts = self.texts[:-1] if not self.texts is None else None
+        texts = "\n".join(self.texts) if self.texts is not None else None
         com = compressor()
         com.insert_normal(world, script, texts)
         com.compress()

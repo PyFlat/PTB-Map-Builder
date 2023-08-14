@@ -1,5 +1,7 @@
 *.pyc
 
+Logs/
+
 ui_to_py.bat
 
 update_ui.py
