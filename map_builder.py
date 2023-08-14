@@ -259,6 +259,9 @@ class MainWindow(QMainWindow):
         shortcut = QShortcut(QKeySequence("Ctrl+3"), self)
         shortcut.activated.connect(lambda: self.switch_to_page(2))
         
+        self.shortcut_edit_enemy = QShortcut(QKeySequence(Qt.Key_Escape), self)
+        self.shortcut_edit_enemy.activated.connect(self.end_edit_enemy)
+        
         self.set_textures(None, -1, True)
         self.set_textures(None, -1, False)
         
@@ -349,11 +352,13 @@ class MainWindow(QMainWindow):
         self.show_only_enemy_blocks()
         self.set_builder_items_enabled(False)
         self.ui.imagePainter.mousePressEvent = self.edit_enemy_event
+        self.shortcut_edit_enemy.setEnabled(True)
     
     def end_edit_enemy(self):
         self.show_every_block()
         self.set_builder_items_enabled(True)
         self.ui.imagePainter.mousePressEvent = self.mouse_click_event
+        self.shortcut_edit_enemy.setEnabled(False)
     
     def edit_enemy_event(self, event):
         x,y = self.get_pos()
