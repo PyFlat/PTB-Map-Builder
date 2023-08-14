@@ -220,6 +220,8 @@ class MainWindow(QMainWindow):
         
         self.current_project = None
         
+        self.changes_since_save = False
+        
         self.comp = compiler()
         
         self.build_background() # Create The Grass Background
@@ -265,8 +267,11 @@ class MainWindow(QMainWindow):
     def add_new_text(self):
         listbox = ListEditDialog(self, self.texts)
         listbox.exec()
+        texts_before = self.texts
         texts = listbox.get_texts()
         self.texts = None if texts == [] else texts
+        if texts_before != self.texts:
+            self.changes_since_save = True
     
     def reset_all_button(self):
         qms = QMessageBox(QMessageBox.Warning, "Warning", "Warning, do you really want to reset?", QMessageBox.Yes | QMessageBox.No, self)
@@ -314,6 +319,7 @@ class MainWindow(QMainWindow):
         health = health if health is not None else self.enemy_health
         self.blocks[x][y] = Block(x,y,texture_idx, block_id, damage, health) if texture_idx not in (14,15) else None
         if texture_idx == 0: self.player = self.blocks[x][y]
+        self.changes_since_save = True
 
     def reset_all(self):
         for x in range(1,24):
@@ -331,7 +337,10 @@ class MainWindow(QMainWindow):
         self.ui.actionEdit_Texts.triggered.connect(lambda: self.add_new_text())
         
     def set_script_text(self, text):
+        old_script = self.scripts
         self.scripts = text
+        if self.scripts != old_script:
+            self.changes_since_save = True
         
     def edit_enemy_defaults(self):
         self.enemy_health, self.enemy_damage = self.enemy_edit_messagebox(self.enemy_health, self.enemy_damage)
@@ -454,7 +463,12 @@ class MainWindow(QMainWindow):
     
     def update_title(self):
         x,y = self.get_pos()
-        self.setWindowTitle(f"PTB-Map-Builder | (x: {x}, y: {y})")
+        if self.current_project is None:
+            name_text = "*untitled.ptb"
+        else:
+            base_name = self.current_project.split("/")[-1]
+            name_text = f"*{base_name}" if self.changes_since_save else base_name
+        self.setWindowTitle(f"PTB-Map-Builder | (x: {x}, y: {y}) | {name_text}")
     
     def get_pos(self):
         pos = self.get_mouse_position()
@@ -498,6 +512,7 @@ class MainWindow(QMainWindow):
                 elif isinstance(block_data, list): 
                     self.place(i, j, texture_idx=block_data[0], health=block_data[1], damage=block_data[2])
                 else: self.place(i, j, block_data)
+        self.changes_since_save = False
 
     def save_map_file(self, saveAs = False):
         if self.player is None: 
@@ -517,6 +532,7 @@ class MainWindow(QMainWindow):
         com.insert_normal(world, script, texts)
         com.compress()
         com.save(file_name)
+        self.changes_since_save = False
 
     def get_combined_info(self):
         block_list = []
