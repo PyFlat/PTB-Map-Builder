@@ -17,12 +17,33 @@ QLineEdit{
     border: 2px solid #1f6aa5;
     border-radius: 5px;
 }
+QCheckBox{
+    color: white;
+    font-size: 20px;
+}
+QCheckBox::indicator{
+    height: 25px;
+    width: 25px;
+    image: url(icons/unchecked.png);
+}
+QLabel#current_left_block, QLabel#current_right_block{
+    border: 2px solid white;
+    border-radius: 3px;
+    qproperty-alignment: AlignCenter;
+    background-color: #1f6aa5
+}
+QCheckBox::indicator:checked{
+    height: 25px;
+    width: 25px;
+    image: url(icons/checked.png);
+}
 QDialog#enemy_edit_msgbox QLabel{
     color: white;
     font-size: 20px;
 }
 QDialog#enemy_edit_msgbox QPushButton{
     text-align: center;
+    padding-left: 5px;
 }
 QListView {
     background-color: rgb(50, 50, 50);  /* Set the background color */

@@ -1,27 +1,19 @@
 import sys
-
-import PySide6.QtGui
-
-from MainWindow import Ui_MainWindow
-from CustomSyntaxHighlighter import CustomSyntaxHighlighter
-from src.CustomTextEdit import CustomTextEdit
 sys.dont_write_bytecode = True
-from tkinter import *
-from tkinter import messagebox, filedialog
-from functools import partial
-from PtbLoad import PtbLoad
-from compiler import *
-from compressor import *
-import pathlib, os
+
+from src.MainWindow import Ui_MainWindow
+from src.CustomSyntaxHighlighter import CustomSyntaxHighlighter
+from src.CustomTextEdit import CustomTextEdit
+from src.PtbLoad import PtbLoad
+from src.compiler import *
+from src.compressor import *
+import src.KEYWORDS, src.RULES
+
+import pathlib, os,re
 
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
-
-import src.KEYWORDS, src.RULES
-
-import re
-
 
 #     def bind_buttons(self):
 #         self.master.bind("<space>", lambda ev: self.bm.start_move())
@@ -482,6 +474,9 @@ class MainWindow(QMainWindow):
         shortcut = QShortcut(QKeySequence("Ctrl+3"), self)
         shortcut.activated.connect(lambda: self.switch_to_page(2))
         
+        self.set_textures(None, -1, True)
+        self.set_textures(None, -1, False)
+        
         self.show()
 
         
@@ -508,8 +503,11 @@ class MainWindow(QMainWindow):
         self.ui.next_page_btn.setEnabled(current_index < self.ui.stackedWidget_2.count() - 1)
 
     def update_current_block(self):
-        self.ui.current_left_block.setPixmap(QPixmap(self.textures[self.texture_left]))
-
+        if self.texture_left >= 0: self.ui.current_left_block.setPixmap(QPixmap(self.textures[self.texture_left]))
+        else: self.ui.current_left_block.setPixmap(QPixmap("icons/delete.png").scaled(20, 20))
+        if self.texture_right >= 0: self.ui.current_right_block.setPixmap(QPixmap(self.textures[self.texture_right]))
+        else: self.ui.current_right_block.setPixmap(QPixmap("icons/delete.png").scaled(20, 20))
+            
     def place(self, x, y, texture_idx, god_mode=False, damage=None, health=None):
         if not god_mode:
             if x <= 0 or x >= 24 or y <= 0 or y >= 24:
@@ -532,13 +530,15 @@ class MainWindow(QMainWindow):
     def connect_menu(self):
         self.ui.actionOpen.triggered.connect(lambda: self.load_map_file())
         self.ui.actionSave.triggered.connect(lambda: self.save_map_file())
-        self.ui.actionEdit_Scripts.triggered.connect(lambda: self.start_script_editor())
+        self.ui.actionEdit_Scripts.triggered.connect(lambda: ScriptEditor(self, self.scripts))
         self.ui.actionEdit_One.triggered.connect(lambda: self.edit_enemy())
-        self.ui.actionEdit_All.triggered.connect(lambda: self.show_every_block())
+        self.ui.actionEdit_All.triggered.connect(lambda: self.edit_enemy_defaults())
         
-    def start_script_editor(self):
-        sc = ScriptEditor(self, self.scripts)
-        self.scripts = sc.get_text()
+    def set_script_text(self, text):
+        self.scripts = text
+        
+    def edit_enemy_defaults(self):
+        self.enemy_health, self.enemy_damage = self.enemy_edit_messagebox(self.enemy_health, self.enemy_damage)
         
     def edit_enemy(self):
         self.show_only_enemy_blocks()
@@ -556,12 +556,13 @@ class MainWindow(QMainWindow):
         if self.blocks[x][y].get_block() == 10:
             health, damage = self.blocks[x][y].get_enemy()
             health, damage = self.enemy_edit_messagebox(health, damage)
-            self.blocks[x][y].set_enemy(int(health), damage)
+            self.blocks[x][y].set_enemy(health, damage)
             self.end_edit_enemy()
 
     def enemy_edit_messagebox(self, health:int, damage:bool):
         messagebox = QDialog(self)
         messagebox.setObjectName("enemy_edit_msgbox")
+        messagebox.setWindowTitle("Enemy editing window")
         layout = QVBoxLayout()
         
         main_widget = QStackedWidget()
@@ -602,7 +603,7 @@ class MainWindow(QMainWindow):
         main_widget.setCurrentIndex(0)
 
         messagebox.exec()
-        return (line_edit.text(), checkbox.isChecked())
+        return (int(line_edit.text()), checkbox.isChecked())
         
     def show_only_enemy_blocks(self):
         for blocklists in self.blocks:
@@ -731,9 +732,11 @@ class MainWindow(QMainWindow):
                 if not block:
                     temp.append({"id": -1, "objectData": {}})
                     continue
-                print(block.texture)
                 if block.texture == 10:
                     health, mode = block.get_enemy()
+                    print(mode)
+                    mode = 1 if mode == False else 2
+                    print(mode)
                     block_info = {"id": 6, "objectData": {"health": health, "id2": mode, "id1": 1}}
                     info["enemys"]["no-damage" if block.damage == 2 else "damage"].append(health)
                 elif block.texture in ids:
@@ -803,7 +806,7 @@ class ScriptEditor(QDialog):
         super().__init__(parent=parent)
         self.parent = parent
         self.start_scripts = "" if scripts is None else scripts
-        self.setWindowTitle("Custom Dialog")
+        self.setWindowTitle("Script-Editor")
         self.setFixedSize(500, 575)
         
         layout = QVBoxLayout()
@@ -822,10 +825,12 @@ class ScriptEditor(QDialog):
 
         self.setLayout(layout)
         self.exec()
+
     def closeEvent(self, event):
         if self.text_edit.toPlainText() == self.start_scripts: 
             self.accept()
             self.text = self.start_scripts
+            self.set_text()
             return
         message_box = QMessageBox(self.parent)
         message_box.setWindowTitle("Syntax Error")
@@ -840,6 +845,7 @@ class ScriptEditor(QDialog):
             event.accept()
         elif result == QMessageBox.Cancel:
             event.ignore()
+    
     def get_keywords(self):
         ret = []
         for keywordlist in src.KEYWORDS.keywords:
@@ -861,9 +867,10 @@ class ScriptEditor(QDialog):
         return menu
     
     def pick_coordinates(self):
-        self.hide()
+        self.setVisible(False)
         self.parent.pick_coords()
         self.parent.coord_signal.connect(self.insert_coords)
+
     def insert_coords(self, x, y):
         self.show()
         cursor = self.text_edit.textCursor()
@@ -895,11 +902,14 @@ class ScriptEditor(QDialog):
             message_box.setIcon(QMessageBox.Information)
             message_box.setStandardButtons(QMessageBox.Ok)
             message_box.exec()
+            return
         self.text = complete_text
+        self.set_text()
         self.accept()
-    def get_text(self):
-        return self.text
-        
+    
+    def set_text(self):
+        self.parent.set_script_text(self.text)
+
 
 if __name__ == "__main__":
     app = QApplication([])

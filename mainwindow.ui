@@ -136,7 +136,7 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
            <item>
             <widget class="QStackedWidget" name="stackedWidget_2">
              <property name="currentIndex">
-              <number>2</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="blocks_page_1">
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -595,7 +595,7 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
              </layout>
             </widget>
            </item>
-           <item>
+           <item alignment="Qt::AlignHCenter">
             <widget class="QWidget" name="widget" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <property name="leftMargin">
@@ -610,8 +610,20 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
               <property name="bottomMargin">
                <number>0</number>
               </property>
-              <item>
+              <item alignment="Qt::AlignHCenter">
                <widget class="QLabel" name="current_left_block">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string/>
                 </property>
@@ -619,6 +631,18 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
               </item>
               <item>
                <widget class="QLabel" name="current_right_block">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string/>
                 </property>
@@ -707,8 +731,8 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
     <property name="title">
      <string>Enemys</string>
     </property>
-    <addaction name="actionEdit_All"/>
     <addaction name="actionEdit_One"/>
+    <addaction name="actionEdit_All"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuScripts"/>
@@ -757,10 +781,16 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
    <property name="text">
     <string>Edit All</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+Shift+E</string>
+   </property>
   </action>
   <action name="actionEdit_One">
    <property name="text">
     <string>Edit One</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+E</string>
    </property>
   </action>
   <action name="actionEdit_Scripts">
@@ -775,10 +805,16 @@ QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QP
    <property name="text">
     <string>New Text</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+T</string>
+   </property>
   </action>
   <action name="actionEdit_Texts">
    <property name="text">
     <string>Edit Texts</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+T</string>
    </property>
   </action>
  </widget>

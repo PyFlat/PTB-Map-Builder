@@ -1,18 +1,8 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'mainwindow2.ui'
-##
-## Created by: Qt User Interface Compiler version 6.5.0
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
-
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from ImagePainterWidget import ImagePainterWidget
+from src.ImagePainterWidget import ImagePainterWidget
 
 
 class Ui_MainWindow(object):
@@ -301,25 +291,31 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.current_left_block = QLabel(self.widget)
         self.current_left_block.setObjectName(u"current_left_block")
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.current_left_block.sizePolicy().hasHeightForWidth())
+        self.current_left_block.setSizePolicy(sizePolicy)
+        self.current_left_block.setMinimumSize(QSize(30, 30))
 
-        self.horizontalLayout_2.addWidget(self.current_left_block)
+        self.horizontalLayout_2.addWidget(self.current_left_block, 0, Qt.AlignHCenter)
 
         self.current_right_block = QLabel(self.widget)
         self.current_right_block.setObjectName(u"current_right_block")
+        sizePolicy.setHeightForWidth(self.current_right_block.sizePolicy().hasHeightForWidth())
+        self.current_right_block.setSizePolicy(sizePolicy)
+        self.current_right_block.setMinimumSize(QSize(30, 30))
 
         self.horizontalLayout_2.addWidget(self.current_right_block)
 
 
-        self.verticalLayout_5.addWidget(self.widget)
+        self.verticalLayout_5.addWidget(self.widget, 0, Qt.AlignHCenter)
 
 
         self.horizontalLayout_4.addWidget(self.widget_2)
 
         self.imagePainter = ImagePainterWidget(self.page)
         self.imagePainter.setObjectName(u"imagePainter")
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.imagePainter.sizePolicy().hasHeightForWidth())
         self.imagePainter.setSizePolicy(sizePolicy)
         self.imagePainter.setMinimumSize(QSize(500, 500))
@@ -368,12 +364,12 @@ class Ui_MainWindow(object):
         self.menuScripts.addAction(self.actionEdit_Scripts)
         self.menuTexts.addAction(self.actionEdit_2)
         self.menuTexts.addAction(self.actionEdit_Texts)
-        self.menuEnemys.addAction(self.actionEdit_All)
         self.menuEnemys.addAction(self.actionEdit_One)
+        self.menuEnemys.addAction(self.actionEdit_All)
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget_2.setCurrentIndex(2)
+        self.stackedWidget_2.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -401,13 +397,25 @@ class Ui_MainWindow(object):
         self.actionOpen.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+O", None))
 #endif // QT_CONFIG(shortcut)
         self.actionEdit_All.setText(QCoreApplication.translate("MainWindow", u"Edit All", None))
+#if QT_CONFIG(shortcut)
+        self.actionEdit_All.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+Shift+E", None))
+#endif // QT_CONFIG(shortcut)
         self.actionEdit_One.setText(QCoreApplication.translate("MainWindow", u"Edit One", None))
+#if QT_CONFIG(shortcut)
+        self.actionEdit_One.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+E", None))
+#endif // QT_CONFIG(shortcut)
         self.actionEdit_Scripts.setText(QCoreApplication.translate("MainWindow", u"Edit Script", None))
 #if QT_CONFIG(shortcut)
         self.actionEdit_Scripts.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+S", None))
 #endif // QT_CONFIG(shortcut)
         self.actionEdit_2.setText(QCoreApplication.translate("MainWindow", u"New Text", None))
+#if QT_CONFIG(shortcut)
+        self.actionEdit_2.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+T", None))
+#endif // QT_CONFIG(shortcut)
         self.actionEdit_Texts.setText(QCoreApplication.translate("MainWindow", u"Edit Texts", None))
+#if QT_CONFIG(shortcut)
+        self.actionEdit_Texts.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+Shift+T", None))
+#endif // QT_CONFIG(shortcut)
         self.block_button_0.setText(QCoreApplication.translate("MainWindow", u" Player", None))
         self.block_button_1.setText(QCoreApplication.translate("MainWindow", u" Endstone", None))
         self.block_button_2.setText(QCoreApplication.translate("MainWindow", u" Water", None))

@@ -1,5 +1,5 @@
 import json
-from compressor import *
+from src.compressor import *
 class PtbLoad():
     li = [[None for i in range(25)] for j in range(25)]
     scripts = None
@@ -25,7 +25,6 @@ class PtbLoad():
             for y in range(25):
                 temp = data[x][y]
                 id_map = id_mapping.get(temp["id"])
-        
                 if id_map is not None:
                     if isinstance(id_map, int):
                         PtbLoad.li[x][y] = id_map
