@@ -724,7 +724,6 @@ class MainWindow(QMainWindow):
         block_list, info = self.get_combined_info()
         world = {"world":block_list}
         script = self.comp.compile(self.scripts) if not self.scripts is None else None
-        print(script)
         texts = self.texts[:-1] if not self.texts is None else None
         com = compressor()
         com.insert_normal(world, script, texts)
