@@ -700,7 +700,7 @@ class MainWindow(QMainWindow):
         self.current_project = file_name
         self.reset_all()
         out = PtbLoader().load_file(file_name)
-        #self.scripts = self.comp.decompile(out[1])
+        self.scripts = self.comp.decompile(out[1])
         loaded_blocks = out[0]
         self.texts = out[2]
         for i, row in enumerate(loaded_blocks):
