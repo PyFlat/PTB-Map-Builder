@@ -27,6 +27,12 @@ class Ui_MainWindow(object):
         self.actionEdit_Scripts.setObjectName(u"actionEdit_Scripts")
         self.actionEdit_Texts = QAction(MainWindow)
         self.actionEdit_Texts.setObjectName(u"actionEdit_Texts")
+        self.actionDraw_Line = QAction(MainWindow)
+        self.actionDraw_Line.setObjectName(u"actionDraw_Line")
+        self.actionDraw_Line.setCheckable(True)
+        self.actionDraw_REct = QAction(MainWindow)
+        self.actionDraw_REct.setObjectName(u"actionDraw_REct")
+        self.actionDraw_REct.setCheckable(True)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -219,6 +225,7 @@ class Ui_MainWindow(object):
         icon16.addFile(u"icons/move.png", QSize(), QIcon.Normal, QIcon.Off)
         self.block_button_16.setIcon(icon16)
         self.block_button_16.setIconSize(QSize(25, 25))
+        self.block_button_16.setCheckable(True)
 
         self.verticalLayout_8.addWidget(self.block_button_16)
 
@@ -348,12 +355,15 @@ class Ui_MainWindow(object):
         self.menuTexts.setObjectName(u"menuTexts")
         self.menuEnemys = QMenu(self.menubar)
         self.menuEnemys.setObjectName(u"menuEnemys")
+        self.menuTools = QMenu(self.menubar)
+        self.menuTools.setObjectName(u"menuTools")
         MainWindow.setMenuBar(self.menubar)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuScripts.menuAction())
         self.menubar.addAction(self.menuTexts.menuAction())
         self.menubar.addAction(self.menuEnemys.menuAction())
+        self.menubar.addAction(self.menuTools.menuAction())
         self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addSeparator()
@@ -363,10 +373,12 @@ class Ui_MainWindow(object):
         self.menuTexts.addAction(self.actionEdit_Texts)
         self.menuEnemys.addAction(self.actionEdit_One)
         self.menuEnemys.addAction(self.actionEdit_All)
+        self.menuTools.addAction(self.actionDraw_Line)
+        self.menuTools.addAction(self.actionDraw_REct)
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget_2.setCurrentIndex(0)
+        self.stackedWidget_2.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -409,6 +421,8 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(shortcut)
         self.actionEdit_Texts.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+T", None))
 #endif // QT_CONFIG(shortcut)
+        self.actionDraw_Line.setText(QCoreApplication.translate("MainWindow", u"Draw Line", None))
+        self.actionDraw_REct.setText(QCoreApplication.translate("MainWindow", u"Draw Rect", None))
         self.block_button_0.setText(QCoreApplication.translate("MainWindow", u" Player", None))
         self.block_button_1.setText(QCoreApplication.translate("MainWindow", u" Endstone", None))
         self.block_button_2.setText(QCoreApplication.translate("MainWindow", u" Water", None))
@@ -438,5 +452,6 @@ class Ui_MainWindow(object):
         self.menuScripts.setTitle(QCoreApplication.translate("MainWindow", u"Scripts", None))
         self.menuTexts.setTitle(QCoreApplication.translate("MainWindow", u"Texts", None))
         self.menuEnemys.setTitle(QCoreApplication.translate("MainWindow", u"Enemys", None))
+        self.menuTools.setTitle(QCoreApplication.translate("MainWindow", u"Tools", None))
     # retranslateUi
 

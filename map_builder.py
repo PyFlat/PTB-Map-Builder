@@ -245,7 +245,7 @@ class MainWindow(QMainWindow):
             button.mousePressEvent = lambda event=False, index=idx: self.set_textures(event=event, idx=index)
             
         self.ui.block_button_15.clicked.connect(self.reset_all_button)
-        
+        self.ui.block_button_16.clicked.connect(self.start_block_move)
         
         self.ui.prev_page_btn.clicked.connect(lambda: self.previous_page())
         self.ui.next_page_btn.clicked.connect(lambda: self.next_page())
@@ -261,6 +261,13 @@ class MainWindow(QMainWindow):
         
         self.shortcut_edit_enemy = QShortcut(QKeySequence(Qt.Key_Escape), self)
         self.shortcut_edit_enemy.activated.connect(self.end_edit_enemy)
+        self.shortcut_edit_enemy.setEnabled(False)
+        
+        self.switch_prev_page = QShortcut(QKeySequence(Qt.Key_Left), self)
+        self.switch_prev_page.activated.connect(lambda: self.previous_page())
+        
+        self.switch_next_page = QShortcut(QKeySequence(Qt.Key_Right), self)
+        self.switch_next_page.activated.connect(lambda: self.next_page())
         
         self.set_textures(None, -1, True)
         self.set_textures(None, -1, False)
@@ -349,7 +356,7 @@ class MainWindow(QMainWindow):
         self.enemy_health, self.enemy_damage = self.enemy_edit_messagebox(self.enemy_health, self.enemy_damage)
         
     def edit_enemy(self):
-        self.show_only_enemy_blocks()
+        self.show_only_block(10)
         self.set_builder_items_enabled(False)
         self.ui.imagePainter.mousePressEvent = self.edit_enemy_event
         self.shortcut_edit_enemy.setEnabled(True)
@@ -415,19 +422,59 @@ class MainWindow(QMainWindow):
         messagebox.exec()
         return (int(line_edit.text()), checkbox.isChecked())
         
-    def show_only_enemy_blocks(self):
-        for blocklists in self.blocks:
-            for block in blocklists:
-                if block is not None and block.get_block() != 10 and block.get_block() != 1:
+    def start_block_move(self):
+        self.ui.imagePainter.mousePressEvent = self.start_moving
+        if not self.ui.block_button_16.isChecked(): self.rebind_mouse()
+        self.move_block_id = None
+        
+    def test(self, x, y):
+        mx, my = self.get_pos()
+        if self.move_block_id is not None:
+            self.ui.imagePainter.remove_image(self.move_block_id)
+        self.move_block_id = self.ui.imagePainter.add_image(self.textures[self.blocks[x][y].get_block()], mx*20, my*20)
+        #self.place(self.movex, self.movey, self.blocks[x][y].get_block())
+        
+    def start_moving(self, event):
+        posx, posy = self.get_pos()
+        if self.blocks[posx][posy] is not None:
+            self.ui.imagePainter.mousePressEvent = lambda ev: self.end_moving(posx, posy)
+            self.timer3 = QTimer()
+            self.timer3.timeout.connect(lambda: self.test(posx, posy))
+            self.timer3.start(10)
+            #self.ui.imagePainter.mouseMoveEvent = self.test(posx, posy)
+        
+    def end_moving(self, x, y):
+        nx, ny = self.get_pos()
+        block:Block = self.blocks[x][y]
+        if block.get_block() == 10:
+            print(block.get_enemy())
+            self.place(nx,ny, block.get_block(), damage=block.get_enemy()[1], health=block.get_enemy()[0])
+        else:
+            self.place(nx,ny, block.get_block())
+        self.remove(x,y)
+        self.ui.imagePainter.remove_image(self.move_block_id)
+        self.rebind_mouse()
+        self.timer3.stop()
+        self.ui.block_button_16.setChecked(False)
+        
+    def rebind_mouse(self):
+        self.ui.imagePainter.mousePressEvent = self.mouse_click_event
+        
+    def show_only_block(self, type:int):
+        for i in range(len(self.blocks)):
+            for j in range(len(self.blocks[i])):
+                block = self.blocks[i][j]
+                if block is not None and block.get_block() != type and i not in (0,24) and j not in (0,24):
                     self.ui.imagePainter.set_image_visibility(block.get_id(), False)
     
     def show_every_block(self):
         for blocklists in self.blocks:
             for block in blocklists:
-                if block is not None and block.get_block() != 10 and block.get_block() != 1:
+                if block is not None:
                     self.ui.imagePainter.set_image_visibility(block.get_id(), True)
 
     def remove(self, x, y):
+        if self.blocks[x][y] is None: return
         id = self.blocks[x][y].id
         if self.blocks[x][y].get_block() == 0: self.player = None
         self.ui.imagePainter.remove_image(id)

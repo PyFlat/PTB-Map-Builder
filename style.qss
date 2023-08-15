@@ -84,8 +84,14 @@ QPushButton{
     background-color: #1f6aa5;
     color: white;
 }
-QPushButton:hover{
+QPushButton:pressed{
+    background-color: #125485;
+}
+QPushButton:hover:!pressed{
     background-color: #144870;
+}
+QPushButton:checked{
+    background-color: #144870
 }
 QPushButton#script_compile_dialog_btn{
     text-align: center;
