@@ -427,21 +427,20 @@ class MainWindow(QMainWindow):
         if not self.ui.block_button_16.isChecked(): self.rebind_mouse()
         self.move_block_id = None
         
-    def test(self, x, y):
+    def update_moving_block(self, x, y):
         mx, my = self.get_pos()
         if self.move_block_id is not None:
             self.ui.imagePainter.remove_image(self.move_block_id)
         self.move_block_id = self.ui.imagePainter.add_image(self.textures[self.blocks[x][y].get_block()], mx*20, my*20)
-        #self.place(self.movex, self.movey, self.blocks[x][y].get_block())
         
     def start_moving(self, event):
         posx, posy = self.get_pos()
         if self.blocks[posx][posy] is not None:
-            self.ui.imagePainter.mousePressEvent = lambda ev: self.end_moving(posx, posy)
+            self.ui.imagePainter.set_image_visibility(self.blocks[posx][posy].id, False)
+            self.ui.imagePainter.mouseReleaseEvent = lambda ev: self.end_moving(posx, posy)
             self.timer3 = QTimer()
-            self.timer3.timeout.connect(lambda: self.test(posx, posy))
+            self.timer3.timeout.connect(lambda: self.update_moving_block(posx, posy))
             self.timer3.start(10)
-            #self.ui.imagePainter.mouseMoveEvent = self.test(posx, posy)
         
     def end_moving(self, x, y):
         nx, ny = self.get_pos()
@@ -455,10 +454,12 @@ class MainWindow(QMainWindow):
         self.ui.imagePainter.remove_image(self.move_block_id)
         self.rebind_mouse()
         self.timer3.stop()
-        self.ui.block_button_16.setChecked(False)
+        self.start_block_move()
         
     def rebind_mouse(self):
-        self.ui.imagePainter.mousePressEvent = self.mouse_click_event
+        self.ui.imagePainter.mousePressEvent = self.mouse_click_event # Bind the Mouse Click
+        self.ui.imagePainter.mouseMoveEvent = self.mouseMove # Bind Mouse Move
+        self.ui.imagePainter.mouseReleaseEvent = self.mouseRelease # Bind Mouse Release
         
     def show_only_block(self, type:int):
         for i in range(len(self.blocks)):
