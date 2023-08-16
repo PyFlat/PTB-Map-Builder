@@ -27,6 +27,7 @@ COMMANDS = [
     f"{START}drawRect on {ARG_LONG} {ARG_LONG} with color ( {ARG_LONG} {ARG_LONG} {ARG_LONG} ) => {ARG_LONG}{END}",
     f"{START}clear {ARG_LONG}{END}{END}",
     f"{START}compare {ARG_LONG} {enum(['>', '<', '==', '<=', '>='])} {ARG_LONG} => {ARG_LONG}{END}",
+    f"{START}compare{END}",
     f"{START}jump {ARG_LONG} lines if {ARG_LONG}{END}",
     f"{START}setFlag {enum(['drop_items'])} = {ARG_SHORT}{END}",
     f"{START}tp to {ARG_LONG} {ARG_LONG}{END}",
