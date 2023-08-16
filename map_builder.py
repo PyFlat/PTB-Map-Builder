@@ -274,6 +274,78 @@ class MainWindow(QMainWindow):
         
         self.show()
         
+    def start_drawing_line(self):
+        self.ui.imagePainter.mousePressEvent = self.start_line
+        if not self.ui.actionDraw_Line.isChecked(): self.rebind_mouse()
+        self.x_stable = None
+        self.check_x = self.check_y = True
+        self.line_images = []
+        
+    def start_line(self, event:QMouseEvent):
+        #print(event.button())
+        texture = self.texture_left if event.button() == Qt.LeftButton else self.texture_right
+        x, y = self.get_pos()
+        self.line_update_timer = QTimer()
+        self.line_update_timer.timeout.connect(lambda: self.update_line(x,y,texture))
+        self.line_update_timer.start(10)
+        self.ui.imagePainter.mouseReleaseEvent = lambda ev: self.update_line(x,y,texture, True)
+        
+    def update_line(self, startx, starty, texture, finish = False):
+        if texture == 0: return
+        curx, cury = self.get_pos()
+    
+        difference_x = curx - startx
+        difference_y = cury - starty
+    
+        if (curx, cury) == (startx, starty):
+            if finish: self.finish_line()
+            return
+    
+        if (curx != startx and self.x_stable is None) or (self.check_x and self.x_stable is not None):
+            self.check_y = False
+            self.x_stable = False
+            difference = difference_x
+            line = startx
+            xy = curx
+        elif (cury != starty and self.x_stable is None) or (self.check_y and self.x_stable is not None):
+            self.check_x = False
+            self.x_stable = True
+            difference = difference_y
+            line = starty
+            xy = cury
+    
+        while self.line_images:
+            self.ui.imagePainter.remove_image(self.line_images.pop(0))
+    
+        difference = difference or 1
+        step = difference // abs(difference)
+    
+        if xy + step - line == 1:
+            self.x_stable, self.check_x, self.check_y = None, True, True
+            return
+
+        for i in range(line, xy + step, step):
+            x, y = (startx, i) if self.x_stable else (i, starty)
+        
+            if not (0 < x < 24 and 0 < y < 24):
+                break
+            
+            if finish:
+                self.place(x,y,texture)
+                continue
+            if texture == -1:
+                is_even = (x % 2 == 0 and y % 2 == 0) or (x % 2 != 0 and y % 2 != 0)
+                texture = 14 if is_even else 15
+        
+            self.line_images.append(self.ui.imagePainter.add_image(self.textures[texture], x * 20, y * 20))
+        
+        if finish: self.finish_line()
+            
+    def finish_line(self):
+        self.line_update_timer.stop()
+        self.rebind_mouse()
+        self.start_drawing_line()
+
     def add_new_text(self):
         listbox = ListEditDialog(self, self.texts)
         listbox.exec()
@@ -345,6 +417,7 @@ class MainWindow(QMainWindow):
         self.ui.actionEdit_One.triggered.connect(lambda: self.edit_enemy())
         self.ui.actionEdit_All.triggered.connect(lambda: self.edit_enemy_defaults())
         self.ui.actionEdit_Texts.triggered.connect(lambda: self.add_new_text())
+        self.ui.actionDraw_Line.triggered.connect(lambda: self.start_drawing_line())
         
     def set_script_text(self, text):
         old_script = self.scripts
@@ -446,7 +519,6 @@ class MainWindow(QMainWindow):
         nx, ny = self.get_pos()
         block:Block = self.blocks[x][y]
         if block.get_block() == 10:
-            print(block.get_enemy())
             self.place(nx,ny, block.get_block(), damage=block.get_enemy()[1], health=block.get_enemy()[0])
         else:
             self.place(nx,ny, block.get_block())
