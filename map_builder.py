@@ -16,172 +16,6 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#     def bind_buttons(self):
-#         self.master.bind("<space>", lambda ev: self.bm.start_move())
-#         self.master.bind("<KeyRelease-space>", lambda ev: self.bm.stop_move())
-#         self.master.bind("<Control-Button-1>", lambda ev: self.bm.update_line(start=True))
-#         self.master.bind("<Control-Button-3>", lambda ev: self.bm.update_line(False, start=True))
-#         self.master.bind("<Control-B1-Motion>", lambda ev: self.bm.update_line())
-#         self.master.bind("<Control-B3-Motion>", lambda ev: self.bm.update_line(False))
-#         self.master.bind("<Control-B1-KeyRelease>", lambda ev: self.bm.update_line(fin=True))
-#         self.master.bind("<Control-B3-KeyRelease>", lambda ev: self.bm.update_line(False,fin=True))
-#         self.master.bind("<Alt-Button-1>", lambda ev: self.bm.update_box(start=True))
-#         self.master.bind("<Alt-Button-3>", lambda ev: self.bm.update_box(False, start=True))
-#         self.master.bind("<Alt-B1-Motion>", lambda ev: self.bm.update_box())
-#         self.master.bind("<Alt-B3-Motion>", lambda ev: self.bm.update_box(False))
-#         self.master.bind("<ButtonRelease-1>", lambda ev: [self.bm.update_box(fin=True),self.bm.update_line(fin=True)])
-#         self.master.bind("<ButtonRelease-3>", lambda ev: [self.bm.update_box(False,fin=True), self.bm.update_line(False,fin=True)])
-#         self.master.bind("<Alt-B1-KeyRelease>", lambda ev: self.bm.update_box(fin=True))
-#         self.master.bind("<Alt-B3-KeyRelease>", lambda ev: self.bm.update_box(False,fin=True))
-#         self.master.bind("<B1-Motion>", lambda ev: self.bm.place(-1,-1, True))
-#         self.master.bind("<B3-Motion>", lambda ev: self.bm.place(-1,-1, False))
-#         self.master.bind("<ButtonPress-1>", lambda ev: [self.bm.save(),self.bm.place(-1,-1, True)])
-#         self.master.bind("<ButtonPress-3>", lambda ev: [self.bm.save(),self.bm.place(-1,-1, False)])
-#         self.master.bind("<Control-z>", lambda ev: self.bm.load())
-#         self.master.bind("<Shift-Button-1>", lambda ev: [Enemy_Editor(False), self.bm.save()])
-#         self.master.bind("<Control-B1-KeyPress>", lambda ev: self.bm.save())
-#         self.master.bind("<Control-B3-KeyPress>", lambda ev: self.bm.save())
-#         self.master.bind("<Alt-B1-KeyPress>", lambda ev: self.bm.save())
-#         self.master.bind("<Alt-B3-KeyPress>", lambda ev: self.bm.save())
-# class BlockManager():
-#     def __init__(self):
-#         self.update_list = []
-#         self.texts = None
-#         self.scripts = None
-#         self.texture_left = -1
-#         self.texture_right = -1
-#         self.textures = []
-#         self.blocks = [[None for i in range(25)] for j in range(25)]
-#         self.last_blocks = []
-#         self.enemy_damage = 1
-#         self.enemy_health = 1
-#         self.line_x = None
-#         self.line_y = None
-#         self.line_images = []
-#         self.move_x_s = self.move_y_s = None
-#         self.mouse_x = None
-#         self.mouse_y = None
-#         self.mobj = None
-#         self.x_stable = None
-#         self.check_x = True
-#         self.check_y = True
-#         self.box_x = None
-#         self.box_y = None
-#         self.comp = compiler()
-#     def start_move(self):
-#         x,y = self.get_pos()
-#         if self.move_x_s == None or self.move_y_s == None:
-#             self.move_x_s = x
-#             self.move_y_s = y
-#         else:
-#             if self.mobj == None:
-#                 if self.blocks[self.move_x_s][self.move_y_s] != None:
-#                     tex = self.blocks[self.move_x_s][self.move_y_s].get_block()
-#                     self.mobj = md.w.create_image(x*20+10,y*20+10,image=self.textures[tex])
-#             else:
-#                 md.w.moveto(self.mobj,x*20,y*20)
-#     def stop_move(self):
-#         x,y = self.get_pos()
-#         b = self.blocks[self.move_x_s][self.move_y_s]
-#         if b == None:
-#             self.move_x_s = None
-#             self.move_x_s = None
-#             md.w.delete(self.mobj)
-#             self.mobj = None
-#             return
-#         if x > 23 or x < 1 or y < 1 or y > 23:
-#             return
-#         oblock = self.blocks[self.move_x_s][self.move_y_s]
-#         otex = self.get_texture()
-#         ntex = oblock.get_block()
-#         self.delete(self.move_x_s, self.move_y_s)
-#         enemy = oblock.get_enemy()
-#         self.set_texture(ntex)
-#         self.place(-1,-1)
-#         if enemy != None:
-#             self.blocks[x][y].health = enemy[0]
-#             self.blocks[x][y].damage = enemy[1]
-#         self.set_texture(otex, True)
-#         self.move_x_s = None
-#         self.move_x_s = None
-#         md.w.delete(self.mobj)
-#         self.mobj = None
-
-#     def update_box(self, dire=True, fin=False, start=False):
-#         if start and self.get_texture(dire) != 0:
-#             self.box_x, self.box_y = self.get_pos()
-#         if self.box_x == None or self.box_y == None:
-#             return
-#         x,y = self.get_pos()
-#         difference_x = x-self.box_x
-#         difference_y = y-self.box_y
-#         if self.box_x == x and self.box_y == y:
-#             return
-#         while len(self.line_images) > 0:
-#             md.w.delete(self.line_images.pop(0))
-#         difference_x = 1 if difference_x == 0 else difference_x
-#         difference_y = 1 if difference_y == 0 else difference_y
-#         stepx = int(difference_x/abs(difference_x))
-#         stepy = int(difference_y/abs(difference_y))
-#         for i in range(self.box_x, x+stepx, stepx):
-#             for j in range(self.box_y, y+stepy, stepy):
-#                 if i <= 0 or i >= 24 or j <= 0 or j >= 24:
-#                     break
-#                 if fin:
-#                     self.place(i, j, dire)
-#                 else:
-#                     texture = self.get_texture(dire)
-#                     if texture == -1:
-#                         is_even = (i%2==0 and j%2==0) or (i%2!=0 and j%2!=0)
-#                         texture = 14 if is_even else 15
-#                     self.line_images.append(md.w.create_image(i * 20 + 10, j * 20 + 10, image=self.textures[texture]))
-#         if fin:
-#             self.box_x = self.box_y = None
-#     def update_line(self, dire=True, fin=False, start=False):
-#         if start and self.get_texture(dire) != 0:
-#             self.line_x,self.line_y = self.get_pos()
-#             self.update_line(dire, fin)
-#         if self.line_x == None or self.line_y == None: return
-#         x,y = self.get_pos()
-#         difference_x = x-self.line_x
-#         difference_y = y-self.line_y
-#         if self.line_x == x and self.line_y == y: return 
-#         elif (x != self.line_x and self.x_stable == None) or (self.check_x and self.x_stable != None):
-#             self.check_y, self.x_stable, difference, line, xy = False, False, difference_x, self.line_x, x
-#         elif (y != self.line_y and self.x_stable == None) or (self.check_y and self.x_stable != None):
-#             self.check_x, self.x_stable, difference, line, xy = False, True, difference_y, self.line_y, y
-#         while len(self.line_images) > 0:
-#             md.w.delete(self.line_images.pop(0))
-#         difference = 1 if difference == 0 else difference
-#         step = int(difference/abs(difference))
-#         if xy + step - line == 1:
-#             self.x_stable, self.check_x, self.check_y = None, True, True
-#             self.update_line(dire, fin)
-#             return
-#         for i in range(line, xy+step, step):
-#             x = self.line_x if self.x_stable else i
-#             y = i if self.x_stable else self.line_y
-#             if x <= 0 or x >= 24 or y <= 0 or y >= 24:
-#                 break
-#             elif fin:
-#                 self.place(x, y, dire)
-#             else:
-#                 texture = self.get_texture(dire)
-#                 if texture == -1:
-#                     is_even = (x%2==0 and y%2==0) or (x%2!=0 and y%2!=0)
-#                     texture = 14 if is_even else 15
-#                 self.line_images.append(md.w.create_image(x * 20 + 10, y * 20 + 10, image=self.textures[texture]))
-#         if fin:
-#             self.x_stable = self.line_x = None
-#             self.check_x = self.check_y = True
-
-
-
-
-
-
-
-    
 class Utils():
     def get_abs_path(relative_path):
         base_path = getattr(sys,'_MEIPASS',os.path.dirname(os.path.abspath(__file__)))
@@ -245,7 +79,7 @@ class MainWindow(QMainWindow):
             button.mousePressEvent = lambda event=False, index=idx: self.set_textures(event=event, idx=index)
             
         self.ui.block_button_15.clicked.connect(self.reset_all_button)
-        self.ui.block_button_16.clicked.connect(self.start_block_move)
+        #self.ui.block_button_16.clicked.connect(self.start_block_move)
         
         self.ui.prev_page_btn.clicked.connect(lambda: self.previous_page())
         self.ui.next_page_btn.clicked.connect(lambda: self.next_page())
@@ -274,7 +108,68 @@ class MainWindow(QMainWindow):
         
         self.show()
         
+    def uncheck(self, action:QAction):
+        list = [self.ui.actionMove_Block, self.ui.actionDraw_Line, self.ui.actionDraw_Rect]
+        for act in list:
+            if act != action:
+                act.setChecked(False)
+        
+    def start_drawing_box(self):
+        self.uncheck(self.ui.actionDraw_Rect)
+        self.ui.imagePainter.mousePressEvent = self.start_box
+        if not self.ui.actionDraw_Rect.isChecked(): self.rebind_mouse()
+        self.box_x = self.box_y = True
+        self.box_images = []
+        
+    def start_box(self, event:QMouseEvent):
+        texture = self.texture_left if event.button() == Qt.LeftButton else self.texture_right
+        x, y = self.get_pos()
+        self.box_update_timer = QTimer()
+        self.box_update_timer.timeout.connect(lambda: self.update_box(x,y,texture))
+        self.box_update_timer.start(10)
+        self.ui.imagePainter.mouseReleaseEvent = lambda ev: self.update_box(x,y,texture, True)
+        
+    def update_box(self, startx, starty, texture, finish=False):
+        if texture == 0: return
+        curx, cury = self.get_pos()
+        
+        if (curx, cury) == (startx, starty):
+            if finish: self.finish_box()
+            return
+        
+        difference_x = curx - startx
+        difference_y = cury - starty
+        difference_x = 1 if difference_x == 0 else difference_x
+        difference_y = 1 if difference_y == 0 else difference_y
+        
+        stepx = difference_x // abs(difference_x)
+        stepy = difference_y // abs(difference_y)
+    
+        while self.box_images:
+            self.ui.imagePainter.remove_image(self.box_images.pop(0))
+    
+        for i in range(startx, curx+stepx, stepx):
+            for j in range(starty, cury+stepy, stepy):
+                if not (0 < i < 24 and 0 < j < 24): break
+                
+                if finish:
+                    self.place(i, j, texture)
+                    continue
+                
+                if texture == -1:
+                    is_even = (i%2==0 and j%2==0) or (i%2!=0 and j%2!=0)
+                    texture = 14 if is_even else 15
+                self.box_images.append(self.ui.imagePainter.add_image(self.textures[texture], i * 20, j * 20))
+        
+        if finish: self.finish_box()
+
+    def finish_box(self):
+        self.box_update_timer.stop()
+        self.rebind_mouse()
+        self.start_drawing_box()
+        
     def start_drawing_line(self):
+        self.uncheck(self.ui.actionDraw_Line)
         self.ui.imagePainter.mousePressEvent = self.start_line
         if not self.ui.actionDraw_Line.isChecked(): self.rebind_mouse()
         self.x_stable = None
@@ -282,7 +177,6 @@ class MainWindow(QMainWindow):
         self.line_images = []
         
     def start_line(self, event:QMouseEvent):
-        #print(event.button())
         texture = self.texture_left if event.button() == Qt.LeftButton else self.texture_right
         x, y = self.get_pos()
         self.line_update_timer = QTimer()
@@ -418,6 +312,8 @@ class MainWindow(QMainWindow):
         self.ui.actionEdit_All.triggered.connect(lambda: self.edit_enemy_defaults())
         self.ui.actionEdit_Texts.triggered.connect(lambda: self.add_new_text())
         self.ui.actionDraw_Line.triggered.connect(lambda: self.start_drawing_line())
+        self.ui.actionDraw_Rect.triggered.connect(lambda: self.start_drawing_box())
+        self.ui.actionMove_Block.triggered.connect(lambda: self.start_block_move())
         
     def set_script_text(self, text):
         old_script = self.scripts
@@ -496,8 +392,9 @@ class MainWindow(QMainWindow):
         return (int(line_edit.text()), checkbox.isChecked())
         
     def start_block_move(self):
+        self.uncheck(self.ui.actionMove_Block)
         self.ui.imagePainter.mousePressEvent = self.start_moving
-        if not self.ui.block_button_16.isChecked(): self.rebind_mouse()
+        if not self.ui.actionMove_Block.isChecked(): self.rebind_mouse()
         self.move_block_id = None
         
     def update_moving_block(self, x, y):

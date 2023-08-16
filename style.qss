@@ -134,7 +134,7 @@ QPushButton#next_page_btn, QPushButton#prev_page_btn{
 QPushButton#next_page_btn:disabled, QPushButton#prev_page_btn:disabled{
 	border-color: #999999;
 }
-QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QPushButton#placeholder4{
+QPushButton#placeholder0, QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QPushButton#placeholder4{
     border: none;
     background-color: #242424
 }
