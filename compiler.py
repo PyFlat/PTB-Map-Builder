@@ -99,7 +99,10 @@ class compiler:
             self.compile_downloadRAM,
             self.compile_toMemory,
             self.compile_toMemory,
-            self.compile_rand
+            self.compile_rand,
+            self.compile_ptr,
+            self.compile_ptr,
+            self.compile_reset
         ]
         self.logfile = log()
 
@@ -167,7 +170,10 @@ class compiler:
             "createMemory": 21,
             "loadToMemory": 22,
             "loadFromMemory": 23,
-            "randomNumber": 24
+            "randomNumber": 24,
+            "loadFromPointer": 25,
+            "storeToPointer": 26,
+            "place_block": 27
         }
         try:
             return cm[cmd]
@@ -200,7 +206,10 @@ class compiler:
             "createMemory",
             "loadToMemory",
             "loadFromMemory",
-            "randomNumber"
+            "randomNumber",
+            "loadFromPointer",
+            "storeToPointer",
+            "place_block"
         ]
         try:
             return cm[cmd]
@@ -233,7 +242,10 @@ class compiler:
             "createMemory at {}",
             "loadToMemory at {} with index {} from {}",
             "loadFromMemory at {} with index {} to {}",
-            "randomNumber from {} to {} => {}"
+            "randomNumber from {} to {} => {}",
+            "loadFromPointer at {} to {}",
+            "storeToPointer value {} to {}",
+            "place_block {}"
         ]
         try:
             return ms[cmd]
@@ -277,7 +289,10 @@ class compiler:
             None,
             None,
             [None, ">", "<", "==", "<=", ">="],
-            [None, "dop_items"],
+            None,
+            [None, "drop_items"],
+            None,
+            None,
             None,
             None,
             None,
@@ -307,13 +322,16 @@ class compiler:
             "*",
             "*§**",
             "**",
-            "§*",
+            "§$",
             "**",
             "**",
             "*",
             "***",
             "***",
-            "***"
+            "***",
+            "**",
+            "**",
+            "*"
         ]
         return cc[cmd]
 
@@ -329,7 +347,15 @@ class compiler:
         result += util.byte(x, 1)
         result += util.byte(y, 1)
         return result
-
+    def compile_ptr(self, attrs, line):
+        util.validateCommandLength(attrs, 5, line)
+        cmd = self.getCommandId(attrs[0])
+        result = util.byte(cmd,1)
+        f = util.validateInteger(attrs[2],65535,line,self.logfile)
+        t = util.validateInteger(attrs[4],65535,line,self.logfile)
+        result += util.byte(f,2)
+        result += util.byte(t,2)
+        return result
     def compile_end(self, attrs, line):
         util.validateCommandLength(attrs, 1, line)
         cmd = self.getCommandId(attrs[0])
@@ -458,7 +484,7 @@ class compiler:
         util.validateCommandLength(attrs, 4, line)
         cmd = self.getCommandId(attrs[0])
         result = util.byte(cmd, 1)
-        values = [None, "dop_items"]
+        values = [None, "drop_items"]
         i = util.validateEnum(attrs[1], values, line, [None])
         result += util.byte(i, 1)
         v = util.validateInteger(attrs[3], 255, line, self.logfile)
@@ -516,7 +542,7 @@ class compiler:
             cmd = self.getCommandId(attrs[0])
             if cmd == False:
                 if "--disable_comment_warnings" not in options:
-                    self.logfile.write_log(
+                    self.logfile.add_log(
                         f"WARNING Line {i} is not a valid command. Use --disable_comment_warnigns to remove this from the log."
                     )
                 continue
