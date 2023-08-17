@@ -7,7 +7,7 @@ from jsonload import *
 from compiler import *
 from compressor import *
 import pathlib, os
-from varname.helpers import Wrapper
+
 
 class Window():
     def __init__(self, width, height):
@@ -103,7 +103,6 @@ class MainDisplay():
         self.master.bind("<Control-B3-KeyPress>", lambda ev: self.bm.save())
         self.master.bind("<Alt-B1-KeyPress>", lambda ev: self.bm.save())
         self.master.bind("<Alt-B3-KeyPress>", lambda ev: self.bm.save())
-        self.master.bind("k", lambda ev: print(self.bm.get_pos()))
     def update_frame(self):
         if self.bm.get_texture() < 0:
             self.bl.config(bg="white", image ="")
@@ -169,12 +168,8 @@ class BlockManager():
     def get_pos(self):
         abs_x = md.master.winfo_pointerx() - md.master.winfo_rootx()
         abs_y = md.master.winfo_pointery() - md.master.winfo_rooty()
-        abs_x_r = round(abs_x, -1) - 80
-        abs_y_r = round(abs_y, -1)
-        abs_x_r += 10 if abs_x_r % 20 == 0 else 0
-        abs_y_r += 10 if abs_y_r % 20 == 0 else 0
-        self.num_x = round((abs_x_r - 10) / 20)
-        self.num_y = round((abs_y_r - 10) / 20)
+        self.num_x =abs_x//20-4
+        self.num_y = abs_y//20
         return [self.num_x, self.num_y]
 
     def place(self, x, y, dire = True):
@@ -390,12 +385,45 @@ class BlockManager():
             for j in range(25):
                 if self.blocks[i][j] and self.blocks[i][j].texture == 0: return True
         return False
+    def get_info(self):
+        dict = {
+                "enemys": {
+                    "damage": [],
+                    "no-damage": []
+                },
+                "items": {
+                    "bombs": 0,
+                    "exp": 0,
+                    "dynamite": 0,
+                    "time_bombs": 0,
+                    "nukes": 0,
+                    "health": 0,
+                    "damage": 0,
+                },
+                "blocks": 0
+                }
+        for row in self.blocks:
+            for block in row:
+                if not block: continue
+                match block.texture:
+                    case 10: dict["enemys"]["no-damage" if block.damage == 2 else "damage"].append(block.health)
+                    case 3: dict["blocks"] += 1
+                    case 4: dict["items"]["bombs"] += 1
+                    case 5: dict["items"]["exp"] += 1
+                    case 7: dict["items"]["dynamite"] += 1
+                    case 8: dict["items"]["time_bombs"] += 1
+                    case 9: dict["items"]["health"] += 1
+                    case 11: dict["items"]["damage"] += 1
+                    case 12: dict["items"]["nukes"] += 1
+        return dict
+    
     def save_to_file(self):
         if not self.check_for_player(): messagebox.showerror("ERROR", "Player is missing"); return
         path = self.get_path()
         if path == None:
             return
         block_list = self.get_json_block_data()
+        info = self.get_info()
         World = {"world":block_list}
         if self.scripts != None:
             script = self.comp.compile(self.scripts)
@@ -405,7 +433,6 @@ class BlockManager():
             texts = self.texts[:-1]
         else:
             texts = None
-        print(texts)
         com = compressor()
         com.insert_normal(World, script, texts)
         com.compress()
@@ -430,31 +457,36 @@ class Script_Editor():
     running = False
     def __init__(self, blocks):
         self.bm = blocks
+        self.current_word = ""
+        self.autocomplete_list = []
+        self.autocomplete_index = 0
         if Script_Editor.running: return
         Script_Editor.running = True
         self.window = Window(600, 600)
         self.window.master.config(bg="#3c3c3c")
         self.window.master.title("Scripts")
-        self.textfeld = Text(self.window.master, relief="flat", font="Calibri 20", bg="#1f1f1f", fg="white", insertbackground="white")
+        self.textfeld = Text(self.window.master, relief="flat", font="Calibri 20", bg="#1f1f1f", fg="white", insertbackground="white", undo=True)
         self.textfeld.place(x=25, y=25, height=525, width=550)
         self.textfeld.bind("<KeyRelease>", self.highlight_syntax)
+        self.textfeld.bind("<Control-BackSpace>", self.delete_whole_word)
         if self.bm.scripts != None:
             self.textfeld.insert("1.0",self.bm.scripts)
         self.highlight_syntax()
         self.submit = Button(self.window.master,relief="flat", text="Submit",bg="orange",fg="white", font="Calibri 20", activeforeground="orange", activebackground="white", border = 0, command=lambda:[self.compile_text(),self.destroy()])
         self.submit.place(x=200, y=560, height=30, width=200)
         self.window.master.protocol("WM_DELETE_WINDOW", self.destroy)
+        
     def highlight_syntax(self, event=None):
-        dict = [
+        self.keywords = [
             {"keywords" : ['on_init', 'on_collect', 'on_step', 'on_explode', "on_destroy", "on_tick"],
             "color": "#dcdcaa",
             "name": "trigger"
             },
-            {"keywords" : ['@', "end", "win", "loose", "add", "subtract", "multiply", "divide", "set", "reset", "store", "set_item", "drawImage", "drawRect", "clear", "compare", "jump", "setFlag", "tp", "jumpRelative", "createMemory", "loadToMemory", "loadFromMemory", "randomNumber"],
+            {"keywords" : ['@', "end", "win", "loose", "add", "subtract", "multiply", "divide", "set", "reset", "store", "set_item", "drawImage", "drawRect", "clear", "compare", "jump", "setFlag", "tp", "jumpRelative", "createMemory", "loadToMemory", "loadFromMemory", "randomNumber", "loadFromPointer"],
             "color": "#2667ca",
             "name": "commands"
             },
-            {"keywords" : ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+            {"keywords" : ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"],
             "color": "#a7ce9b",
             "name": "number"
             },
@@ -462,13 +494,21 @@ class Script_Editor():
             "color": "#9cdcfe",
             "name": "variables"
             },
-            {"keywords": ["player.health"],
+            {"keywords": ["player.health", "player.bombs", "player.range", "player.dynamite", "player.timed_bombs", "player.damage", "player.nukes",],
             "color": "#c3602d",
             "name": "player_set"}
         ]
-        
-        for key in dict:
+        #self.check_autofill(event)
+        self.remove_all_highlights(event)
+        for key in self.keywords:
             self.apply_highlight(key["name"], key["keywords"], key["color"])
+
+    def remove_all_highlights(self, event=None):
+        if event and "Shift" in event.keysym:
+            return
+        for tag in self.textfeld.tag_names():
+            if tag != "sel":
+                self.textfeld.tag_remove(tag, '1.0', END)
 
     def apply_highlight(self, name, keywords, color):
         self.textfeld.tag_configure(name, foreground=color)
@@ -478,16 +518,34 @@ class Script_Editor():
                 pos = self.textfeld.search(keyword, start, stopindex=END)
                 if not pos:
                     break
-                end = f'{pos}+{len(keyword)}c'
-                self.textfeld.tag_add(name, pos, end)
-                start = end
-    
+                next_char = self.textfeld.get(f'{pos}+{len(keyword)}c')
+                if next_char == " " or next_char == "\n":
+                    end = f'{pos}+{len(keyword)}c'
+                    self.textfeld.tag_add(name, pos, end)
+                start = f'{pos}+1c'
+                
+    def delete_whole_word(self, event):
+        cursor_position = self.textfeld.index(INSERT)
+
+        start_index = self.textfeld.search(r'\s', cursor_position, backwards=True, regexp=True, stopindex="1.0")
+        if not start_index:
+            start_index = "1.0"
+        self.textfeld.delete(start_index, cursor_position)
+
+                
+
     def compile_text(self):
         self.bm.scripts = self.textfeld.get("1.0",END)
+        try: 
+            self.bm.comp.compile(self.bm.scripts)
+        except compilerError as e:
+            line, x, y = e.get()
+            print(line, x,y)
     def destroy(self):
         self.window.master.destroy()
         self.window.master.quit()
         Script_Editor.running = False
+        
 class Text_Editor():
     running = False
     def __init__(self, blocks):
