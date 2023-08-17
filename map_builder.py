@@ -399,13 +399,14 @@ class MainWindow(QMainWindow):
         
     def update_moving_block(self, x, y):
         mx, my = self.get_pos()
+        if not (0 < mx < 24 and 0 < my < 24): return
         if self.move_block_id is not None:
             self.ui.imagePainter.remove_image(self.move_block_id)
         self.move_block_id = self.ui.imagePainter.add_image(self.textures[self.blocks[x][y].get_block()], mx*20, my*20)
         
     def start_moving(self, event):
         posx, posy = self.get_pos()
-        if self.blocks[posx][posy] is not None:
+        if self.blocks[posx][posy] is not None and (0 < posx < 24 and 0 < posy < 24):
             self.ui.imagePainter.set_image_visibility(self.blocks[posx][posy].id, False)
             self.ui.imagePainter.mouseReleaseEvent = lambda ev: self.end_moving(posx, posy)
             self.timer3 = QTimer()
@@ -415,11 +416,12 @@ class MainWindow(QMainWindow):
     def end_moving(self, x, y):
         nx, ny = self.get_pos()
         block:Block = self.blocks[x][y]
+        self.remove(x,y)
         if block.get_block() == 10:
             self.place(nx,ny, block.get_block(), damage=block.get_enemy()[1], health=block.get_enemy()[0])
         else:
             self.place(nx,ny, block.get_block())
-        self.remove(x,y)
+        
         self.ui.imagePainter.remove_image(self.move_block_id)
         self.rebind_mouse()
         self.timer3.stop()
