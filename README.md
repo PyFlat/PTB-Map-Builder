@@ -1,4 +1,4 @@
-<h1 align=center>Map-Builder for <a href="https://github.com/PyFlat-Studios-JR/Plant-The-Bomb">Plant-The-Bomb</a></h1>
+<h1 align=center>Map-Builder for <a href="https://github.com/PyFlat/Plant-The-Bomb">Plant-The-Bomb</a></h1>
 
 # Warning:
 - Map-loading is currently broken
@@ -45,7 +45,7 @@
   </tr>
   <tr>
     <td>Player</td>
-    <td><img src="https://github.com/PyFlat-Studios-JR/PTB-Map-Builder/blob/main/textures/00_%20player.png"></img></td>
+    <td><img src="textures/00_%20player.png"></img></td>
     <td>The start position of the player</td>
    </tr>
    <tr>
