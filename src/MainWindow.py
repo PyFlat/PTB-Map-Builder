@@ -3,10 +3,11 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from src.ImagePainterWidget import ImagePainterWidget
-
+import os
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow, dirpath=None):
+        if dirpath is not None: os.chdir(os.path.dirname(dirpath))
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(676, 530)

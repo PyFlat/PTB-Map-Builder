@@ -24,11 +24,11 @@ class Utils():
 
 class MainWindow(QMainWindow):
     coord_signal = Signal(int, int)
-    def __init__(self):
+    def __init__(self, dirpath=None):
         super().__init__()
         
         self.ui = Ui_MainWindow() # Setup the Ui from the Designer
-        self.ui.setupUi(self)
+        self.ui.setupUi(self, dirpath)
         
         self.connect_menu()
         
@@ -520,9 +520,12 @@ class MainWindow(QMainWindow):
         self.drawing = False
         self.current_texture = None
         
-    def load_map_file(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "Load a PTB Map", "", "*.ptb")
-        if not file_name: return
+    def load_map_file(self, path=None):
+        if path is not None:
+            file_name = path
+        else:
+            file_name, _ = QFileDialog.getOpenFileName(self, "Load a PTB Map", "", "*.ptb")
+            if not file_name: return
         self.current_project = file_name
         self.reset_all()
         out = PtbLoader().load_file(file_name)
@@ -754,5 +757,8 @@ class ScriptEditor(QDialog):
 
 if __name__ == "__main__":
     app = QApplication([])
-    md = MainWindow()
+    md = MainWindow(sys.argv[0])
+    if len(sys.argv) > 1: 
+        path = sys.argv[1]
+        md.load_map_file(path)
     sys.exit(app.exec())
