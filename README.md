@@ -1,37 +1,13 @@
 <h1 align=center>Map-Builder for <a href="https://github.com/PyFlat/Plant-The-Bomb">Plant-The-Bomb</a></h1>
 
-# Warning:
-- Map-loading is currently broken
-
 # Credits:
 - Some textures are from <a href="https://de.freepik.com/">Freepik.com</a>
 
 # Control:
-1. Key: **Ctrl+Z**
-    - Undo changes (only working for one change)
-2. Key: **Left click and Right click**
-    - Place/Select a block
-3. Key: **Ctrl+Left click**
-    - Open enemy window
-4. Key: **Space**
-    - Click the key while the mouse is over a block and hold the key
-    - Move to the new location and let the key go
-    - -> Block will be moved
-5. Key: **Ctrl+Left/Right click**
-    - Makes a straight line
-6. Key: **Alt+Left/Right click**
-    - Lets you create a rectangle
+- Comming Soon
 
 # Usage:
-- Select the texture on the left side
-- You can left and right click to select two different blocks 
-- Below the script button you can see your currently selected block
-- Click in the field to place a block
-- With the white texture you can delete blocks (orange button)
-- The block types are explained [here](#blocks)
-- With the red button you can delete everything
-- With the green button you can select where you want to save the map **(Attention: file must have extension .ptb to be able to use it later on)**
-- With the blue button you can load maps, both old *.json* and new *.ptb* files
+- Comming Soon
 
 # Scripting Documentation:
 - Comming Soon
