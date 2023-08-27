@@ -754,9 +754,11 @@ class ScriptEditor(QDialog):
 
 
 if __name__ == "__main__":
+    print(sys.argv)
     app = QApplication([])
     md = MainWindow(sys.argv[0])
     if len(sys.argv) > 1: 
         path = sys.argv[1]
+        
         md.load_map_file(path)
     sys.exit(app.exec())
