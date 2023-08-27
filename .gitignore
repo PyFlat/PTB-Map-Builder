@@ -2,6 +2,8 @@
 
 *.iss
 
+*.spec
+
 Logs/
 
 ui_to_py.bat

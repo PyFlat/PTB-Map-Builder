@@ -1,4 +1,4 @@
-import sys
+import sys, pathlib, os,re
 sys.dont_write_bytecode = True
 
 from src.MainWindow import Ui_MainWindow
@@ -9,8 +9,6 @@ from src.compiler import *
 from src.compressor import *
 import src.KEYWORDS, src.RULES
 from src.ListEditDialog import ListEditDialog
-
-import pathlib, os,re
 
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
