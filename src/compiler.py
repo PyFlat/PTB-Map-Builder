@@ -587,6 +587,8 @@ class compiler:
         return mask.format(*tuple(chrs))
 
     def decompile(self, data: bytes) -> str:
+        if data == b"\x00\r":
+            return ""
         data = data[1:]
         lines = []
         result = ""

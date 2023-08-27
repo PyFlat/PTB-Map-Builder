@@ -1,4 +1,5 @@
-import json
+import json, logging, os; from datetime import datetime
+
 class compressor():
     def __init__(self, key = None):
         self.data = None
@@ -8,6 +9,14 @@ class compressor():
         self.key = key
         self.result = None
         self.name = ""
+        if not os.path.exists("Logs"):
+            os.makedirs("Logs")
+
+        current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        log_filename = f'Logs/log_{current_time}.log'
+
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', filename=log_filename, filemode='w')
+        
     def load(self, file):
         f = file.split(".")
         end = f[len(f)-1]
@@ -29,7 +38,7 @@ class compressor():
                 ss = rest + "sbin"
                 self.scripts = open(ss,"rb").read()
             except:
-                print("[WARNING] Could not retrieve script source")
+                logging.warning("Could not retrieve script source")
             try:
                 ss = rest + "txt"
                 self.texts = open(ss,"r").read()
@@ -48,10 +57,9 @@ class compressor():
                         t += "::"
                     self.texts = t
                 else:
-                    print("[WARNING] Could not find or load texts")
+                    logging.warning("Could not find or load texts")
         else:
-            print("[ERROR] Unrecognizable File Format")
-        print("Loaded File: " + file)
+            logging.error("Unrecognizable File Format")
     def insert_normal(self, world, scripts=None,texts=None):
         if scripts == None:
             scripts = b"\x00\x0d"
@@ -109,7 +117,7 @@ class compressor():
                     e_a.append(self.data["world"][i][j]["objectData"]["id2"])
                     e_h.append(self.data["world"][i][j]["objectData"]["health"])
         if show_error:
-            print("[WARNING] Using outdated Save format. Could not set enemy type data")
+            logging.warning("Using outdated Save format. Could not set enemy type data")
         t = max(e_t)
         a = max(e_a)
         h = max(e_h)
@@ -126,16 +134,16 @@ class compressor():
         key_part_3 = (a).to_bytes(1, "big")
         key_part_4 = (h).to_bytes(4, "big")
         self.key = key_part_1 + key_part_2 + key_part_3 + key_part_4
-        print("Generated Key : " + str(self.key))
+        logging.info(f"Generated Key : {self.key}")
     def compress(self):
         if self.mode != 0:
-            print("[ERROR] System set to decompression mode: Invalid data")
+            logging.error("System set to decompression mode: Invalid data")
             return
         if self.data == None:
-            print("[ERROR] No data found to compress")
+            logging.error("No data found to compress")
             return
         if self.key == None:
-            print("[INFO] No key found. Generating key to match data")
+            logging.info("No key found. Generating key to match data")
             self.get_key()
         result = b""
         bin_result = ""
@@ -175,9 +183,9 @@ class compressor():
         self.result = result
     def decompress(self):
         if self.mode != 1:
-            print("[ERROR] System set to decompression mode: Invalid data")
+            logging.error("System set to decompression mode: Invalid data")
         if self.data == None:
-            print("[ERROR] No data found to compress")
+            logging.error("No data found to compress")
             return
         #Read key
         self.key = self.data[0:8]
@@ -206,7 +214,7 @@ class compressor():
                 count_enemy += 1
             if bid == 5:
                 count_item += 1
-       # print(count_enemy, count_item)
+        # print(count_enemy, count_item)
         ex_size_enemy = count_enemy * (key_enemy_t+key_enemy_h+key_enemy_a)
         ex_size_item = count_item * 20
         ex_size_total = ex_size_enemy + ex_size_item + ex_size_world
@@ -281,7 +289,6 @@ class compressor():
                 if byte_block_text_and_script[i+2] == 0:
                     texts.append(ctext)
                     ctext = ""
-                    print("LOL",texts)
                     script_first = i+2
                     break
                 texts.append(ctext)
@@ -310,7 +317,7 @@ class compressor():
                 n += pp[i] + "."
             self.name = n
         if self.result == None:
-            print("[ERROR] No data found to save")
+            logging.error("No data found to save")
             return False
         if self.mode == 0:
             file = open(self.name+"ptb","wb")
@@ -321,7 +328,7 @@ class compressor():
             pass
             #not yet in here
         else:
-            print("[ERROR] No valid Operation")
+            logging.error("No valid Operation")
             return False
 class util():
     def get_bin_length(data):
@@ -340,13 +347,3 @@ class util():
     def transform_to_int(data):
         t = "0b" + data
         return int(t, 2)
-
-"""
-cmp = compressor()
-cmp.insert_normal(json.loads(open("test.json").read()),b"\x00\x05\x01\x01\x00\x0d","test\ntest\ntest")
-cmp.compress()
-dc = compressor()
-dc.insert_comp(cmp.result)
-dc.decompress()
-print(dc.get_data()[2])
-"""
