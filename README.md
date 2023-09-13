@@ -21,7 +21,7 @@
   </tr>
   <tr>
     <td>Player</td>
-    <td><img src="textures/00_%20player.png"></img></td>
+    <td><img src="textures/00_player.png"></img></td>
     <td>The start position of the player</td>
    </tr>
    <tr>
