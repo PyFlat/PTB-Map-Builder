@@ -123,7 +123,7 @@ class Ui_MainWindow(object):
         self.block_button_6 = QPushButton(self.blocks_page_1)
         self.block_button_6.setObjectName(u"block_button_6")
         icon6 = QIcon()
-        icon6.addFile(u"textures/06_+ghost.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon6.addFile(u"textures/06_ghost.png", QSize(), QIcon.Normal, QIcon.Off)
         self.block_button_6.setIcon(icon6)
         self.block_button_6.setIconSize(QSize(25, 25))
 
@@ -381,7 +381,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget_2.setCurrentIndex(2)
+        self.stackedWidget_2.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -433,7 +433,7 @@ class Ui_MainWindow(object):
         self.block_button_3.setText(QCoreApplication.translate("MainWindow", u" Wall", None))
         self.block_button_4.setText(QCoreApplication.translate("MainWindow", u"+ Bomb", None))
         self.block_button_5.setText(QCoreApplication.translate("MainWindow", u"+ Fire", None))
-        self.block_button_6.setText(QCoreApplication.translate("MainWindow", u"+ Ghost", None))
+        self.block_button_6.setText(QCoreApplication.translate("MainWindow", u"Ghost", None))
         self.block_button_7.setText(QCoreApplication.translate("MainWindow", u"+ Dynamite", None))
         self.block_button_8.setText(QCoreApplication.translate("MainWindow", u"+ Time Bomb", None))
         self.block_button_9.setText(QCoreApplication.translate("MainWindow", u"+ Heart", None))
