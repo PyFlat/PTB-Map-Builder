@@ -1,14 +1,10 @@
 *.pyc
 
-*.iss
-
 *.spec
 
 Logs/
 
 mainwindow.ui
-
-setup.py
 
 build/
 
