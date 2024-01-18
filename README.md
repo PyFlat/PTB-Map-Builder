@@ -1,18 +1,23 @@
 <h1 align=center>Map-Builder for <a href="https://github.com/PyFlat/Plant-The-Bomb">Plant-The-Bomb</a></h1>
 
 # Credits:
+
 - Some textures are from <a href="https://de.freepik.com/">Freepik.com</a>
 
 # Control:
+
 - Comming Soon
 
 # Usage:
+
 - Comming Soon
 
 # Scripting Documentation:
+
 - Comming Soon
 
 # Blocks:
+
 <table>
   <tr>
     <th>Block</th>
@@ -21,7 +26,7 @@
   </tr>
   <tr>
     <td>Player</td>
-    <td><img src="textures/00_%20player.png"></img></td>
+    <td><img src="textures/00_player.png"></img></td>
     <td>The start position of the player</td>
    </tr>
    <tr>
@@ -51,7 +56,7 @@
    </tr>
    <tr>
     <td>Ghost</td>
-    <td><img src="textures/06_%2Bghost.png"></img></td>
+    <td><img src="textures/06_ghost.png"></img></td>
     <td>Gives you a random curse</td>
    </tr>
    <tr>

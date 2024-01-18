@@ -15,3 +15,5 @@ mainwindow.ui
 setup.py
 
 build/
+
+build_exe.bat
