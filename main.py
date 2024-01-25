@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
     def __init__(self, dirpath=None):
         super().__init__()
 
-        self.ui = Ui_MainWindow() # Setup the Ui from the Designer
+        self.ui = Ui_MainWindow()
         self.ui.setupUi(self, dirpath)
 
         self.connect_menu()
