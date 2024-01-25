@@ -231,9 +231,9 @@ class compiler:
             "set_item {1} = {0}",
             "win",
             "loose",
-            "drawImage {3} on {1} {2} => {0}",
-            "drawRect on {1} {2} with color ( {3} {4} {5} ) => {0}",
-            "clear {}",
+            "drawImage {2} on {0} {1}",
+            "drawRect on {0} {1} with color ( {2} {3} {4} )",
+            "clear {0} {1}",
             "compare {} {} {} => {}",
             "jump {} lines if {}",
             "setFlag {} = {}",
@@ -317,9 +317,9 @@ class compiler:
             "*§",
             "",
             "",
-            "****",
-            "******",
-            "*",
+            "***",
+            "*****",
+            "**",
             "*§**",
             "**",
             "§$",
@@ -419,8 +419,6 @@ class compiler:
         x = util.validateInteger(attrs[3], 65535, line, self.logfile)
         y = util.validateInteger(attrs[4], 65535, line, self.logfile)
         i = util.validateInteger(attrs[1], 65535, line, self.logfile)
-        s = util.validateInteger(attrs[6], 65535, line, self.logfile)
-        result += util.byte(s, 2)
         result += util.byte(x, 2)
         result += util.byte(y, 2)
         result += util.byte(i, 2)
@@ -435,10 +433,8 @@ class compiler:
         r = util.validateInteger(attrs[7], mx, line, self.logfile)
         g = util.validateInteger(attrs[8], mx, line, self.logfile)
         b = util.validateInteger(attrs[9], mx, line, self.logfile)
-        s = util.validateInteger(attrs[12], mx, line, self.logfile)
         cmd = self.getCommandId(attrs[0])
         result = util.byte(cmd, 1)
-        result += util.byte(s, 2)
         result += util.byte(x, 2)
         result += util.byte(y, 2)
         result += util.byte(r, 2)
@@ -448,10 +444,12 @@ class compiler:
 
     def compile_clear(self, attrs, line):
         util.validateCommandLength(attrs, 2, line)
-        slot = util.validateInteger(attrs[1], 65535, line, self.logfile)
+        x = util.validateInteger(attrs[1], 65535, line, self.logfile)
+        y = util.validateInteger(attrs[2], 65535, line, self.logfile)
         cmd = self.getCommandId(attrs[0])
         result = util.byte(cmd, 1)
-        result += util.byte(slot, 2)
+        result += util.byte(x, 2)
+        result += util.byte(y, 2)
         return result
 
     def compile_comp(self, attrs, line):
