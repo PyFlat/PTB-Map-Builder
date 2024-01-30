@@ -740,7 +740,7 @@ class ScriptEditor(QDialog):
         lineedit.setReadOnly(True)
         lineedit.setAlignment(Qt.AlignCenter)
         dropdown.setLineEdit(lineedit)
-        dropdown.addItems(["on_step", "on_collect", "on_destroy"])
+        dropdown.addItems(["on_step", "on_collect", "on_destroy", "on_explode"])
         layout.addWidget(dropdown)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok)
