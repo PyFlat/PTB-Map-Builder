@@ -707,7 +707,11 @@ class ScriptEditor(QDialog):
         pick_coords_action.setText("Pick Coordinates")
         pick_coords_action.setShortcut("Ctrl+Shift+C")
         pick_coords_action.triggered.connect(lambda: self.pick_coordinates())
+        add_teleporter = QAction(self)
+        add_teleporter.setText("Add Teleporter")
+        add_teleporter.triggered.connect(lambda: self.start_teleporter_adding())
         tool_menu.addAction(pick_coords_action)
+        tool_menu.addAction(add_teleporter)
         menu.addMenu(tool_menu)
         return menu
 
@@ -715,6 +719,39 @@ class ScriptEditor(QDialog):
         self.setVisible(False)
         self.parent.pick_coords()
         self.parent.coord_signal.connect(self.insert_coords)
+
+    def start_teleporter_adding(self):
+        self.coordsm = []
+        self.setVisible(False)
+        msg_box = QMessageBox(self.parent)
+        msg_box.setWindowTitle("Message Box with Dropdown")
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setText("Select an item from the dropdown:")
+
+        combo_box = QComboBox()
+        combo_box.addItem("Item 1")
+        combo_box.addItem("Item 2")
+        combo_box.addItem("Item 3")
+        combo_box.addItem("Item 4")
+
+        msg_box.layout().addWidget(combo_box)
+
+        msg_box.addButton("OK", QMessageBox.AcceptRole)
+
+        msg_box.exec()
+
+        self.parent.pick_coords()
+        self.parent.coord_signal.connect(lambda x, y: self.save_cor(x,y, True))
+
+    def save_cor(self, x, y, fir:bool):
+        self.coordsm.append([x,y])
+        if fir:
+            self.parent.pick_coords()
+            self.parent.coord_signal.connect(lambda x, y: self.save_cor(x,y, False))
+
+        if not fir:
+            print(self.coordsm)
+
 
     def insert_coords(self, x, y):
         self.show()
