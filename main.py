@@ -1,4 +1,6 @@
 import sys, pathlib, os,re
+
+from PySide6.QtGui import QMouseEvent
 sys.dont_write_bytecode = True
 
 from src.MainWindow import Ui_MainWindow
@@ -619,11 +621,12 @@ class MainWindow(QMainWindow):
         self.set_builder_items_enabled(False)
         self.ui.imagePainter.mousePressEvent = lambda event: self.get_coords_on_mouse_click()
 
+
     def get_coords_on_mouse_click(self):
-        x,y = self.get_pos()
-        self.coord_signal.emit(x,y)
         self.ui.imagePainter.mousePressEvent = self.mouse_click_event
+        x,y = self.get_pos()
         self.set_builder_items_enabled(True)
+        self.coord_signal.emit(x,y)
 
 class Block():
     def __init__(self, x,y,texture_id, block_id, damage, health):
@@ -649,6 +652,7 @@ class Block():
 class ScriptEditor(QDialog):
     def __init__(self, parent:MainWindow, scripts):
         super().__init__(parent=parent)
+        self.connection = None
         self.parent = parent
         self.start_scripts = "" if scripts is None else scripts
         self.setWindowTitle("Script-Editor")
@@ -721,36 +725,63 @@ class ScriptEditor(QDialog):
         self.parent.coord_signal.connect(self.insert_coords)
 
     def start_teleporter_adding(self):
-        self.coordsm = []
         self.setVisible(False)
-        msg_box = QMessageBox(self.parent)
-        msg_box.setWindowTitle("Message Box with Dropdown")
-        msg_box.setIcon(QMessageBox.Information)
-        msg_box.setText("Select an item from the dropdown:")
 
-        combo_box = QComboBox()
-        combo_box.addItem("Item 1")
-        combo_box.addItem("Item 2")
-        combo_box.addItem("Item 3")
-        combo_box.addItem("Item 4")
+        dialog = QDialog(self.parent)
+        dialog.setWindowTitle("Dropdown Dialog")
 
-        msg_box.layout().addWidget(combo_box)
+        layout = QVBoxLayout(dialog)
 
-        msg_box.addButton("OK", QMessageBox.AcceptRole)
+        dropdown = QComboBox()
+        delegate = AlignDelegate(dropdown)
+        dropdown.setItemDelegate(delegate)
 
-        msg_box.exec()
+        lineedit = QComboBoxButton(dropdown)
+        lineedit.setReadOnly(True)
+        lineedit.setAlignment(Qt.AlignCenter)
+        dropdown.setLineEdit(lineedit)
+        dropdown.addItems(["on_step", "on_collect", "on_destroy"])
+        layout.addWidget(dropdown)
 
-        self.parent.pick_coords()
-        self.parent.coord_signal.connect(lambda x, y: self.save_cor(x,y, True))
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok)
+        button_box.accepted.connect(dialog.accept)
+        layout.addWidget(button_box)
 
-    def save_cor(self, x, y, fir:bool):
-        self.coordsm.append([x,y])
-        if fir:
+        res = dialog.exec()
+        if res:
+            msg_box = QMessageBox(self.parent)
+            msg_box.setText("Pick the start coordinate for your teleporter")
+            msg_box.addButton(QMessageBox.Ok)
+            msg_box.setWindowTitle("")
+            msg_box.exec()
+            self.trigger_text = dropdown.currentText()
             self.parent.pick_coords()
-            self.parent.coord_signal.connect(lambda x, y: self.save_cor(x,y, False))
+            self.connection = self.parent.coord_signal.connect(self.save_cor)
+        else:
+            self.setVisible(True)
 
-        if not fir:
-            print(self.coordsm)
+    def save_cor(self, x, y):
+        self.start = x, y
+        msg_box = QMessageBox(self.parent)
+        msg_box.setText("Pick the target coordinate for your teleporter")
+        msg_box.addButton(QMessageBox.Ok)
+        msg_box.setWindowTitle("")
+        msg_box.exec()
+        self.parent.pick_coords()
+        self.parent.coord_signal.disconnect(self.connection)
+        self.connection = self.parent.coord_signal.connect(self.finish)
+
+    def finish(self, x, y):
+        start_x = self.start[0]
+        start_y = self.start[1]
+        end_x = x
+        end_y = y
+        command = f"@ {self.trigger_text} on {start_x} {start_y}\nset 0 = {end_x}\nset 1 = {end_y}\ntp to 0 1\nend"
+        complete_text = self.text_edit.toPlainText()
+        complete_text += "" if complete_text.endswith("\n") or complete_text == "" else "\n"
+        self.text_edit.setPlainText(complete_text+command)
+        self.setVisible(True)
+        self.parent.coord_signal.disconnect(self.connection)
 
 
     def insert_coords(self, x, y):
@@ -792,6 +823,16 @@ class ScriptEditor(QDialog):
     def set_text(self):
         self.parent.set_script_text(self.text)
 
+class QComboBoxButton(QLineEdit):
+    def mousePressEvent(self, e):
+        combo = self.parent()
+        if isinstance(combo, QComboBox):
+            combo.showPopup()
+
+class AlignDelegate(QStyledItemDelegate):
+    def initStyleOption(self, option, index):
+        super(AlignDelegate, self).initStyleOption(option, index)
+        option.displayAlignment = Qt.AlignCenter
 
 if __name__ == "__main__":
     app = QApplication([])
