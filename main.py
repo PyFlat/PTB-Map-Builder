@@ -522,7 +522,6 @@ class MainWindow(QMainWindow):
         self.current_texture = None
 
     def load_map_file(self, path=None):
-        print("HI")
         if path is not None:
             file_name = path
         else:
@@ -758,7 +757,6 @@ class ScriptEditor(QDialog):
 
 
 if __name__ == "__main__":
-    print(sys.argv)
     app = QApplication([])
     md = MainWindow(sys.argv[0])
     if len(sys.argv) > 1:
