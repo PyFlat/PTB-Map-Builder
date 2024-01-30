@@ -296,12 +296,15 @@ class MainWindow(QMainWindow):
         self.changes_since_save = True
 
     def reset_all(self):
+        self.current_project = None
+        self.scripts = None
         for x in range(1,24):
             for y in range(1,24):
                 if self.blocks[x][y]:
                     self.remove(x,y)
 
     def connect_menu(self):
+        self.ui.actionNew.triggered.connect(lambda: self.reset_all())
         self.ui.actionOpen.triggered.connect(lambda: self.load_map_file())
         self.ui.actionSave.triggered.connect(lambda: self.save_map_file())
         self.ui.actionSave_As.triggered.connect(lambda: self.save_map_file(True))
@@ -519,13 +522,14 @@ class MainWindow(QMainWindow):
         self.current_texture = None
 
     def load_map_file(self, path=None):
+        print("HI")
         if path is not None:
             file_name = path
         else:
             file_name, _ = QFileDialog.getOpenFileName(self, "Load a PTB Map", "", "*.ptb")
             if not file_name: return
-        self.current_project = file_name
         self.reset_all()
+        self.current_project = file_name
         out = PtbLoader().load_file(file_name)
         self.scripts = self.comp.decompile(out[1])
         loaded_blocks = out[0]
