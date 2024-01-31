@@ -1,17 +1,175 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+# -*- coding: utf-8 -*-
 
-from src.ImagePainterWidget import ImagePainterWidget
-import os
+################################################################################
+## Form generated from reading UI file 'mainwindow.ui'
+##
+## Created by: Qt User Interface Compiler version 6.5.0
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
+
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QMainWindow,
+    QMenu, QMenuBar, QPushButton, QSizePolicy,
+    QStackedWidget, QVBoxLayout, QWidget)
+
+from imagepainterwidget import ImagePainterWidget
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow, dirpath=None):
-        if dirpath is not None: 
-            if os.path.isabs(dirpath): os.chdir(os.path.dirname(dirpath))
+    def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(676, 530)
+        MainWindow.resize(676, 544)
+        MainWindow.setStyleSheet(u"*{\n"
+"	font-family: Calibri;\n"
+"}\n"
+"\n"
+"QWidget{\n"
+"    background-color: #242424\n"
+"}\n"
+"QPlainTextEdit{\n"
+"    color: white;\n"
+"    font-size: 20px;\n"
+"}\n"
+"QLineEdit{\n"
+"    color: white;\n"
+"    font-size: 20px;\n"
+"    qproperty-alignment: AlignCenter;\n"
+"    outline: none;\n"
+"    border: 2px solid #1f6aa5;\n"
+"    border-radius: 5px;\n"
+"}\n"
+"QCheckBox{\n"
+"    color: white;\n"
+"    font-size: 20px;\n"
+"}\n"
+"QCheckBox::indicator{\n"
+"    height: 25px;\n"
+"    width: 25px;\n"
+"    image: url(icons/unchecked.png);\n"
+"}\n"
+"QLabel#current_left_block, QLabel#current_right_block{\n"
+"    border: 2px solid white;\n"
+"    border-radius: 3px;\n"
+"    qproperty-alignment: AlignCenter;\n"
+"    background-color: #1f6aa5\n"
+"}\n"
+"QCheckBox::indicator:checked{\n"
+"    height: 25px;\n"
+"    width: 25px;\n"
+"    image: url(icons/checked.png);\n"
+"}\n"
+"QDialog#enemy_edit_msgbox QLabel{\n"
+"    color: white;\n"
+"    font-size: 20px;\n"
+"}\n"
+"QDialog#enemy_edit_msgbox QPushButton{\n"
+"    text-align: "
+                        "center;\n"
+"    padding-left: 5px;\n"
+"}\n"
+"QListView {\n"
+"    background-color: rgb(50, 50, 50);\n"
+"    color: rgb(200, 200, 200);\n"
+"    border: 1px solid rgb(100, 100, 100); \n"
+"    outline: none;\n"
+"}\n"
+"QListView#text_edit{\n"
+"    font-size: 17px;\n"
+"}\n"
+"QDialog#text_edit_dialog QPushButton{\n"
+"    text-align: center;\n"
+"    padding-left: 5px;\n"
+"}\n"
+"QListView::item {\n"
+"    padding: 5px;\n"
+"}\n"
+"QListView::item:selected {\n"
+"    background-color: rgb(100, 100, 100);\n"
+"    color: rgb(255, 255, 255); \n"
+"}\n"
+"QMessageBox QLabel{\n"
+"    font-size: 20px;\n"
+"    color: white;\n"
+"}\n"
+"QMessageBox QPushButton{\n"
+"    padding: 5 10 5 10;\n"
+"    text-align: center;\n"
+"}\n"
+"\n"
+"QPushButton{\n"
+"    text-align: left;\n"
+"    padding: 5 5 5 10;\n"
+"    font-family: Calibri;\n"
+"    font-size: 20px;\n"
+"    border: 2px solid white;\n"
+"    border-radius: 5px;\n"
+"    background-color: #1f6aa5;\n"
+"    color: white;\n"
+"}\n"
+"QPushButton:pressed{\n"
+"    background-color: #125485;\n"
+""
+                        "}\n"
+"QPushButton:hover:!pressed{\n"
+"    background-color: #144870;\n"
+"}\n"
+"QPushButton:checked{\n"
+"    background-color: #144870\n"
+"}\n"
+"QPushButton#script_compile_dialog_btn{\n"
+"    text-align: center;\n"
+"    padding: 4 15 4 15;\n"
+"}\n"
+"QMenuBar{\n"
+"    font-size: 15px;\n"
+"    color: white;\n"
+"    margin-left: 5;\n"
+"}\n"
+"QMenu::item{\n"
+"	font-size: 12px;\n"
+"	color: white;\n"
+"	padding: 3 5 3 5;\n"
+"    margin: 3;\n"
+"    border-radius: 5px;\n"
+"}\n"
+"QMenuBar::item{\n"
+"    border-top-left-radius: 5px;\n"
+"    border-top-right-radius: 5px;\n"
+"    margin: 5 0 0 0;\n"
+"    padding: 5 10 5 10;\n"
+"}\n"
+"QMenu{\n"
+"    border: 2px solid #535353;\n"
+"}\n"
+"\n"
+"QMenu::separator{\n"
+"    background-color: white;\n"
+"    height: 1px;\n"
+"    margin: 0 5 0 5;\n"
+"}\n"
+"QMenu::item:selected, QMenuBar::item:selected{\n"
+"    background-color: #4a4a4a;\n"
+"}\n"
+"QPushButton#next_page_btn, QPushButton#prev_page_btn{\n"
+"	text-align: center;\n"
+"	padding: 5 0 5 0;\n"
+"}\n"
+"QPushButton#next_page_btn:dis"
+                        "abled, QPushButton#prev_page_btn:disabled{\n"
+"	border-color: #999999;\n"
+"}\n"
+"QPushButton#placeholder0, QPushButton#placeholder1, QPushButton#placeholder2, QPushButton#placeholder3, QPushButton#placeholder4{\n"
+"    border: none;\n"
+"    background-color: #242424\n"
+"}")
         self.actionSave = QAction(MainWindow)
         self.actionSave.setObjectName(u"actionSave")
         self.actionSave_As = QAction(MainWindow)

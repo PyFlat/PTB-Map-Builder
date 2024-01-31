@@ -263,7 +263,7 @@ QPushButton#placeholder0, QPushButton#placeholder1, QPushButton#placeholder2, QP
                  </property>
                  <property name="icon">
                   <iconset>
-                   <normaloff>textures/02_water.png</normaloff>textures/02_water.png</iconset>
+                   <normaloff>textures/02_water.gif</normaloff>textures/02_water.gif</iconset>
                  </property>
                  <property name="iconSize">
                   <size>

@@ -78,8 +78,16 @@ class MainWindow(QMainWindow):
             idx = -1 if i == len(self.textures)-2 else i
             button.mousePressEvent = lambda event=False, index=idx: self.set_textures(event=event, idx=index)
 
+        movie = QMovie(self)
+        movie.setFileName(self.textures[2])
+
+        def update_icon():
+            self.ui.block_button_2.setIcon(movie.currentPixmap())
+
+        movie.frameChanged.connect(update_icon)
+        movie.start()
+
         self.ui.block_button_15.clicked.connect(self.reset_all_button)
-        #self.ui.block_button_16.clicked.connect(self.start_block_move)
 
         self.ui.prev_page_btn.clicked.connect(lambda: self.previous_page())
         self.ui.next_page_btn.clicked.connect(lambda: self.next_page())
@@ -277,11 +285,13 @@ class MainWindow(QMainWindow):
         self.ui.prev_page_btn.setEnabled(current_index > 0)
         self.ui.next_page_btn.setEnabled(current_index < self.ui.stackedWidget_2.count() - 1)
 
+
     def update_current_block(self):
         if self.texture_left >= 0: self.ui.current_left_block.setPixmap(QPixmap(self.textures[self.texture_left]))
         else: self.ui.current_left_block.setPixmap(QPixmap("icons/delete.png").scaled(20, 20))
         if self.texture_right >= 0: self.ui.current_right_block.setPixmap(QPixmap(self.textures[self.texture_right]))
         else: self.ui.current_right_block.setPixmap(QPixmap("icons/delete.png").scaled(20, 20))
+
 
     def place(self, x, y, texture_idx, god_mode=False, damage=None, health=None):
         if not god_mode:
