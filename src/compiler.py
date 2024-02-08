@@ -102,7 +102,8 @@ class compiler:
             self.compile_rand,
             self.compile_ptr,
             self.compile_ptr,
-            self.compile_reset
+            self.compile_reset,
+            self.compile_text
         ]
         self.logfile = log()
 
@@ -173,7 +174,8 @@ class compiler:
             "randomNumber": 24,
             "loadFromPointer": 25,
             "storeToPointer": 26,
-            "place_block": 27
+            "place_block": 27,
+            "show_text": 28
         }
         try:
             return cm[cmd]
@@ -209,7 +211,8 @@ class compiler:
             "randomNumber",
             "loadFromPointer",
             "storeToPointer",
-            "place_block"
+            "place_block",
+            "show_text"
         ]
         try:
             return cm[cmd]
@@ -245,7 +248,8 @@ class compiler:
             "randomNumber from {} to {} => {}",
             "loadFromPointer at {} to {}",
             "storeToPointer value {} to {}",
-            "place_block {}"
+            "place_block {}",
+            "show_text {1} using {0}"
         ]
         try:
             return ms[cmd]
@@ -298,7 +302,8 @@ class compiler:
             None,
             None,
             None,
-            None
+            None,
+            [None, "mode_popup","mode_display"]
         ]
         return ens[cmd]
 
@@ -331,7 +336,8 @@ class compiler:
             "***",
             "**",
             "**",
-            "*"
+            "*",
+            "$*"
         ]
         return cc[cmd]
 
@@ -529,6 +535,13 @@ class compiler:
         result += util.byte(_min,2)
         result += util.byte(_max,2)
         result += util.byte(stor,2)
+        return result
+    def compile_text(self, attrs, line):
+        util.validateCommandLength(attrs, 4, line)
+        text = util.validateInteger(attrs[1],65535,line,self.logfile)
+        mode = util.validateEnum(attrs[1],["mode_popup","mode_display"],line, [None])
+        result = util.byte(mode, 1)
+        result += util.byte(text,2)
         return result
     def compile(self, script: str, options="") -> bytes:
         self.logfile.add_log(f"Compiling started with options {options}")

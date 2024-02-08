@@ -37,5 +37,6 @@ COMMANDS = [
     f"{START}randomNumber from {ARG_LONG} to {ARG_LONG} => {ARG_LONG}{END}",
     f"{START}loadFromPointer at {ARG_LONG} to {ARG_LONG}{END}",
     f"{START}storeToPointer value {ARG_LONG} to {ARG_LONG}{END}",
-    f"{START}place_block {ARG_LONG}{END}"
+    f"{START}place_block {ARG_LONG}{END}",
+    f"{START}show_text {ARG_LONG} using {enum(['mode_popup','mode_display'])}"
 ]
