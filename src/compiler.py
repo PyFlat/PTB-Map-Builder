@@ -303,6 +303,7 @@ class compiler:
             None,
             None,
             None,
+            None,
             [None, "mode_popup","mode_display"]
         ]
         return ens[cmd]
