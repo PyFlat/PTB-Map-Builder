@@ -540,7 +540,8 @@ class compiler:
         util.validateCommandLength(attrs, 4, line)
         text = util.validateInteger(attrs[1],65535,line,self.logfile)
         mode = util.validateEnum(attrs[3],["mode_popup","mode_display"],line, [None])
-        result = util.byte(mode, 1)
+        result = util.byte(self.getCommandId(attrs[0]),1)
+        result += util.byte(mode, 1)
         result += util.byte(text,2)
         return result
     def compile(self, script: str, options="") -> bytes:
