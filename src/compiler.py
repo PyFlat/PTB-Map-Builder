@@ -539,7 +539,7 @@ class compiler:
     def compile_text(self, attrs, line):
         util.validateCommandLength(attrs, 4, line)
         text = util.validateInteger(attrs[1],65535,line,self.logfile)
-        mode = util.validateEnum(attrs[1],["mode_popup","mode_display"],line, [None])
+        mode = util.validateEnum(attrs[3],["mode_popup","mode_display"],line, [None])
         result = util.byte(mode, 1)
         result += util.byte(text,2)
         return result
