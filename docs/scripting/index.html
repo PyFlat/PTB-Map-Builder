@@ -321,6 +321,77 @@
           the draw layer.<br />
           2. {section_no_name}<br />
           <code>place_block</code>: {under_construction}<br />
+          <code>place_block {address}</code> is a rather complex command, used
+          to directly manipulate the game world. As obvious it does not follow any
+          specific argument pattern, but its behavior is defined solely by the specified
+          memory. Below is a table, that shows, what this code does when.
+          <table>
+            <tr><th>address</th><th>address+1</th><th>address+2</th><th>address+3</th><th>address+4</th><th>Behaviour</th></tr>
+            <tr>
+              <td>ID (0)</td><td>X</td><td>Y</td><td>NOT_USED</td><td>NOT_USED</td>
+              <td>
+                This places an air block on the specified position, when ID is 0. The +3 and +4 slots are not used.
+              </td>
+            </tr>
+            <tr>
+              <td>ID (1)</td><td>X</td><td>Y</td><td>NOT_USED</td><td>NOT_USED</td>
+              <td>
+                This blaces an indestructible block at the specified position.
+              </td>
+            </tr>
+            <tr>
+              <td>ID (2)</td><td>X</td><td>Y</td><td>NOT_USED</td><td>NOT_USED</td>
+              <td>
+                This blaces a destructible block at the specified position.
+              </td>
+            </tr>
+            <tr>
+              <td>ID (3)</td><td>X</td><td>Y</td><td>NOT_USED</td><td>NOT_USED</td>
+              <td>
+                This blaces a water block at the specified position.
+              </td>
+            </tr>
+            <tr>
+              <td>ID (4)</td><td>X</td><td>Y</td><td>RNG_START</td><td>RNG_END</td>
+              <td>
+                This blaces an item at the specified position. RNG_START and RNG_END are an old
+                relic and should only be set to the same value. To generate random items use the RANDOM
+                command. Below is a list of item mappings to RNG_VALUES:<br>
+                <table id="t0" onclick="show_table(1)">
+                  <tr><th>RNG_VALUES</th><th>ITEM</th></tr>
+                  <tr><td>0</td><td>nuke</td></tr>
+                  <tr><td>1</td><td>dynamite</td></tr>
+                  <tr><td>50</td><td>health+</td></tr>
+                  <tr><td>80</td><td>damage+</td></tr>
+                  <tr><td>200</td><td>timebomb+</td></tr>
+                  <tr><td>300</td><td>shield</td></tr>
+                  <tr><td>500</td><td>bomb+</td></tr>
+                  <tr><td>700</td><td>range+</td></tr>
+                  <tr><td>900</td><td>curse</td></tr>
+                </table>
+                <table id="t1" hidden="" onclick="show_table(0)">
+                  <tr><th>Click for more info</th></tr>
+                </table>
+                <script>
+                  function show_table(i) {
+                    i = i?1:0; //sanitize input
+                    document.getElementById(`t${i}`).hidden=false;
+                    document.getElementById(`t${i^1}`).hidden=true;
+                  }
+                  document.getElementById("t0").innerHTML = "<tr><th>Click to hide</th><th></th></tr>" + document.getElementById("t0").innerHTML;
+                  show_table(1);
+                </script>
+              </td>
+            </tr>
+            <tr>
+              <td>ID (5)</td><td>X</td><td>Y</td><td>HEALTH</td><td>DAMAGE_MODE</td>
+              <td>
+                This blaces an enemy at the specified position. What health does, does not need explanation, but keep in mind, that enemies with 0 health
+                will still take one hit, until they are defeated. However they will (probably) also die, if the player attacks them with 0 damage.
+                There are currently only two attack-modes: 0 does nothing and 1 is the basic orthogonal attack. There are plans to extend this in future updates.
+              </td>
+            </tr>
+          </table>
         </div>
         <hr />
         <h3 id="advanced-logic">e. Advanced Logic</h3>
