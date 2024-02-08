@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget
-from PySide6.QtGui import QPainter, QImage
+from PySide6.QtGui import QPainter, QImage, QMovie, QPixmap
 
 class ImagePainterWidget(QWidget):
     def __init__(self, parent=None):
@@ -11,6 +11,15 @@ class ImagePainterWidget(QWidget):
         self.counter += 1
         image = QImage(image_path)
         self.image_entries[self.counter] = {'position': (x, y), 'image': image, 'visible': True}
+
+        if image_path.endswith(".gif"):
+            movie = QMovie(image_path)
+            movie.frameChanged.connect(self.update)
+            movie.start()
+            self.image_entries[self.counter]['movie'] = movie
+        else:
+            self.image_entries[self.counter]['movie'] = None
+
         self.update()
         return self.counter
 
@@ -29,5 +38,8 @@ class ImagePainterWidget(QWidget):
         for entry in self.image_entries.values():
             if entry['visible']:
                 x, y = entry['position']
-                image = entry['image']
-                painter.drawImage(x, y, image)
+                if entry['movie'] is not None:
+                    pixmap = entry['movie'].currentPixmap()
+                else:
+                    pixmap = QPixmap.fromImage(entry['image'])
+                painter.drawPixmap(x, y, pixmap)

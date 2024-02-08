@@ -1,4 +1,6 @@
 import sys, pathlib, os,re
+
+from PySide6.QtGui import QMouseEvent
 sys.dont_write_bytecode = True
 
 from src.MainWindow import Ui_MainWindow
@@ -76,8 +78,16 @@ class MainWindow(QMainWindow):
             idx = -1 if i == len(self.textures)-2 else i
             button.mousePressEvent = lambda event=False, index=idx: self.set_textures(event=event, idx=index)
 
+        movie = QMovie(self)
+        movie.setFileName(self.textures[2])
+
+        def update_icon():
+            self.ui.block_button_2.setIcon(movie.currentPixmap())
+
+        movie.frameChanged.connect(update_icon)
+        movie.start()
+
         self.ui.block_button_15.clicked.connect(self.reset_all_button)
-        #self.ui.block_button_16.clicked.connect(self.start_block_move)
 
         self.ui.prev_page_btn.clicked.connect(lambda: self.previous_page())
         self.ui.next_page_btn.clicked.connect(lambda: self.next_page())
@@ -275,11 +285,13 @@ class MainWindow(QMainWindow):
         self.ui.prev_page_btn.setEnabled(current_index > 0)
         self.ui.next_page_btn.setEnabled(current_index < self.ui.stackedWidget_2.count() - 1)
 
+
     def update_current_block(self):
         if self.texture_left >= 0: self.ui.current_left_block.setPixmap(QPixmap(self.textures[self.texture_left]))
         else: self.ui.current_left_block.setPixmap(QPixmap("icons/delete.png").scaled(20, 20))
         if self.texture_right >= 0: self.ui.current_right_block.setPixmap(QPixmap(self.textures[self.texture_right]))
         else: self.ui.current_right_block.setPixmap(QPixmap("icons/delete.png").scaled(20, 20))
+
 
     def place(self, x, y, texture_idx, god_mode=False, damage=None, health=None):
         if not god_mode:
@@ -296,12 +308,15 @@ class MainWindow(QMainWindow):
         self.changes_since_save = True
 
     def reset_all(self):
+        self.current_project = None
+        self.scripts = None
         for x in range(1,24):
             for y in range(1,24):
                 if self.blocks[x][y]:
                     self.remove(x,y)
 
     def connect_menu(self):
+        self.ui.actionNew.triggered.connect(lambda: self.reset_all())
         self.ui.actionOpen.triggered.connect(lambda: self.load_map_file())
         self.ui.actionSave.triggered.connect(lambda: self.save_map_file())
         self.ui.actionSave_As.triggered.connect(lambda: self.save_map_file(True))
@@ -524,8 +539,8 @@ class MainWindow(QMainWindow):
         else:
             file_name, _ = QFileDialog.getOpenFileName(self, "Load a PTB Map", "", "*.ptb")
             if not file_name: return
-        self.current_project = file_name
         self.reset_all()
+        self.current_project = file_name
         out = PtbLoader().load_file(file_name)
         self.scripts = self.comp.decompile(out[1])
         loaded_blocks = out[0]
@@ -616,11 +631,12 @@ class MainWindow(QMainWindow):
         self.set_builder_items_enabled(False)
         self.ui.imagePainter.mousePressEvent = lambda event: self.get_coords_on_mouse_click()
 
+
     def get_coords_on_mouse_click(self):
-        x,y = self.get_pos()
-        self.coord_signal.emit(x,y)
         self.ui.imagePainter.mousePressEvent = self.mouse_click_event
+        x,y = self.get_pos()
         self.set_builder_items_enabled(True)
+        self.coord_signal.emit(x,y)
 
 class Block():
     def __init__(self, x,y,texture_id, block_id, damage, health):
@@ -646,6 +662,7 @@ class Block():
 class ScriptEditor(QDialog):
     def __init__(self, parent:MainWindow, scripts):
         super().__init__(parent=parent)
+        self.connection = None
         self.parent = parent
         self.start_scripts = "" if scripts is None else scripts
         self.setWindowTitle("Script-Editor")
@@ -704,7 +721,11 @@ class ScriptEditor(QDialog):
         pick_coords_action.setText("Pick Coordinates")
         pick_coords_action.setShortcut("Ctrl+Shift+C")
         pick_coords_action.triggered.connect(lambda: self.pick_coordinates())
+        add_teleporter = QAction(self)
+        add_teleporter.setText("Add Teleporter")
+        add_teleporter.triggered.connect(lambda: self.start_teleporter_adding())
         tool_menu.addAction(pick_coords_action)
+        tool_menu.addAction(add_teleporter)
         menu.addMenu(tool_menu)
         return menu
 
@@ -712,6 +733,66 @@ class ScriptEditor(QDialog):
         self.setVisible(False)
         self.parent.pick_coords()
         self.parent.coord_signal.connect(self.insert_coords)
+
+    def start_teleporter_adding(self):
+        self.setVisible(False)
+
+        dialog = QDialog(self.parent)
+        dialog.setWindowTitle("Dropdown Dialog")
+
+        layout = QVBoxLayout(dialog)
+
+        dropdown = QComboBox()
+        delegate = AlignDelegate(dropdown)
+        dropdown.setItemDelegate(delegate)
+
+        lineedit = QComboBoxButton(dropdown)
+        lineedit.setReadOnly(True)
+        lineedit.setAlignment(Qt.AlignCenter)
+        dropdown.setLineEdit(lineedit)
+        dropdown.addItems(["on_step", "on_collect", "on_destroy", "on_explode"])
+        layout.addWidget(dropdown)
+
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok)
+        button_box.accepted.connect(dialog.accept)
+        layout.addWidget(button_box)
+
+        res = dialog.exec()
+        if res:
+            msg_box = QMessageBox(self.parent)
+            msg_box.setText("Pick the start coordinate for your teleporter")
+            msg_box.addButton(QMessageBox.Ok)
+            msg_box.setWindowTitle("")
+            msg_box.exec()
+            self.trigger_text = dropdown.currentText()
+            self.parent.pick_coords()
+            self.connection = self.parent.coord_signal.connect(self.save_cor)
+        else:
+            self.setVisible(True)
+
+    def save_cor(self, x, y):
+        self.start = x, y
+        msg_box = QMessageBox(self.parent)
+        msg_box.setText("Pick the target coordinate for your teleporter")
+        msg_box.addButton(QMessageBox.Ok)
+        msg_box.setWindowTitle("")
+        msg_box.exec()
+        self.parent.pick_coords()
+        self.parent.coord_signal.disconnect(self.connection)
+        self.connection = self.parent.coord_signal.connect(self.finish)
+
+    def finish(self, x, y):
+        start_x = self.start[0]
+        start_y = self.start[1]
+        end_x = x
+        end_y = y
+        command = f"@ {self.trigger_text} on {start_x} {start_y}\nset 0 = {end_x}\nset 1 = {end_y}\ntp to 0 1\nend"
+        complete_text = self.text_edit.toPlainText()
+        complete_text += "" if complete_text.endswith("\n") or complete_text == "" else "\n"
+        self.text_edit.setPlainText(complete_text+command)
+        self.setVisible(True)
+        self.parent.coord_signal.disconnect(self.connection)
+
 
     def insert_coords(self, x, y):
         self.show()
@@ -752,9 +833,18 @@ class ScriptEditor(QDialog):
     def set_text(self):
         self.parent.set_script_text(self.text)
 
+class QComboBoxButton(QLineEdit):
+    def mousePressEvent(self, e):
+        combo = self.parent()
+        if isinstance(combo, QComboBox):
+            combo.showPopup()
+
+class AlignDelegate(QStyledItemDelegate):
+    def initStyleOption(self, option, index):
+        super(AlignDelegate, self).initStyleOption(option, index)
+        option.displayAlignment = Qt.AlignCenter
 
 if __name__ == "__main__":
-    print(sys.argv)
     app = QApplication([])
     md = MainWindow(sys.argv[0])
     if len(sys.argv) > 1:

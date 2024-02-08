@@ -4,8 +4,7 @@
 
 Logs/
 
-mainwindow.ui
-
 build/
 
 build_exe.bat
+update.bat
