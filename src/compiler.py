@@ -337,7 +337,7 @@ class compiler:
             "**",
             "**",
             "*",
-            "$*"
+            "§*"
         ]
         return cc[cmd]
 
