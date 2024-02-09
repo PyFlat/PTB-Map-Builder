@@ -84,9 +84,9 @@
         <h2>2. Command Documentation</h2>
         <h3 id="triggers">a. Triggers</h3>
         <p>
-          Triggers are activated by in-game actions. They initialize execution
-          of the script. There are different kinds of triggers, that can have
-          different properties.
+          Triggers are activated by in-game actions. They initialize the
+          execution of the script. There are different kinds of triggers that
+          can have different properties.
         </p>
         <p>
           All triggers follow the same command syntax:
@@ -104,8 +104,8 @@
             <td>true</td>
             <td>false</td>
             <td>
-              Theoretically reusable, however these are only triggered once
-              after world load
+              Theoretically reusable; however, these are only triggered once
+              after world load.
             </td>
           </tr>
           <tr>
@@ -114,29 +114,29 @@
             <td>true</td>
             <td>
               If the player steps on the specified position, this trigger
-              executes
+              executes.
             </td>
           </tr>
           <tr>
             <td>on_collect</td>
             <td>false</td>
             <td>true</td>
-            <td>Same as above, but it can't be reused</td>
+            <td>Same as above, but it can't be reused.</td>
           </tr>
           <tr>
             <td>on_explode</td>
             <td>true</td>
             <td>true</td>
             <td>
-              Whenever a explosion occures on the specified position, this gets
-              executed
+              Whenever an explosion occurs on the specified position, this gets
+              executed.
             </td>
           </tr>
           <tr>
             <td>on_destroy</td>
             <td>false</td>
             <td>true</td>
-            <td>The on_collect equivalent of on_explode</td>
+            <td>The on_collect equivalent of on_explode.</td>
           </tr>
           <tr>
             <td>on_tick</td>
@@ -144,15 +144,15 @@
             <td>false</td>
             <td>
               This gets executed on every tick. A tick is just a game update.
-              The default tickrate is 20/s
+              The default tickrate is 20/s.
             </td>
           </tr>
         </table>
         <p class="important">
-          If the code starts execution, it will only stop, when it reaches an
+          If the code starts execution, it will only stop when it reaches an
           "end" statement! This is required and can lead to crashes otherwise.
         </p>
-        <p>the syntax for "end" is just "end"!</p>
+        <p>The syntax for "end" is just "end"!</p>
         <hr />
         <h3 id="control-flow">b. Control Flow</h3>
         <div>
