@@ -53,20 +53,13 @@ class ImagePainterWidget(QWidget):
         for id, entry in self.image_entries.items():
             if entry['visible']:
                 x, y = entry['position']
-                if entry['movie'] is not None:
-                    pixmap = entry['movie'].currentPixmap()
-                else:
-                    pixmap = QPixmap.fromImage(entry['image'])
+                pixmap = entry['movie'].currentPixmap() if entry['movie'] else QPixmap.fromImage(entry['image'])
 
-                rx, ry = x//20, y//20
+                rx, ry = x // 20, y // 20
                 painter.drawPixmap(x, y, pixmap)
 
-                if self.highlighted_block_active:
-                    if (rx, ry) != self.highlighted_block_coords:
-                        color = QColor(128, 128, 128, 180)
-                        painter.fillRect(x, y, pixmap.width(), pixmap.height(), color)
+                if self.highlighted_block_active and (rx, ry) != self.highlighted_block_coords:
+                    painter.fillRect(x, y, pixmap.width(), pixmap.height(), QColor(128, 128, 128, 180))
 
-                if self.highlight_enemys:
-                    if (rx, ry) not in self.enemys:
-                        color = QColor(128, 128, 128, 180)
-                        painter.fillRect(x, y, pixmap.width(), pixmap.height(), color)
+                if self.highlight_enemys and (rx, ry) not in self.enemys:
+                    painter.fillRect(x, y, pixmap.width(), pixmap.height(), QColor(128, 128, 128, 180))
