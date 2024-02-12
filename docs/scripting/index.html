@@ -580,15 +580,13 @@
             navigator.clipboard
               .writeText(codeContent)
               .then(() => {
-                // Change button text and color temporarily
                 this.textContent = "Copied!";
-                this.style.backgroundColor = "#28a745"; // green color
+                this.style.backgroundColor = "#28a745";
 
-                // Restore original button text and color after 2 seconds
                 setTimeout(() => {
                   this.textContent = originalButtonText;
-                  this.style.backgroundColor = "#007bff"; // original blue color
-                }, 2000);
+                  this.style.backgroundColor = "#007bff";
+                }, 1300);
               })
               .catch((err) => {
                 console.error("Failed to copy: ", err);
