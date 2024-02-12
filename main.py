@@ -35,6 +35,8 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget_2.setCurrentIndex(0)
         self.ui.prev_page_btn.setDisabled(True)
 
+        self.ui.imagePainter.setMouseTracking(True)
+
         self.setStyleSheet(open(Utils.get_abs_path("style.qss"), "r").read())
 
         self.textures = self.load_textures() # Load All Textures
@@ -104,6 +106,10 @@ class MainWindow(QMainWindow):
         self.shortcut_edit_enemy = QShortcut(QKeySequence(Qt.Key_Escape), self)
         self.shortcut_edit_enemy.activated.connect(self.end_edit_enemy)
         self.shortcut_edit_enemy.setEnabled(False)
+
+        self.shortcut_pick_coords =  QShortcut(QKeySequence(Qt.Key_Escape), self)
+        self.shortcut_pick_coords.activated.connect(self.end_coord_pick)
+        self.shortcut_pick_coords.setEnabled(False)
 
         self.switch_prev_page = QShortcut(QKeySequence(Qt.Key_Left), self)
         self.switch_prev_page.activated.connect(lambda: self.previous_page())
@@ -630,13 +636,23 @@ class MainWindow(QMainWindow):
     def pick_coords(self):
         self.set_builder_items_enabled(False)
         self.ui.imagePainter.mousePressEvent = lambda event: self.get_coords_on_mouse_click()
+        self.ui.imagePainter.mouseMoveEvent = self.update_coords_highlighting
+        self.shortcut_pick_coords.setEnabled(True)
 
+    def update_coords_highlighting(self, event):
+        coords = self.get_pos()
+        self.ui.imagePainter.set_highlighted_block(coords[0], coords[1], True)
 
     def get_coords_on_mouse_click(self):
-        self.ui.imagePainter.mousePressEvent = self.mouse_click_event
         x,y = self.get_pos()
-        self.set_builder_items_enabled(True)
         self.coord_signal.emit(x,y)
+        self.end_coord_pick()
+
+    def end_coord_pick(self):
+        self.ui.imagePainter.set_highlighted_block()
+        self.rebind_mouse()
+        self.set_builder_items_enabled(True)
+
 
 class Block():
     def __init__(self, x,y,texture_id, block_id, damage, health):
