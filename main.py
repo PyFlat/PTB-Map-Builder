@@ -637,7 +637,8 @@ class MainWindow(QMainWindow):
         self.set_builder_items_enabled(False)
         self.ui.imagePainter.mousePressEvent = lambda event: self.get_coords_on_mouse_click()
         self.ui.imagePainter.mouseMoveEvent = self.update_coords_highlighting
-        self.shortcut_pick_coords.setEnabled(True)
+        if not self.shortcut_edit_enemy.isEnabled():
+            self.shortcut_pick_coords.setEnabled(True)
 
     def update_coords_highlighting(self, event):
         coords = self.get_pos()
