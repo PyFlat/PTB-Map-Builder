@@ -15,7 +15,7 @@ class ImagePainterWidget(QWidget):
         self.counter += 1
         image = QImage(image_path)
         self.image_entries[self.counter] = {'position': (x, y), 'image': image, 'visible': True}
-        if "10_enemy.png" in image_path:
+        if image_path.endswith("10_enemy.png"):
             self.enemys.append((x//20, y//20))
 
         if image_path.endswith(".gif"):
