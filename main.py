@@ -344,13 +344,13 @@ class MainWindow(QMainWindow):
         self.enemy_health, self.enemy_damage = self.enemy_edit_messagebox(self.enemy_health, self.enemy_damage)
 
     def edit_enemy(self):
-        self.show_only_block(10)
+        self.ui.imagePainter.set_highlight_enmemys(True)
         self.set_builder_items_enabled(False)
         self.ui.imagePainter.mousePressEvent = self.edit_enemy_event
         self.shortcut_edit_enemy.setEnabled(True)
 
     def end_edit_enemy(self):
-        self.show_every_block()
+        self.ui.imagePainter.set_highlight_enmemys(False)
         self.set_builder_items_enabled(True)
         self.ui.imagePainter.mousePressEvent = self.mouse_click_event
         self.shortcut_edit_enemy.setEnabled(False)

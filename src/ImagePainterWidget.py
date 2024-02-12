@@ -8,11 +8,15 @@ class ImagePainterWidget(QWidget):
         self.counter = 0
         self.highlighted_block_coords = None  # Store the coordinates of the highlighted block
         self.highlighted_block_active = False
+        self.highlight_enemys = False
+        self.enemys = []
 
-    def add_image(self, image_path, x, y):
+    def add_image(self, image_path:str, x, y):
         self.counter += 1
         image = QImage(image_path)
         self.image_entries[self.counter] = {'position': (x, y), 'image': image, 'visible': True}
+        if "10_enemy.png" in image_path:
+            self.enemys.append((x//20, y//20))
 
         if image_path.endswith(".gif"):
             movie = QMovie(image_path)
@@ -40,6 +44,10 @@ class ImagePainterWidget(QWidget):
         self.highlighted_block_active = active
         self.update()
 
+    def set_highlight_enmemys(self, active=False):
+        self.highlight_enemys = active
+        self.update()
+
     def paintEvent(self, event):
         painter = QPainter(self)
         for id, entry in self.image_entries.items():
@@ -55,5 +63,10 @@ class ImagePainterWidget(QWidget):
 
                 if self.highlighted_block_active:
                     if (rx, ry) != self.highlighted_block_coords:
+                        color = QColor(128, 128, 128, 180)
+                        painter.fillRect(x, y, pixmap.width(), pixmap.height(), color)
+
+                if self.highlight_enemys:
+                    if (rx, ry) not in self.enemys:
                         color = QColor(128, 128, 128, 180)
                         painter.fillRect(x, y, pixmap.width(), pixmap.height(), color)
