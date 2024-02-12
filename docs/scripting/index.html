@@ -37,10 +37,9 @@
                 <a href="#advanced-logic">Advanced Logic</a>
               </li>
             </ul>
-          <li>
-              <a href="#examples">3. Examples</a>
-            </li>
           </li>
+
+          <li><a href="#examples">3. Examples</a></li>
         </ul>
       </nav>
     </div>
@@ -278,15 +277,31 @@
               This flag determines if random item drops from blocks are enabled.
             </li>
           </ol>
-          4. <code>show_message {msg} using {mode}</code><br>
+          4. <code>show_message {msg} using {mode}</code><br />
           This command shows some text somwhere on screen using a specific mode.
-          Texts are created seperately using the text-editor in a list with indexing starting
-          at 0. As with nearly everything text access is relative. A list of possible modes
-          and their behavior are listed below:
+          Texts are created seperately using the text-editor in a list with
+          indexing starting at 0. As with nearly everything text access is
+          relative. A list of possible modes and their behavior are listed
+          below:
           <table>
-            <tr><th>mode</th><th>description</th></tr>
-            <tr><td>mode_display</td><td>Displays the text on the side of the screen, until other text is shown.</td></tr>
-            <tr><td>mode_popup</td><td>Displays the text as a popup on screen, until the user closes it. <span class="important">THIS WILL PAUSE THE GAME!</span></td></tr>
+            <tr>
+              <th>mode</th>
+              <th>description</th>
+            </tr>
+            <tr>
+              <td>mode_display</td>
+              <td>
+                Displays the text on the side of the screen, until other text is
+                shown.
+              </td>
+            </tr>
+            <tr>
+              <td>mode_popup</td>
+              <td>
+                Displays the text as a popup on screen, until the user closes
+                it. <span class="important">THIS WILL PAUSE THE GAME!</span>
+              </td>
+            </tr>
           </table>
         </div>
         <hr />
@@ -509,27 +524,40 @@
           random number in the range <code>({start}-{end})</code> and stores it
           to <code>{stor}</code>.
         </div>
-        <h2 id="examples">3. Examples</h3>
-        <div>
-          If you reach this section you are expected to have read and understood all avaliable commands.
-          <br><div class="code_block">
-            @ on_init on 0 0<br>
-            setFlag drop_items = 0<br>
-            end
-          </div>
-          This line is in the tutorial map. It simply disables item drops on load
-          <hr/>
+        <h3 id="examples">3. Examples</h3>
+        <div class="code-container">
           <div class="code_block">
-            @ on_step on 10 10<br>
-            set 0 = 20<br>
-            tp to 0 0<br>
-            end
+            <div class="code-content">
+              @ on_init on 0 0<br />
+              setFlag drop_items = 0<br />
+              end
+            </div>
+            <button class="copy-button">Copy</button>
           </div>
-          This is the script for creating a simple teleporter. When the player steps on 5 5, they
-          get teleported to 20 20. As seen by the trigger, this teleporter is reusable.
-          <hr/>
-          More examples are coming soon!
+          <p>
+            This line is in the tutorial map. It simply disables item drops on
+            load
+          </p>
         </div>
+        <hr />
+        <div class="code-container">
+          <div class="code_block">
+            <div class="code-content">
+              @ on_step on 10 10<br />
+              set 0 = 20<br />
+              tp to 0 0<br />
+              end
+            </div>
+            <button class="copy-button">Copy</button>
+          </div>
+          <p>
+            This is the script for creating a simple teleporter. When the player
+            steps on 5 5, they get teleported to 20 20. As seen by the trigger,
+            this teleporter is reusable.
+          </p>
+        </div>
+        <hr />
+        More examples are coming soon!
       </div>
     </div>
 
@@ -540,6 +568,34 @@
     <script>
       document.body.innerHTML = document.body.innerHTML.replaceAll("{", "&lt;");
       document.body.innerHTML = document.body.innerHTML.replaceAll("}", "&gt;");
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const copyButtons = document.querySelectorAll(".copy-button");
+
+        copyButtons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            const codeContent = this.previousElementSibling.innerText;
+            const originalButtonText = this.textContent;
+
+            navigator.clipboard
+              .writeText(codeContent)
+              .then(() => {
+                // Change button text and color temporarily
+                this.textContent = "Copied!";
+                this.style.backgroundColor = "#28a745"; // green color
+
+                // Restore original button text and color after 2 seconds
+                setTimeout(() => {
+                  this.textContent = originalButtonText;
+                  this.style.backgroundColor = "#007bff"; // original blue color
+                }, 2000);
+              })
+              .catch((err) => {
+                console.error("Failed to copy: ", err);
+              });
+          });
+        });
+      });
     </script>
   </body>
 </html>
