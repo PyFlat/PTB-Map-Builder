@@ -46,6 +46,14 @@ code {
   font-family: "Courier New", Courier, monospace;
   margin: 10px 0;
 }
+.code_block {
+  background-color: #616161;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 5px;
+  font-family: "Courier New", Courier, monospace;
+  margin: 10px 0;
+}
 table {
   width: 100%;
   border-collapse: collapse;

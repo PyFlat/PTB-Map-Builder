@@ -512,7 +512,23 @@
         <h2 id="examples">3. Examples</h3>
         <div>
           If you reach this section you are exspected to have read and understood all avaliable commands. 
-          
+          <br><div class="code_block">
+            @ on_init on 0 0<br>
+            setFlag drop_items = 0<br>
+            end
+          </div>
+          This line is in the tutorial map. It simply disables item drops on load
+          <hr/>
+          <div class="code_block">
+            @ on_step on 10 10<br>
+            set 0 = 20<br>
+            tp to 0 0<br>
+            end
+          </div>
+          This is the script for creating a simple teleporter. When the player steps on 5 5, they
+          get teleported to 20 20. As seen by the trigger, this teleporter is reusable.
+          <hr/>
+          More examples are coming soon!
         </div>
       </div>
     </div>
