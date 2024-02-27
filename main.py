@@ -719,12 +719,18 @@ class RedoUndoManager():
                         })
         if changes == []:
             return
+
+        if self.stackptr < len(self.stack) - 1:
+            self.stack = self.stack[:self.stackptr+1]
+            self.stacksz = len(self.stack)
+
         if len(self.stack) >= self.maxsize:     #failure condition: the stack is full!
             self.stack.pop(0)
             self.stacksz -= 1
             self.stackptr -= 1
         self.valid = self.stackptr + 1 #valid until the current event
         self.stackptr += 1
+
         if len(self.stack) >= self.stacksz:
             self.stack.append(changes)
             self.stacksz += 1
