@@ -149,6 +149,7 @@ class MainWindow(QMainWindow):
         self.box_images = []
 
     def start_box(self, event:QMouseEvent):
+        self.old_grid = self.copy_grid(self.blocks)
         texture = self.texture_left if event.button() == Qt.LeftButton else self.texture_right
         x, y = self.get_pos()
         self.box_update_timer = QTimer()
@@ -185,14 +186,17 @@ class MainWindow(QMainWindow):
 
                 if texture == -1:
                     is_even = (i%2==0 and j%2==0) or (i%2!=0 and j%2!=0)
-                    texture = 14 if is_even else 15
-                self.box_images.append(self.ui.imagePainter.add_image(self.textures[texture], i * 20, j * 20))
+                    block_texture = 14 if is_even else 15
+                else:
+                    block_texture = texture
+                self.box_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], i * 20, j * 20))
 
         if finish: self.finish_box()
 
     def finish_box(self):
         self.box_update_timer.stop()
         self.rebind_mouse()
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
         self.start_drawing_box()
 
     def start_drawing_line(self):
@@ -204,6 +208,7 @@ class MainWindow(QMainWindow):
         self.line_images = []
 
     def start_line(self, event:QMouseEvent):
+        self.old_grid = self.copy_grid(self.blocks)
         texture = self.texture_left if event.button() == Qt.LeftButton else self.texture_right
         x, y = self.get_pos()
         self.line_update_timer = QTimer()
@@ -256,15 +261,18 @@ class MainWindow(QMainWindow):
                 continue
             if texture == -1:
                 is_even = (x % 2 == 0 and y % 2 == 0) or (x % 2 != 0 and y % 2 != 0)
-                texture = 14 if is_even else 15
+                block_texture = 14 if is_even else 15
+            else:
+                block_texture = texture
 
-            self.line_images.append(self.ui.imagePainter.add_image(self.textures[texture], x * 20, y * 20))
+            self.line_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], x * 20, y * 20))
 
         if finish: self.finish_line()
 
     def finish_line(self):
         self.line_update_timer.stop()
         self.rebind_mouse()
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
         self.start_drawing_line()
 
     def add_new_text(self):
@@ -435,6 +443,7 @@ class MainWindow(QMainWindow):
 
     def start_block_move(self):
         self.uncheck(self.ui.actionMove_Block)
+        self.old_grid = self.copy_grid(self.blocks)
         self.ui.imagePainter.mousePressEvent = self.start_moving
         if not self.ui.actionMove_Block.isChecked(): self.rebind_mouse()
         self.move_block_id = None
@@ -467,6 +476,7 @@ class MainWindow(QMainWindow):
         self.ui.imagePainter.remove_image(self.move_block_id)
         self.rebind_mouse()
         self.timer3.stop()
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
         self.start_block_move()
 
     def rebind_mouse(self):
