@@ -31,6 +31,9 @@ class ImagePainterWidget(QWidget):
 
     def remove_image(self, unique_id):
         if unique_id in self.image_entries:
+            enemy = tuple(x // 20 for x in self.image_entries[unique_id]["position"])
+            if enemy in self.enemys:
+                self.enemys.remove(enemy)
             del self.image_entries[unique_id]
             self.update()
 
