@@ -1,4 +1,5 @@
 import sys, pathlib, os
+import copy
 
 from PySide6.QtGui import QMouseEvent
 sys.dont_write_bytecode = True
@@ -65,6 +66,9 @@ class MainWindow(QMainWindow):
         shortcut = QShortcut(QKeySequence("Ctrl+Z"), self)
         shortcut.activated.connect(self.RedoUndoManager.strg_z)
 
+        shortcut = QShortcut(QKeySequence("Ctrl+Y"), self)
+        shortcut.activated.connect(self.RedoUndoManager.strg_y)
+
 
         self.build_background() # Create The Grass Background
 
@@ -129,7 +133,7 @@ class MainWindow(QMainWindow):
         self.show()
 
     def copy_grid(self, grid):
-        return [row[:] for row in grid]
+        return copy.deepcopy(grid)
 
     def uncheck(self, action:QAction):
         list = [self.ui.actionMove_Block, self.ui.actionDraw_Line, self.ui.actionDraw_Rect]
@@ -371,11 +375,13 @@ class MainWindow(QMainWindow):
         self.set_builder_items_enabled(True)
         self.ui.imagePainter.mousePressEvent = self.mouse_click_event
         self.shortcut_edit_enemy.setEnabled(False)
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
 
     def edit_enemy_event(self, event):
         x,y = self.get_pos()
         if self.blocks[x][y] is None: return
         if self.blocks[x][y].get_block() == 10:
+            self.old_grid = self.copy_grid(self.blocks)
             health, damage = self.blocks[x][y].get_enemy()
             health, damage = self.enemy_edit_messagebox(health, damage)
             self.blocks[x][y].set_enemy(health, damage)
@@ -676,7 +682,7 @@ class MainWindow(QMainWindow):
         self.set_builder_items_enabled(True)
 
 class RedoUndoManager():
-    def __init__(self, parent):
+    def __init__(self, parent:MainWindow):
         self.parent = parent
         self.stack = []
         self.stackptr = -1
@@ -686,19 +692,33 @@ class RedoUndoManager():
     def __copy(self, grid):
         return [row[:] for row in grid]
 
+    def compare(self, cell1: Block, cell2: Block):
+        if cell1 is None and cell2 is None:
+            return True  # Both cells are None, so they are considered equal
+        elif cell1 is None or cell2 is None:
+            return False  # One cell is None while the other is not, they are not equal
+        else:
+            if cell1.get_block() == cell2.get_block():
+                if cell1.get_enemy() == cell2.get_enemy():
+                    return True
+
+        return False  # If none of the conditions are met, the cells are not equal
+
+
     def apply_changes(self, grid_old=None, grid_new=None):
         changes = []
 
         for x, row in enumerate(grid_old):
             for y, cell in enumerate(row):
-                if grid_new[x][y] != cell:
+                if not self.compare(grid_new[x][y], cell):
                     changes.append({
                         "x": x,
                         "y": y,
                         "old": cell,
                         "new":grid_new[x][y]
                         })
-
+        if changes == []:
+            return
         if len(self.stack) >= self.maxsize:     #failure condition: the stack is full!
             self.stack.pop(0)
             self.stacksz -= 1
@@ -718,8 +738,6 @@ class RedoUndoManager():
         for change in self.stack[self.stackptr]:
             self.parent.place_obj(change['old'], change['x'], change['y'])
 
-        self.stack.pop(-1)
-        self.stacksz -= 1
         self.stackptr -= 1
         return True
     def strg_y(self):
@@ -727,7 +745,7 @@ class RedoUndoManager():
             return False #either the stack pointer is at max range or the valid range is smaller!
         self.stackptr += 1
         for change in self.stack[self.stackptr]:
-            pass #un-reverse the changes here!
+            self.parent.place_obj(change['new'], change['x'], change['y'])
         return True
 
 if __name__ == "__main__":
