@@ -683,11 +683,13 @@ class RedoUndoManager():
             self.stacksz += 1
         else:
             self.stack[self.stackptr] = changes
+        print(self.stack)
         return True
     def strg_z(self):
         if self.stackptr - 1 < 0:
             return False #the stack (unfortunately) is empty.
         for change in self.stack[self.stackptr]:
+            print(change)
             pass #reverse these changes here!!!
         self.stackptr -= 1
         return True
@@ -701,8 +703,12 @@ class RedoUndoManager():
 
 if __name__ == "__main__":
     app = QApplication([])
-    md = MainWindow(sys.argv[0])
-    if len(sys.argv) > 1:
-        path = sys.argv[1]
-        md.load_map_file(path)
+    # md = MainWindow(sys.argv[0])
+    # if len(sys.argv) > 1:
+    #     path = sys.argv[1]
+    #     md.load_map_file(path)
+
+    rd = RedoUndoManager()
+    print(rd.apply_changes([[1], [2], [3]], [[2], [2], [3]]))
+    rd.strg_z()
     sys.exit(app.exec())
