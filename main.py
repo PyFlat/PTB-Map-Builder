@@ -128,6 +128,9 @@ class MainWindow(QMainWindow):
 
         self.show()
 
+    def copy_grid(self, grid):
+        return [row[:] for row in grid]
+
     def uncheck(self, action:QAction):
         list = [self.ui.actionMove_Block, self.ui.actionDraw_Line, self.ui.actionDraw_Rect]
         for act in list:
@@ -539,13 +542,12 @@ class MainWindow(QMainWindow):
         return target_pos
 
     def mouse_click_event(self, event):
+        self.old_grid = self.copy_grid(self.blocks)
         self.drawing = True
         b, p = event.button(), self.get_pos()
         x,y = p
         self.current_texture = self.texture_left if b == Qt.LeftButton else self.texture_right
-        old_cell = self.blocks[x][y]
         self.place(x, y, self.current_texture)
-        self.RedoUndoManager.apply_changes(old_cell=old_cell, new_cell=self.blocks[x][y], block_x=x, block_y=y)
 
     def mouseMove(self, event):
         if self.drawing:
@@ -555,6 +557,8 @@ class MainWindow(QMainWindow):
     def mouseRelease(self, event):
         self.drawing = False
         self.current_texture = None
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
+
 
     def load_map_file(self, path=None):
         if path is not None:
@@ -682,27 +686,19 @@ class RedoUndoManager():
     def __copy(self, grid):
         return [row[:] for row in grid]
 
-    def apply_changes(self, grid_old=None, grid_new=None, old_cell=None, new_cell=None, block_x=None, block_y=None):
+    def apply_changes(self, grid_old=None, grid_new=None):
         changes = []
-        if old_cell is not None or new_cell is not None:
-            changes.append({
-                "x": block_x,
-                "y": block_y,
-                "old": old_cell,
-                "new": new_cell
-            })
-        elif grid_old != None:
-            for x, row in enumerate(grid_old):
-                for y, cell in enumerate(row):
-                    if grid_new[x][y] != cell:
-                        changes.append({
-                            "x": x,
-                            "y": y,
-                            "old": cell,
-                            "new":grid_new[x][y]
-                            })
-        else:
-            return
+
+        for x, row in enumerate(grid_old):
+            for y, cell in enumerate(row):
+                if grid_new[x][y] != cell:
+                    changes.append({
+                        "x": x,
+                        "y": y,
+                        "old": cell,
+                        "new":grid_new[x][y]
+                        })
+
         if len(self.stack) >= self.maxsize:     #failure condition: the stack is full!
             self.stack.pop(0)
             self.stacksz -= 1
