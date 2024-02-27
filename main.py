@@ -657,7 +657,7 @@ class MainWindow(QMainWindow):
 class RedoUndoManager():
     def __init__(self):
         self.stack = []
-        self.stackptr = 0
+        self.stackptr = -1
         self.stacksz = 0
         self.valid = 0          #the valid range of the stack
         self.maxsize = 100
@@ -688,7 +688,7 @@ class RedoUndoManager():
         print(self.stack)
         return True
     def strg_z(self):
-        if self.stackptr - 1 < 0:
+        if self.stackptr < 0:
             return False #the stack (unfortunately) is empty.
         for change in self.stack[self.stackptr]:
             print(change)
