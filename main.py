@@ -654,13 +654,55 @@ class MainWindow(QMainWindow):
         self.rebind_mouse()
         self.set_builder_items_enabled(True)
 
-
+class RedoUndoManager():
+    def __init__(self):
+        self.stack = []
+        self.stackptr = 0
+        self.stacksz = 0
+        self.valid = 0          #the valid range of the stack
+        self.maxsize = 100
+    def __copy(self, grid):
+        return [row[:] for row in grid]
+    def apply_changes(self, grid_old, grid_new):
+        changes = []
+        for x, row in enumerate(grid_old):
+            for y, cell in enumerate(row):
+                if grid_new[x][y] != cell:
+                    changes.append({
+                        "x": x,
+                        "y": y,
+                        "old": cell,
+                        "new":grid_new[x][y]
+                        })
+        if len(self.stack) >= self.maxsize:     #failure condition: the stack is full!
+            return False
+        self.valid = self.stackptr + 1 #valid until the current event
+        self.stackptr += 1
+        if len(self.stack) >= self.stacksz:
+            self.stack.append(changes)
+            self.stacksz += 1
+        else:
+            self.stack[self.stackptr] = changes
+        return True
+    def strg_z(self):
+        if self.stackptr - 1 < 0:
+            return False #the stack (unfortunately) is empty.
+        for change in self.stack[self.stackptr]:
+            pass #reverse these changes here!!!
+        self.stackptr -= 1
+        return True
+    def strg_y(self):
+        if self.stackptr >= self.stacksz or self.stackptr >= self.valid:
+            return False #either the stack pointer is at max range or the valid range is smaller!
+        self.stackptr += 1
+        for change in self.stack[self.stackptr]:
+            pass #un-reverse the changes here!
+        return True
 
 if __name__ == "__main__":
     app = QApplication([])
     md = MainWindow(sys.argv[0])
     if len(sys.argv) > 1:
         path = sys.argv[1]
-
         md.load_map_file(path)
     sys.exit(app.exec())
