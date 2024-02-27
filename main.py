@@ -60,6 +60,12 @@ class MainWindow(QMainWindow):
 
         self.comp = compiler()
 
+        self.RedoUndoManager = RedoUndoManager(self)
+
+        shortcut = QShortcut(QKeySequence("Ctrl+Z"), self)
+        shortcut.activated.connect(self.RedoUndoManager.strg_z)
+
+
         self.build_background() # Create The Grass Background
 
         self.build_border() # Create the Endstone Border
@@ -313,6 +319,14 @@ class MainWindow(QMainWindow):
         if texture_idx == 0: self.player = self.blocks[x][y]
         self.changes_since_save = True
 
+    def place_obj(self, block: Block, x:int, y:int):
+        if block is None:
+            self.remove(x, y)
+        else:
+            texture = block.get_block()
+            health, damage = block.get_enemy() or (None, None)
+            self.place(x, y, texture, damage=damage, health=health)
+
     def reset_all(self):
         self.current_project = None
         self.scripts = None
@@ -527,8 +541,11 @@ class MainWindow(QMainWindow):
     def mouse_click_event(self, event):
         self.drawing = True
         b, p = event.button(), self.get_pos()
+        x,y = p
         self.current_texture = self.texture_left if b == Qt.LeftButton else self.texture_right
-        self.place(p[0], p[1], self.current_texture)
+        old_cell = self.blocks[x][y]
+        self.place(x, y, self.current_texture)
+        self.RedoUndoManager.apply_changes(old_cell=old_cell, new_cell=self.blocks[x][y], block_x=x, block_y=y)
 
     def mouseMove(self, event):
         if self.drawing:
@@ -655,7 +672,8 @@ class MainWindow(QMainWindow):
         self.set_builder_items_enabled(True)
 
 class RedoUndoManager():
-    def __init__(self):
+    def __init__(self, parent):
+        self.parent = parent
         self.stack = []
         self.stackptr = -1
         self.stacksz = 0
@@ -663,17 +681,28 @@ class RedoUndoManager():
         self.maxsize = 100
     def __copy(self, grid):
         return [row[:] for row in grid]
-    def apply_changes(self, grid_old, grid_new):
+
+    def apply_changes(self, grid_old=None, grid_new=None, old_cell=None, new_cell=None, block_x=None, block_y=None):
         changes = []
-        for x, row in enumerate(grid_old):
-            for y, cell in enumerate(row):
-                if grid_new[x][y] != cell:
-                    changes.append({
-                        "x": x,
-                        "y": y,
-                        "old": cell,
-                        "new":grid_new[x][y]
-                        })
+        if old_cell is not None or new_cell is not None:
+            changes.append({
+                "x": block_x,
+                "y": block_y,
+                "old": old_cell,
+                "new": new_cell
+            })
+        elif grid_old != None:
+            for x, row in enumerate(grid_old):
+                for y, cell in enumerate(row):
+                    if grid_new[x][y] != cell:
+                        changes.append({
+                            "x": x,
+                            "y": y,
+                            "old": cell,
+                            "new":grid_new[x][y]
+                            })
+        else:
+            return
         if len(self.stack) >= self.maxsize:     #failure condition: the stack is full!
             self.stack.pop(0)
             self.stacksz -= 1
@@ -685,14 +714,16 @@ class RedoUndoManager():
             self.stacksz += 1
         else:
             self.stack[self.stackptr] = changes
-        print(self.stack)
         return True
+
     def strg_z(self):
         if self.stackptr < 0:
             return False #the stack (unfortunately) is empty.
         for change in self.stack[self.stackptr]:
-            print(change)
-            pass #reverse these changes here!!!
+            self.parent.place_obj(change['old'], change['x'], change['y'])
+
+        self.stack.pop(-1)
+        self.stacksz -= 1
         self.stackptr -= 1
         return True
     def strg_y(self):
@@ -705,12 +736,8 @@ class RedoUndoManager():
 
 if __name__ == "__main__":
     app = QApplication([])
-    # md = MainWindow(sys.argv[0])
-    # if len(sys.argv) > 1:
-    #     path = sys.argv[1]
-    #     md.load_map_file(path)
-
-    rd = RedoUndoManager()
-    print(rd.apply_changes([[1], [2], [3]], [[2], [2], [3]]))
-    rd.strg_z()
+    md = MainWindow(sys.argv[0])
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+        md.load_map_file(path)
     sys.exit(app.exec())

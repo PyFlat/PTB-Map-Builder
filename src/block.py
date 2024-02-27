@@ -7,6 +7,8 @@ class Block():
         self.health = health if texture_id == 10 else None
         self.damage = damage if texture_id == 10 else None
         self.edit = True if self.texture == 10 else False
+    def get_pos(self):
+        return self.x, self.y
     def get_block(self):
         return self.texture
     def get_id(self):
