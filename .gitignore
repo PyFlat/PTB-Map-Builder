@@ -10,3 +10,5 @@ build_exe.bat
 update.bat
 
 mainwindow_ui.py
+
+venv/
