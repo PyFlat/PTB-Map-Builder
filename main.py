@@ -817,6 +817,7 @@ class RedoUndoManager():
             self.parent.place_obj(change['old'], change['x'], change['y'])
 
         self.stackptr -= 1
+        self.parent.changes_since_save = True
         return True
     def strg_y(self):
         if self.stackptr >= self.stacksz or self.stackptr >= self.valid:
@@ -824,6 +825,7 @@ class RedoUndoManager():
         self.stackptr += 1
         for change in self.stack[self.stackptr]:
             self.parent.place_obj(change['new'], change['x'], change['y'])
+        self.parent.changes_since_save = True
         return True
 
 if __name__ == "__main__":
