@@ -801,6 +801,7 @@ QPushButton#placeholder0, QPushButton#placeholder1, QPushButton#placeholder2, QP
      <string>Tools</string>
     </property>
     <addaction name="actionDraw_Line"/>
+    <addaction name="actionDraw_Box"/>
     <addaction name="actionDraw_Rect"/>
     <addaction name="actionMove_Block"/>
    </widget>
@@ -887,13 +888,19 @@ QPushButton#placeholder0, QPushButton#placeholder1, QPushButton#placeholder2, QP
    <property name="text">
     <string>Draw Line</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+L</string>
+   </property>
   </action>
-  <action name="actionDraw_Rect">
+  <action name="actionDraw_Box">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Draw Rect</string>
+    <string>Draw Box</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+B</string>
    </property>
   </action>
   <action name="actionMove_Block">
@@ -902,6 +909,20 @@ QPushButton#placeholder0, QPushButton#placeholder1, QPushButton#placeholder2, QP
    </property>
    <property name="text">
     <string>Move Block</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+M</string>
+   </property>
+  </action>
+  <action name="actionDraw_Rect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Draw Rect</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+R</string>
    </property>
   </action>
  </widget>

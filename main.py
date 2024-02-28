@@ -136,15 +136,15 @@ class MainWindow(QMainWindow):
         return copy.deepcopy(grid)
 
     def uncheck(self, action:QAction):
-        list = [self.ui.actionMove_Block, self.ui.actionDraw_Line, self.ui.actionDraw_Rect]
+        list = [self.ui.actionMove_Block, self.ui.actionDraw_Line, self.ui.actionDraw_Box, self.ui.actionDraw_Rect]
         for act in list:
             if act != action:
                 act.setChecked(False)
 
     def start_drawing_box(self):
-        self.uncheck(self.ui.actionDraw_Rect)
+        self.uncheck(self.ui.actionDraw_Box)
         self.ui.imagePainter.mousePressEvent = self.start_box
-        if not self.ui.actionDraw_Rect.isChecked(): self.rebind_mouse()
+        if not self.ui.actionDraw_Box.isChecked(): self.rebind_mouse()
         self.box_x = self.box_y = True
         self.box_images = []
 
@@ -198,6 +198,65 @@ class MainWindow(QMainWindow):
         self.rebind_mouse()
         self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
         self.start_drawing_box()
+
+    def start_drawing_rect(self):
+        self.uncheck(self.ui.actionDraw_Rect)
+        self.ui.imagePainter.mousePressEvent = self.start_rect
+        if not self.ui.actionDraw_Rect.isChecked(): self.rebind_mouse()
+        self.rect_x = self.rect_y = True
+        self.rect_images = []
+
+    def start_rect(self, event:QMouseEvent):
+        self.old_grid = self.copy_grid(self.blocks)
+        texture = self.texture_left if event.button() == Qt.LeftButton else self.texture_right
+        x, y = self.get_pos()
+        self.rect_update_timer = QTimer()
+        self.rect_update_timer.timeout.connect(lambda: self.update_rect(x,y,texture))
+        self.rect_update_timer.start(10)
+        self.ui.imagePainter.mouseReleaseEvent = lambda ev: self.update_rect(x,y,texture, True)
+
+    def update_rect(self, startx, starty, texture, finish=False):
+        if texture == 0: return
+        curx, cury = self.get_pos()
+
+        if (curx, cury) == (startx, starty):
+            if finish: self.finish_rect()
+            return
+
+        difference_x = curx - startx
+        difference_y = cury - starty
+        difference_x = 1 if difference_x == 0 else difference_x
+        difference_y = 1 if difference_y == 0 else difference_y
+
+        stepx = difference_x // abs(difference_x)
+        stepy = difference_y // abs(difference_y)
+
+        while self.rect_images:
+            self.ui.imagePainter.remove_image(self.rect_images.pop(0))
+
+        for i in range(startx, curx+stepx, stepx):
+            for j in range(starty, cury+stepy, stepy):
+                if not (i == startx or i == curx or j == starty or j == cury): continue
+                if not (0 < i < 24 and 0 < j < 24): break
+
+                if finish:
+                    self.place(i, j, texture)
+                    continue
+
+                if texture == -1:
+                    is_even = (i%2==0 and j%2==0) or (i%2!=0 and j%2!=0)
+                    block_texture = 14 if is_even else 15
+                else:
+                    block_texture = texture
+                self.rect_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], i * 20, j * 20))
+
+        if finish: self.finish_rect()
+
+    def finish_rect(self):
+        self.rect_update_timer.stop()
+        self.rebind_mouse()
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
+        self.start_drawing_rect()
 
     def start_drawing_line(self):
         self.uncheck(self.ui.actionDraw_Line)
@@ -345,6 +404,8 @@ class MainWindow(QMainWindow):
     def reset_all(self):
         self.current_project = None
         self.scripts = None
+        self.texts = None
+        self.RedoUndoManager.__init__(self)
         for x in range(1,24):
             for y in range(1,24):
                 if self.blocks[x][y]:
@@ -360,7 +421,8 @@ class MainWindow(QMainWindow):
         self.ui.actionEdit_All.triggered.connect(lambda: self.edit_enemy_defaults())
         self.ui.actionEdit_Texts.triggered.connect(lambda: self.add_new_text())
         self.ui.actionDraw_Line.triggered.connect(lambda: self.start_drawing_line())
-        self.ui.actionDraw_Rect.triggered.connect(lambda: self.start_drawing_box())
+        self.ui.actionDraw_Box.triggered.connect(lambda: self.start_drawing_box())
+        self.ui.actionDraw_Rect.triggered.connect(lambda: self.start_drawing_rect())
         self.ui.actionMove_Block.triggered.connect(lambda: self.start_block_move())
 
     def set_script_text(self, text):
