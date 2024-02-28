@@ -1,16 +1,18 @@
-import sys, pathlib, os,re
+import sys, pathlib, os
+import copy
 
 from PySide6.QtGui import QMouseEvent
 sys.dont_write_bytecode = True
 
 from src.MainWindow import Ui_MainWindow
-from src.CustomSyntaxHighlighter import CustomSyntaxHighlighter
-from src.CustomTextEdit import CustomTextEdit
+
 from src.PtbLoad import PtbLoader
 from src.compiler import *
 from src.compressor import *
-import src.KEYWORDS, src.RULES
 from src.ListEditDialog import ListEditDialog
+from src.block import Block
+from src.ScriptEditor import ScriptEditor
+from src.RedoUndoManager import RedoUndoManager
 
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
@@ -59,6 +61,15 @@ class MainWindow(QMainWindow):
         self.changes_since_save = False
 
         self.comp = compiler()
+
+        self.RedoUndoManager = RedoUndoManager(self)
+
+        shortcut = QShortcut(QKeySequence("Ctrl+Z"), self)
+        shortcut.activated.connect(self.RedoUndoManager.strg_z)
+
+        shortcut = QShortcut(QKeySequence("Ctrl+Y"), self)
+        shortcut.activated.connect(self.RedoUndoManager.strg_y)
+
 
         self.build_background() # Create The Grass Background
 
@@ -122,20 +133,24 @@ class MainWindow(QMainWindow):
 
         self.show()
 
+    def copy_grid(self, grid):
+        return copy.deepcopy(grid)
+
     def uncheck(self, action:QAction):
-        list = [self.ui.actionMove_Block, self.ui.actionDraw_Line, self.ui.actionDraw_Rect]
+        list = [self.ui.actionMove_Block, self.ui.actionDraw_Line, self.ui.actionDraw_Box, self.ui.actionDraw_Rect]
         for act in list:
             if act != action:
                 act.setChecked(False)
 
     def start_drawing_box(self):
-        self.uncheck(self.ui.actionDraw_Rect)
+        self.uncheck(self.ui.actionDraw_Box)
         self.ui.imagePainter.mousePressEvent = self.start_box
-        if not self.ui.actionDraw_Rect.isChecked(): self.rebind_mouse()
+        if not self.ui.actionDraw_Box.isChecked(): self.rebind_mouse()
         self.box_x = self.box_y = True
         self.box_images = []
 
     def start_box(self, event:QMouseEvent):
+        self.old_grid = self.copy_grid(self.blocks)
         texture = self.texture_left if event.button() == Qt.LeftButton else self.texture_right
         x, y = self.get_pos()
         self.box_update_timer = QTimer()
@@ -172,15 +187,77 @@ class MainWindow(QMainWindow):
 
                 if texture == -1:
                     is_even = (i%2==0 and j%2==0) or (i%2!=0 and j%2!=0)
-                    texture = 14 if is_even else 15
-                self.box_images.append(self.ui.imagePainter.add_image(self.textures[texture], i * 20, j * 20))
+                    block_texture = 14 if is_even else 15
+                else:
+                    block_texture = texture
+                self.box_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], i * 20, j * 20))
 
         if finish: self.finish_box()
 
     def finish_box(self):
         self.box_update_timer.stop()
         self.rebind_mouse()
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
         self.start_drawing_box()
+
+    def start_drawing_rect(self):
+        self.uncheck(self.ui.actionDraw_Rect)
+        self.ui.imagePainter.mousePressEvent = self.start_rect
+        if not self.ui.actionDraw_Rect.isChecked(): self.rebind_mouse()
+        self.rect_x = self.rect_y = True
+        self.rect_images = []
+
+    def start_rect(self, event:QMouseEvent):
+        self.old_grid = self.copy_grid(self.blocks)
+        texture = self.texture_left if event.button() == Qt.LeftButton else self.texture_right
+        x, y = self.get_pos()
+        self.rect_update_timer = QTimer()
+        self.rect_update_timer.timeout.connect(lambda: self.update_rect(x,y,texture))
+        self.rect_update_timer.start(10)
+        self.ui.imagePainter.mouseReleaseEvent = lambda ev: self.update_rect(x,y,texture, True)
+
+    def update_rect(self, startx, starty, texture, finish=False):
+        if texture == 0: return
+        curx, cury = self.get_pos()
+
+        if (curx, cury) == (startx, starty):
+            if finish: self.finish_rect()
+            return
+
+        difference_x = curx - startx
+        difference_y = cury - starty
+        difference_x = 1 if difference_x == 0 else difference_x
+        difference_y = 1 if difference_y == 0 else difference_y
+
+        stepx = difference_x // abs(difference_x)
+        stepy = difference_y // abs(difference_y)
+
+        while self.rect_images:
+            self.ui.imagePainter.remove_image(self.rect_images.pop(0))
+
+        for i in range(startx, curx+stepx, stepx):
+            for j in range(starty, cury+stepy, stepy):
+                if not (i == startx or i == curx or j == starty or j == cury): continue
+                if not (0 < i < 24 and 0 < j < 24): break
+
+                if finish:
+                    self.place(i, j, texture)
+                    continue
+
+                if texture == -1:
+                    is_even = (i%2==0 and j%2==0) or (i%2!=0 and j%2!=0)
+                    block_texture = 14 if is_even else 15
+                else:
+                    block_texture = texture
+                self.rect_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], i * 20, j * 20))
+
+        if finish: self.finish_rect()
+
+    def finish_rect(self):
+        self.rect_update_timer.stop()
+        self.rebind_mouse()
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
+        self.start_drawing_rect()
 
     def start_drawing_line(self):
         self.uncheck(self.ui.actionDraw_Line)
@@ -191,6 +268,7 @@ class MainWindow(QMainWindow):
         self.line_images = []
 
     def start_line(self, event:QMouseEvent):
+        self.old_grid = self.copy_grid(self.blocks)
         texture = self.texture_left if event.button() == Qt.LeftButton else self.texture_right
         x, y = self.get_pos()
         self.line_update_timer = QTimer()
@@ -243,15 +321,18 @@ class MainWindow(QMainWindow):
                 continue
             if texture == -1:
                 is_even = (x % 2 == 0 and y % 2 == 0) or (x % 2 != 0 and y % 2 != 0)
-                texture = 14 if is_even else 15
+                block_texture = 14 if is_even else 15
+            else:
+                block_texture = texture
 
-            self.line_images.append(self.ui.imagePainter.add_image(self.textures[texture], x * 20, y * 20))
+            self.line_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], x * 20, y * 20))
 
         if finish: self.finish_line()
 
     def finish_line(self):
         self.line_update_timer.stop()
         self.rebind_mouse()
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
         self.start_drawing_line()
 
     def add_new_text(self):
@@ -313,9 +394,19 @@ class MainWindow(QMainWindow):
         if texture_idx == 0: self.player = self.blocks[x][y]
         self.changes_since_save = True
 
+    def place_obj(self, block: Block, x:int, y:int):
+        if block is None:
+            self.remove(x, y)
+        else:
+            texture = block.get_block()
+            health, damage = block.get_enemy() or (None, None)
+            self.place(x, y, texture, damage=damage, health=health)
+
     def reset_all(self):
         self.current_project = None
         self.scripts = None
+        self.texts = None
+        self.RedoUndoManager.__init__(self)
         for x in range(1,24):
             for y in range(1,24):
                 if self.blocks[x][y]:
@@ -331,7 +422,8 @@ class MainWindow(QMainWindow):
         self.ui.actionEdit_All.triggered.connect(lambda: self.edit_enemy_defaults())
         self.ui.actionEdit_Texts.triggered.connect(lambda: self.add_new_text())
         self.ui.actionDraw_Line.triggered.connect(lambda: self.start_drawing_line())
-        self.ui.actionDraw_Rect.triggered.connect(lambda: self.start_drawing_box())
+        self.ui.actionDraw_Box.triggered.connect(lambda: self.start_drawing_box())
+        self.ui.actionDraw_Rect.triggered.connect(lambda: self.start_drawing_rect())
         self.ui.actionMove_Block.triggered.connect(lambda: self.start_block_move())
 
     def set_script_text(self, text):
@@ -354,11 +446,13 @@ class MainWindow(QMainWindow):
         self.set_builder_items_enabled(True)
         self.ui.imagePainter.mousePressEvent = self.mouse_click_event
         self.shortcut_edit_enemy.setEnabled(False)
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
 
     def edit_enemy_event(self, event):
         x,y = self.get_pos()
         if self.blocks[x][y] is None: return
         if self.blocks[x][y].get_block() == 10:
+            self.old_grid = self.copy_grid(self.blocks)
             health, damage = self.blocks[x][y].get_enemy()
             health, damage = self.enemy_edit_messagebox(health, damage)
             self.blocks[x][y].set_enemy(health, damage)
@@ -412,6 +506,7 @@ class MainWindow(QMainWindow):
 
     def start_block_move(self):
         self.uncheck(self.ui.actionMove_Block)
+        self.old_grid = self.copy_grid(self.blocks)
         self.ui.imagePainter.mousePressEvent = self.start_moving
         if not self.ui.actionMove_Block.isChecked(): self.rebind_mouse()
         self.move_block_id = None
@@ -444,6 +539,7 @@ class MainWindow(QMainWindow):
         self.ui.imagePainter.remove_image(self.move_block_id)
         self.rebind_mouse()
         self.timer3.stop()
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
         self.start_block_move()
 
     def rebind_mouse(self):
@@ -525,10 +621,12 @@ class MainWindow(QMainWindow):
         return target_pos
 
     def mouse_click_event(self, event):
+        self.old_grid = self.copy_grid(self.blocks)
         self.drawing = True
         b, p = event.button(), self.get_pos()
+        x,y = p
         self.current_texture = self.texture_left if b == Qt.LeftButton else self.texture_right
-        self.place(p[0], p[1], self.current_texture)
+        self.place(x, y, self.current_texture)
 
     def mouseMove(self, event):
         if self.drawing:
@@ -538,6 +636,8 @@ class MainWindow(QMainWindow):
     def mouseRelease(self, event):
         self.drawing = False
         self.current_texture = None
+        self.RedoUndoManager.apply_changes(self.old_grid, self.blocks)
+
 
     def load_map_file(self, path=None):
         if path is not None:
@@ -654,218 +754,10 @@ class MainWindow(QMainWindow):
         self.rebind_mouse()
         self.set_builder_items_enabled(True)
 
-
-class Block():
-    def __init__(self, x,y,texture_id, block_id, damage, health):
-        self.x = x
-        self.y = y
-        self.texture = texture_id
-        self.id = block_id
-        self.health = health if texture_id == 10 else None
-        self.damage = damage if texture_id == 10 else None
-        self.edit = True if self.texture == 10 else False
-    def get_block(self):
-        return self.texture
-    def get_id(self):
-        return self.id
-    def get_enemy(self):
-        if self.texture == 10:
-            return (self.health, self.damage)
-    def set_enemy(self, health, damage):
-        if self.texture == 10:
-            self.health = health
-            self.damage = damage
-
-class ScriptEditor(QDialog):
-    def __init__(self, parent:MainWindow, scripts):
-        super().__init__(parent=parent)
-        self.connection = None
-        self.parent = parent
-        self.start_scripts = "" if scripts is None else scripts
-        self.setWindowTitle("Script-Editor")
-        self.setFixedSize(500, 575)
-
-        layout = QVBoxLayout()
-
-        layout.setMenuBar(self.create_menu())
-
-        self.text_edit = CustomTextEdit(self.get_keywords())
-        CustomSyntaxHighlighter(self.text_edit.document())
-        self.text_edit.setPlainText(self.start_scripts)
-        layout.addWidget(self.text_edit)
-
-        compile_btn = QPushButton("Save")
-        compile_btn.setObjectName("script_compile_dialog_btn")
-        compile_btn.clicked.connect(self.try_compile)
-        layout.addWidget(compile_btn, alignment=Qt.AlignCenter)
-
-        self.setLayout(layout)
-        self.exec()
-
-    def closeEvent(self, event):
-        if self.text_edit.toPlainText() == self.start_scripts:
-            self.accept()
-            self.text = self.start_scripts
-            self.set_text()
-            return
-        message_box = QMessageBox(self.parent)
-        message_box.setWindowTitle("Syntax Error")
-        message_box.setText("Do you want to save the change you made?")
-        message_box.setIcon(QMessageBox.Warning)
-        message_box.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
-        result = message_box.exec()
-        if result == QMessageBox.Save:
-            self.try_compile()
-            event.accept()
-        elif result == QMessageBox.Discard:
-            event.accept()
-        elif result == QMessageBox.Cancel:
-            event.ignore()
-
-    def get_keywords(self):
-        ret = []
-        for keywordlist in src.KEYWORDS.keywords:
-            for keyword in keywordlist["keywords"]:
-                ret.append(keyword)
-        return ret
-
-    def create_menu(self):
-        menu = QMenuBar(self)
-
-        tool_menu = QMenu(menu)
-        tool_menu.setTitle("Tools")
-        pick_coords_action = QAction(self)
-        pick_coords_action.setText("Pick Coordinates")
-        pick_coords_action.setShortcut("Ctrl+Shift+C")
-        pick_coords_action.triggered.connect(lambda: self.pick_coordinates())
-        add_teleporter = QAction(self)
-        add_teleporter.setText("Add Teleporter")
-        add_teleporter.triggered.connect(lambda: self.start_teleporter_adding())
-        tool_menu.addAction(pick_coords_action)
-        tool_menu.addAction(add_teleporter)
-        menu.addMenu(tool_menu)
-        return menu
-
-    def pick_coordinates(self):
-        self.setVisible(False)
-        self.parent.pick_coords()
-        self.parent.coord_signal.connect(self.insert_coords)
-
-    def start_teleporter_adding(self):
-        self.setVisible(False)
-
-        dialog = QDialog(self.parent)
-        dialog.setWindowTitle("Dropdown Dialog")
-
-        layout = QVBoxLayout(dialog)
-
-        dropdown = QComboBox()
-        delegate = AlignDelegate(dropdown)
-        dropdown.setItemDelegate(delegate)
-
-        lineedit = QComboBoxButton(dropdown)
-        lineedit.setReadOnly(True)
-        lineedit.setAlignment(Qt.AlignCenter)
-        dropdown.setLineEdit(lineedit)
-        dropdown.addItems(["on_step", "on_collect", "on_destroy", "on_explode"])
-        layout.addWidget(dropdown)
-
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok)
-        button_box.accepted.connect(dialog.accept)
-        layout.addWidget(button_box)
-
-        res = dialog.exec()
-        if res:
-            msg_box = QMessageBox(self.parent)
-            msg_box.setText("Pick the start coordinate for your teleporter")
-            msg_box.addButton(QMessageBox.Ok)
-            msg_box.setWindowTitle("")
-            msg_box.exec()
-            self.trigger_text = dropdown.currentText()
-            self.parent.pick_coords()
-            self.connection = self.parent.coord_signal.connect(self.save_cor)
-        else:
-            self.setVisible(True)
-
-    def save_cor(self, x, y):
-        self.start = x, y
-        msg_box = QMessageBox(self.parent)
-        msg_box.setText("Pick the target coordinate for your teleporter")
-        msg_box.addButton(QMessageBox.Ok)
-        msg_box.setWindowTitle("")
-        msg_box.exec()
-        self.parent.pick_coords()
-        self.parent.coord_signal.disconnect(self.connection)
-        self.connection = self.parent.coord_signal.connect(self.finish)
-
-    def finish(self, x, y):
-        start_x = self.start[0]
-        start_y = self.start[1]
-        end_x = x
-        end_y = y
-        command = f"@ {self.trigger_text} on {start_x} {start_y}\nset 0 = {end_x}\nset 1 = {end_y}\ntp to 0 1\nend"
-        complete_text = self.text_edit.toPlainText()
-        complete_text += "" if complete_text.endswith("\n") or complete_text == "" else "\n"
-        self.text_edit.setPlainText(complete_text+command)
-        self.setVisible(True)
-        self.parent.coord_signal.disconnect(self.connection)
-
-
-    def insert_coords(self, x, y):
-        self.show()
-        cursor = self.text_edit.textCursor()
-        cursor.insertText(f"{x} {y}")
-        self.parent.coord_signal.disconnect()
-
-    def check_for_syntax_errors(self, script):
-        lines = script.split("\n")
-        errors = []
-        for i, line in enumerate(lines):
-            ok = False
-            for rule in src.RULES.COMMANDS:
-                if re.match(rule, line):
-                    ok = True
-                    break
-            if not ok:
-                errors.append(i)
-        return errors
-
-    def try_compile(self):
-        complete_text = self.text_edit.toPlainText()
-        errors = self.check_for_syntax_errors(complete_text)
-        if errors != [] and complete_text != "":
-            message_box = QMessageBox(self.parent)
-            message_box.setWindowTitle("Syntax Error")
-            error_lines = '\n'.join([f"Line: {error+1}" for error in errors])
-            error_message = f"Syntax Error:\n{error_lines}"
-            message_box.setText(error_message)
-            message_box.setIcon(QMessageBox.Information)
-            message_box.setStandardButtons(QMessageBox.Ok)
-            message_box.exec()
-            return
-        self.text = complete_text
-        self.set_text()
-        self.accept()
-
-    def set_text(self):
-        self.parent.set_script_text(self.text)
-
-class QComboBoxButton(QLineEdit):
-    def mousePressEvent(self, e):
-        combo = self.parent()
-        if isinstance(combo, QComboBox):
-            combo.showPopup()
-
-class AlignDelegate(QStyledItemDelegate):
-    def initStyleOption(self, option, index):
-        super(AlignDelegate, self).initStyleOption(option, index)
-        option.displayAlignment = Qt.AlignCenter
-
 if __name__ == "__main__":
     app = QApplication([])
     md = MainWindow(sys.argv[0])
     if len(sys.argv) > 1:
         path = sys.argv[1]
-
         md.load_map_file(path)
     sys.exit(app.exec())
