@@ -1,6 +1,4 @@
-<center>
-
-# [Plant-The-Bomb](https://github.com/PyFlat/Plant-The-Bomb) Map Builder</center>
+<h1 align=center><a href="https://github.com/PyFlat/Plant-The-Bomb">Plant-The-Bomb</a> Map Builder</h1>
 
 An app to easily create maps for [Plant-The-Bomb](https://github.com/PyFlat/Plant-The-Bomb).
 
