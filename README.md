@@ -1,5 +1,8 @@
+<center>
+
 # [Plant-The-Bomb](https://github.com/PyFlat/Plant-The-Bomb) Map Builder
 
+</center>
 <ToDo>
 
 ## Table of Contents
