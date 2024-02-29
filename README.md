@@ -73,13 +73,15 @@ If you want to use the source code directly, follow these steps:
 
 ## Compatibility
 
-| Map-Builder Version | Plant-The-Bomb Version | Compatible | Comment |
-| ------------------- | ---------------------- | ---------- | ------- |
-| v1.                 | v                      | ❌         | -       |
-| v                   | v                      | ❌         | -       |
-| v                   | v                      | ❌         | -       |
-| v                   | v                      | ❌         | -       |
-| v                   | v                      | ❌         | -       |
+| Map-Builder Version | Plant-The-Bomb Version | Comment                                                              |
+| ------------------- | ---------------------- | -------------------------------------------------------------------- |
+| v1.0.0              | v1.0.0 & v1.1.0        | This version cannot load files yet, it is not recommended to use it. |
+| v1.1.0              | v1.0.0 & v1.1.0        | -                                                                    |
+| v1.2.0              | v2.0.0                 | -                                                                    |
+| v1.3.0              | v2.0.0                 | -                                                                    |
+| v2.0.0              | v2.1.0                 | -                                                                    |
+
+If you want to create maps for older versions you have to use **`Pic-To-Text`**. In this case, please contact us in our Discord.
 
 ## License
 
