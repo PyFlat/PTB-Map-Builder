@@ -71,9 +71,15 @@ If you want to use the source code directly, follow these steps:
 
 <ToDo>
 
-## Features
+## Compatibility
 
-<ToDo>
+| Map-Builder Version | Plant-The-Bomb Version | Compatible | Comment |
+| ------------------- | ---------------------- | ---------- | ------- |
+| v1.                 | v                      | ❌         | -       |
+| v                   | v                      | ❌         | -       |
+| v                   | v                      | ❌         | -       |
+| v                   | v                      | ❌         | -       |
+| v                   | v                      | ❌         | -       |
 
 ## License
 
@@ -87,10 +93,6 @@ If you want to use the source code directly, follow these steps:
 
 <ToDo>
 
-## Documentation
-
-<ToDo>
-
-## Examples or Screenshots
+## Screenshots
 
 <ToDo>
