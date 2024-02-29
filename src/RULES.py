@@ -23,11 +23,10 @@ COMMANDS = [
     f"{START}set_item {enum(['player.health','player.bombs','player.range','player.dynamite','player.timed_bombs','player.damage','player.nukes'])} = {ARG_LONG}{END}",
     f"{START}win{END}",
     f"{START}loose{END}",
-    f"{START}drawImage {ARG_LONG} on {ARG_LONG} {ARG_LONG} => {ARG_LONG}{END}",
-    f"{START}drawRect on {ARG_LONG} {ARG_LONG} with color ( {ARG_LONG} {ARG_LONG} {ARG_LONG} ) => {ARG_LONG}{END}",
-    f"{START}clear {ARG_LONG}{END}{END}",
+    f"{START}drawImage {ARG_LONG} on {ARG_LONG} {ARG_LONG}{END}",
+    f"{START}drawRect on {ARG_LONG} {ARG_LONG} with color ( {ARG_LONG} {ARG_LONG} {ARG_LONG} ){END}",
+    f"{START}clear {ARG_LONG} {ARG_LONG}{END}",
     f"{START}compare {ARG_LONG} {enum(['>', '<', '==', '<=', '>='])} {ARG_LONG} => {ARG_LONG}{END}",
-    f"{START}compare{END}",
     f"{START}jump {ARG_LONG} lines if {ARG_LONG}{END}",
     f"{START}setFlag {enum(['drop_items'])} = {ARG_SHORT}{END}",
     f"{START}tp to {ARG_LONG} {ARG_LONG}{END}",
@@ -38,5 +37,6 @@ COMMANDS = [
     f"{START}randomNumber from {ARG_LONG} to {ARG_LONG} => {ARG_LONG}{END}",
     f"{START}loadFromPointer at {ARG_LONG} to {ARG_LONG}{END}",
     f"{START}storeToPointer value {ARG_LONG} to {ARG_LONG}{END}",
-    f"{START}place_block {ARG_LONG}{END}"
+    f"{START}place_block {ARG_LONG}{END}",
+    f"{START}show_text {ARG_LONG} using {enum(['mode_popup','mode_display'])}"
 ]

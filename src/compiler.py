@@ -102,7 +102,8 @@ class compiler:
             self.compile_rand,
             self.compile_ptr,
             self.compile_ptr,
-            self.compile_reset
+            self.compile_reset,
+            self.compile_text
         ]
         self.logfile = log()
 
@@ -173,7 +174,8 @@ class compiler:
             "randomNumber": 24,
             "loadFromPointer": 25,
             "storeToPointer": 26,
-            "place_block": 27
+            "place_block": 27,
+            "show_text": 28
         }
         try:
             return cm[cmd]
@@ -209,7 +211,8 @@ class compiler:
             "randomNumber",
             "loadFromPointer",
             "storeToPointer",
-            "place_block"
+            "place_block",
+            "show_text"
         ]
         try:
             return cm[cmd]
@@ -231,9 +234,9 @@ class compiler:
             "set_item {1} = {0}",
             "win",
             "loose",
-            "drawImage {3} on {1} {2} => {0}",
-            "drawRect on {1} {2} with color ( {3} {4} {5} ) => {0}",
-            "clear {}",
+            "drawImage {2} on {0} {1}",
+            "drawRect on {0} {1} with color ( {2} {3} {4} )",
+            "clear {0} {1}",
             "compare {} {} {} => {}",
             "jump {} lines if {}",
             "setFlag {} = {}",
@@ -245,7 +248,8 @@ class compiler:
             "randomNumber from {} to {} => {}",
             "loadFromPointer at {} to {}",
             "storeToPointer value {} to {}",
-            "place_block {}"
+            "place_block {}",
+            "show_text {1} using {0}"
         ]
         try:
             return ms[cmd]
@@ -298,7 +302,9 @@ class compiler:
             None,
             None,
             None,
-            None
+            None,
+            None,
+            [None, "mode_popup","mode_display"]
         ]
         return ens[cmd]
 
@@ -317,9 +323,9 @@ class compiler:
             "*§",
             "",
             "",
-            "****",
-            "******",
-            "*",
+            "***",
+            "*****",
+            "**",
             "*§**",
             "**",
             "§$",
@@ -331,7 +337,8 @@ class compiler:
             "***",
             "**",
             "**",
-            "*"
+            "*",
+            "§*"
         ]
         return cc[cmd]
 
@@ -419,8 +426,6 @@ class compiler:
         x = util.validateInteger(attrs[3], 65535, line, self.logfile)
         y = util.validateInteger(attrs[4], 65535, line, self.logfile)
         i = util.validateInteger(attrs[1], 65535, line, self.logfile)
-        s = util.validateInteger(attrs[6], 65535, line, self.logfile)
-        result += util.byte(s, 2)
         result += util.byte(x, 2)
         result += util.byte(y, 2)
         result += util.byte(i, 2)
@@ -435,10 +440,8 @@ class compiler:
         r = util.validateInteger(attrs[7], mx, line, self.logfile)
         g = util.validateInteger(attrs[8], mx, line, self.logfile)
         b = util.validateInteger(attrs[9], mx, line, self.logfile)
-        s = util.validateInteger(attrs[12], mx, line, self.logfile)
         cmd = self.getCommandId(attrs[0])
         result = util.byte(cmd, 1)
-        result += util.byte(s, 2)
         result += util.byte(x, 2)
         result += util.byte(y, 2)
         result += util.byte(r, 2)
@@ -448,10 +451,12 @@ class compiler:
 
     def compile_clear(self, attrs, line):
         util.validateCommandLength(attrs, 2, line)
-        slot = util.validateInteger(attrs[1], 65535, line, self.logfile)
+        x = util.validateInteger(attrs[1], 65535, line, self.logfile)
+        y = util.validateInteger(attrs[2], 65535, line, self.logfile)
         cmd = self.getCommandId(attrs[0])
         result = util.byte(cmd, 1)
-        result += util.byte(slot, 2)
+        result += util.byte(x, 2)
+        result += util.byte(y, 2)
         return result
 
     def compile_comp(self, attrs, line):
@@ -531,6 +536,14 @@ class compiler:
         result += util.byte(_min,2)
         result += util.byte(_max,2)
         result += util.byte(stor,2)
+        return result
+    def compile_text(self, attrs, line):
+        util.validateCommandLength(attrs, 4, line)
+        text = util.validateInteger(attrs[1],65535,line,self.logfile)
+        mode = util.validateEnum(attrs[3],[None,"mode_popup","mode_display"],line, [None])
+        result = util.byte(self.getCommandId(attrs[0]),1)
+        result += util.byte(mode, 1)
+        result += util.byte(text,2)
         return result
     def compile(self, script: str, options="") -> bytes:
         self.logfile.add_log(f"Compiling started with options {options}")

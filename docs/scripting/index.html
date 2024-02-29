@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PTB Scripting Documentation</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="container">
+        <h1>PTB Scripting Documentation</h1>
+      </div>
+    </header>
+
+    <div class="container content">
+      <nav class="section">
+        <ul>
+          <li><a href="#general-info">1. General Information</a></li>
+          <li class="dropdown">
+            <a href="#command-doc">2. Command Documentation</a>
+            <ul class="dropdown-content">
+              <li><a href="#triggers">Triggers</a></li>
+              <li><a href="#control-flow">Control Flow</a></li>
+              <li><a href="#math">Math</a></li>
+              <li>
+                <a href="#basic-in-game-interactions"
+                  >Basic In-Game Interactions</a
+                >
+              </li>
+              <li>
+                <a href="#advanced-in-game-interactions"
+                  >Advanced In-Game Interactions</a
+                >
+              </li>
+              <li>
+                <a href="#advanced-logic">Advanced Logic</a>
+              </li>
+            </ul>
+          </li>
+
+          <li><a href="#examples">3. Examples</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="container" id="general-info">
+      <div class="section">
+        <h2>1. General Information</h2>
+        <p>
+          Welcome to the complete and easy-to-understand guidebook of
+          PTB-Scripting! Scripting is used to interact in all sorts of ways with
+          the world and to perform basic logic. You can write scripts using the
+          script editor window in the map builder. It contains some basic syntax
+          highlighting and debugging options.
+        </p>
+        <p class="important">
+          Scripts are compiled into bytecode at map creation! Comments and
+          non-command lines are not recoverable!
+        </p>
+        <p>
+          By default, everything that is not a command is automatically treated
+          as a comment. However, this will throw a compiler warning. Use the //
+          "command" to mark a line as a comment and tell the compiler that it is
+          not your mistake. On map load, you can recover scripts to a very basic
+          format. It is <span class="important">highly recommended</span> to
+          save larger script projects separately and copy them in for
+          compilation.
+        </p>
+        <p>
+          Scripts have access to a small memory with 65,536 slots that can hold
+          numbers. There are commands that can read and modify these slots.
+        </p>
+        <p>
+          Scripts are interpreted line by line from top to bottom. The location
+          of the program counter can be modified by jump instructions.
+        </p>
+        <p>
+          Some scripts may use coordinates from the game block grid. Note here
+          that the grid is 25x25 spaces large, with (0,0) as the top-left corner
+          and (24, 24) as the bottom-right corner.
+        </p>
+      </div>
+
+      <div class="section" id="command-doc">
+        <h2>2. Command Documentation</h2>
+        <h3 id="triggers">a. Triggers</h3>
+        <p>
+          Triggers are activated by in-game actions. They initialize the
+          execution of the script. There are different kinds of triggers that
+          can have different properties.
+        </p>
+        <p>
+          All triggers follow the same command syntax:
+          <code>@ {name} on {x} {y}</code>
+        </p>
+        <table>
+          <tr>
+            <th>Trigger Name</th>
+            <th>Reusable</th>
+            <th>Positional</th>
+            <th>Triggered By</th>
+          </tr>
+          <tr>
+            <td>on_init</td>
+            <td>true</td>
+            <td>false</td>
+            <td>
+              Theoretically reusable; however, these are only triggered once
+              after world load.
+            </td>
+          </tr>
+          <tr>
+            <td>on_step</td>
+            <td>true</td>
+            <td>true</td>
+            <td>
+              If the player steps on the specified position, this trigger
+              executes.
+            </td>
+          </tr>
+          <tr>
+            <td>on_collect</td>
+            <td>false</td>
+            <td>true</td>
+            <td>Same as above, but it can't be reused.</td>
+          </tr>
+          <tr>
+            <td>on_explode</td>
+            <td>true</td>
+            <td>true</td>
+            <td>
+              Whenever an explosion occurs on the specified position, this gets
+              executed.
+            </td>
+          </tr>
+          <tr>
+            <td>on_destroy</td>
+            <td>false</td>
+            <td>true</td>
+            <td>The on_collect equivalent of on_explode.</td>
+          </tr>
+          <tr>
+            <td>on_tick</td>
+            <td>true</td>
+            <td>false</td>
+            <td>
+              This gets executed on every tick. A tick is just a game update.
+              The default tickrate is 20/s.
+            </td>
+          </tr>
+        </table>
+        <p class="important">
+          If the code starts execution, it will only stop when it reaches an
+          "end" statement! This is required and can lead to crashes otherwise.
+        </p>
+        <p>The syntax for "end" is just "end"!</p>
+        <hr />
+        <h3 id="control-flow">b. Control Flow</h3>
+        <div>
+          As stated previously, the program flows from top to bottom, starting
+          at a trigger, until it reaches an "end" command. The only other way to
+          modify the executed line is with the jump command. The jump command
+          follows the following syntax:
+          <code>jump {amount_of_lines} lines if {address}</code>.
+          amount_of_lines specifies the number of lines relative to the current
+          line that the program can jump.
+          <element class="important"
+            >THIS VALUE MAY NOT BE NEGATIVE! USE jumpRelative
+            instead!!!</element
+          ><br />Notice for clarification: The normal execution advancement is
+          not used by jump commands! So
+          <code>jump 1 lines if {some_value_that_is_always_true}</code> is the
+          exact same as not jumping at all, while
+          <code>jump 2 lines if {...}</code> would skip 1 line.
+          <element class="important"
+            ><code>jump 0 lines if {...}</code> is not supported! It will cause
+            the game to freeze!</element
+          >
+          Some information about conditions: It will jump if the value stored in
+          the memory at <code>{address}</code> is
+          <element class="important">NOT 0</element>! You can jump a maximum of
+          65,535 lines.
+          <br />
+          jumpRelative works very similarly and follows the same syntax. The
+          only difference is that the number of lines jumped is dependent on the
+          value stored at <code>{amount_of_lines}</code>. This removes the limit
+          of <code>{amount_of_lines}</code>
+          and allows for negative jumps as well!
+        </div>
+        <hr />
+        <div>
+          <h3 id="math">c. Math</h3>
+          Everyone loves Math!<br />
+          That's why the PTB-Scripting System provides a bunch of different
+          math-related commands! The basic syntax of these commands is:
+          <code>{command} {a} , {b} => {c}</code>. The operation is performed on
+          the values in <code>{a}</code> and <code>{b}</code>, and the result is
+          stored in <code>{c}</code>. Enjoy a list of available math commands:
+          <table>
+            <tr>
+              <th>Command</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>add</td>
+              <td>adds a and b</td>
+            </tr>
+            <tr>
+              <td>subtract</td>
+              <td>subtracts b from a</td>
+            </tr>
+            <tr>
+              <td>multiply</td>
+              <td>multiplies a and b</td>
+            </tr>
+            <tr>
+              <td>divide</td>
+              <td>performs whole-number division a//b</td>
+            </tr>
+          </table>
+          Not really math, but I have no better place to put these, so here you
+          go: <code>set {address} = {value}</code>. This sets
+          <code>{address}</code> in memory to <code>{value}.</code>
+          <element class="important">
+            <code>{value}</code> must not be larger than 255 or smaller than
+            0!!!
+          </element>
+          <code>reset {address}</code> is equivalent to
+          <code>set {address} = 0</code>. Lastly,
+          <code>compare {a} {op} {b} => {c}</code>. This command compares
+          <code>{a}</code> and <code>{b}</code> using <code>{op}</code> and
+          stores the result in <code>{c}</code>.<br />Valid operations are:
+          <code>{, }, ==, {=, }=</code>
+        </div>
+
+        <hr />
+        <h3 id="basic-in-game-interactions">d. Basic in-game interactions</h3>
+        <div>
+          These commands can be used for reading and manipulating in-game
+          values.
+          <ol>
+            <li>
+              <code>store</code> & <code>set_item</code><br />
+              <code>store {item} to {address}</code>: This command reads values
+              from the player inventory and stores them in memory.<br />
+              <code>set_item {item} = {address}</code>: This command stores
+              values from memory to player inventory.<br />
+              Valid values for <code>{item}</code> are:
+              <ul>
+                <li>player.health</li>
+                <li>player.bombs</li>
+                <li>player.range</li>
+                <li>player.dynamite</li>
+                <li>player.timed_bombs</li>
+                <li>player.damage</li>
+                <li>player.nukes</li>
+              </ul>
+              The range stat displayed is 1 lower than the stored value.
+            </li>
+            <li>
+              <code>win</code> & <code>lose</code><br />
+              No need for syntax, these are very simple. They can be used to
+              instantly win or lose a level!
+            </li>
+            <li>
+              <code>tp</code> & <code>setFlag</code><br />
+              <code>tp to {x} {y}</code>: Teleports the player to
+              <code>{x}</code> and <code>{y}</code>. These are
+              <span class="important"
+                >NOT ABSOLUTE BUT RELATIVE VALUES! (so take the values from
+                their respective address)</span
+              ><br />
+              <code>setFlag {flag} = {value}</code>: Changes certain flags in
+              the game. However, "flags" would be a wrong name for this feature,
+              as the only flag that currently exists is <code>drop_items</code>.
+              This flag determines if random item drops from blocks are enabled.
+            </li>
+          </ol>
+          4. <code>show_message {msg} using {mode}</code><br />
+          This command shows some text somwhere on screen using a specific mode.
+          Texts are created seperately using the text-editor in a list with
+          indexing starting at 0. As with nearly everything text access is
+          relative. A list of possible modes and their behavior are listed
+          below:
+          <table>
+            <tr>
+              <th>mode</th>
+              <th>description</th>
+            </tr>
+            <tr>
+              <td>mode_display</td>
+              <td>
+                Displays the text on the side of the screen, until other text is
+                shown.
+              </td>
+            </tr>
+            <tr>
+              <td>mode_popup</td>
+              <td>
+                Displays the text as a popup on screen, until the user closes
+                it. <span class="important">THIS WILL PAUSE THE GAME!</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <hr />
+        <h3 id="advanced-in-game-interactions">
+          e. Advanced in-game interactions
+        </h3>
+        <div>
+          These commands usually follow a more complex syntax but also provide
+          more powerful properties.
+          <br /><span class="important">
+            ALL VALUES IN THE FOLLOWING SECTION ARE RELATIVE </span
+          ><br />
+          1. Draw commands:<br />
+          Draw commands draw to a special grid that is layered above the game
+          graphics.
+          <span class="important">
+            Only one element may be on one position at any time! Creating new
+            elements onto preexisting ones will result in them being
+            overwritten! </span
+          ><br />
+          There are 3 draw commands that exist. These are used to directly draw
+          rectangles or textures to the game world.
+          <ul>
+            <li>
+              <code>drawImage {img} on {x} {y}</code>: This one draws an image
+              from the game's <code>src/textures/</code> directory.
+              <code>{img}</code> determines the index of the image being drawn,
+              starting at 0. You are allowed to add custom images into the
+              textures folder; however, everyone who plays the map also needs
+              those textures in that order.
+              <span class="important">
+                DO NOT CHANGE THE ORDER OF PREEXISTING IMAGES! THIS WILL MESS UP
+                EVERY TEXTURE IN THE GAME!!!
+              </span>
+            </li>
+            <li>
+              <code>drawRect on {x} {y} with color ( {r} {g} {b} )</code>: Draws
+              a rectangle of a specific RGB color to a specified position.
+            </li>
+            <li>
+              <code>clear {x} {y}</code>: Responsible for removing a graphic
+              from the draw layer.
+            </li>
+          </ul>
+          2. {section_no_name}<br />
+          <code>place_block</code>: {under_construction}<br />
+          <code>place_block {address}</code> is a rather complex command used to
+          directly manipulate the game world. As obvious, it does not follow any
+          specific argument pattern, but its behavior is defined solely by the
+          specified memory. Below is a table that shows what this code does
+          when.
+          <table>
+            <tr>
+              <th>address</th>
+              <th>address+1</th>
+              <th>address+2</th>
+              <th>address+3</th>
+              <th>address+4</th>
+              <th>Behaviour</th>
+            </tr>
+            <tr>
+              <td>ID (0)</td>
+              <td>X</td>
+              <td>Y</td>
+              <td>NOT_USED</td>
+              <td>NOT_USED</td>
+              <td>
+                This places an air block on the specified position when ID is 0.
+                The +3 and +4 slots are not used.
+              </td>
+            </tr>
+            <tr>
+              <td>ID (1)</td>
+              <td>X</td>
+              <td>Y</td>
+              <td>NOT_USED</td>
+              <td>NOT_USED</td>
+              <td>
+                This places an indestructible block at the specified position.
+              </td>
+            </tr>
+            <tr>
+              <td>ID (2)</td>
+              <td>X</td>
+              <td>Y</td>
+              <td>NOT_USED</td>
+              <td>NOT_USED</td>
+              <td>
+                This places a destructible block at the specified position.
+              </td>
+            </tr>
+            <tr>
+              <td>ID (3)</td>
+              <td>X</td>
+              <td>Y</td>
+              <td>NOT_USED</td>
+              <td>NOT_USED</td>
+              <td>This places a water block at the specified position.</td>
+            </tr>
+            <tr>
+              <td>ID (4)</td>
+              <td>X</td>
+              <td>Y</td>
+              <td>RNG_START</td>
+              <td>RNG_END</td>
+              <td>
+                This places an item at the specified position. RNG_START and
+                RNG_END are an old relic and should only be set to the same
+                value. To generate random items, use the RANDOM command. Below
+                is a list of item mappings to RNG_VALUES:<br />
+                <table id="t0" onclick="show_table(1)">
+                  <tr>
+                    <th>RNG_VALUES</th>
+                    <th>ITEM</th>
+                  </tr>
+                  <tr>
+                    <td>0</td>
+                    <td>nuke</td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>dynamite</td>
+                  </tr>
+                  <tr>
+                    <td>50</td>
+                    <td>health+</td>
+                  </tr>
+                  <tr>
+                    <td>80</td>
+                    <td>damage+</td>
+                  </tr>
+                  <tr>
+                    <td>200</td>
+                    <td>timebomb+</td>
+                  </tr>
+                  <tr>
+                    <td>300</td>
+                    <td>shield</td>
+                  </tr>
+                  <tr>
+                    <td>500</td>
+                    <td>bomb+</td>
+                  </tr>
+                  <tr>
+                    <td>700</td>
+                    <td>range+</td>
+                  </tr>
+                  <tr>
+                    <td>900</td>
+                    <td>curse</td>
+                  </tr>
+                </table>
+                <table id="t1" hidden="" onclick="show_table(0)">
+                  <tr>
+                    <th>Click for more info</th>
+                  </tr>
+                </table>
+                <script>
+                  function show_table(i) {
+                    i = i ? 1 : 0; //sanitize input
+                    document.getElementById(`t${i}`).hidden = false;
+                    document.getElementById(`t${i ^ 1}`).hidden = true;
+                  }
+                  document.getElementById("t0").innerHTML =
+                    "<tr><th>Click to hide</th><th></th></tr>" +
+                    document.getElementById("t0").innerHTML;
+                  show_table(1);
+                </script>
+              </td>
+            </tr>
+            <tr>
+              <td>ID (5)</td>
+              <td>X</td>
+              <td>Y</td>
+              <td>HEALTH</td>
+              <td>DAMAGE_MODE</td>
+              <td>
+                This places an enemy at the specified position. What health
+                does, does not need explanation, but keep in mind that enemies
+                with 0 health will still take one hit until they are defeated.
+                However, they will (probably) also die if the player attacks
+                them with 0 damage. There are currently only two attack modes: 0
+                does nothing and 1 is the basic orthogonal attack. There are
+                plans to extend this in future updates.
+              </td>
+            </tr>
+          </table>
+        </div>
+        <hr />
+        <h3 id="advanced-logic">e. Advanced Logic</h3>
+        <div>
+          This section allows for some more advanced logic with more niche use
+          cases.<br />
+          1. Pointers<br />
+          For anyone who is familiar with low-level programming, this section
+          should be self-explanatory. For anyone who is not, this section
+          hopefully simplifies the topic down.
+          <br />
+          First, let's start with things you are already familiar with: Reading
+          from memory addresses. There you provide a location where the program
+          should look for the value. Pointers just provide an additional layer
+          of abstraction: You no longer provide the location directly, but you
+          provide the location of the place where the location of the data is
+          stored. You provide a location that "points" to the real location of
+          the data. Pointers can be used for dynamic memory management and other
+          fun stuff.
+          <br />Now let's finally get to the syntax:<br />
+          <code>loadFromPointer at {pointer} to {address}</code>: Dereferences a
+          pointer to a constant address.<br />
+          <code>storeToPointer value {data} to {pointer}</code>: Stores data to
+          some pointer location.<br />
+          <span class="important">
+            Pointers are to be used carefully: You can easily break everything
+            very quickly when using pointers.
+          </span>
+          <br />
+          2. Randomization<br />
+          If you ever need random numbers for some reason, here you go
+          <code>randomNumber from {start} to {end} => {stor}</code>: Generates a
+          random number in the range <code>({start}-{end})</code> and stores it
+          to <code>{stor}</code>.
+        </div>
+        <h3 id="examples">3. Examples</h3>
+        <div class="code-container">
+          <div class="code_block">
+            <div class="code-content">
+              @ on_init on 0 0<br />
+              setFlag drop_items = 0<br />
+              end
+            </div>
+            <button class="copy-button">Copy</button>
+          </div>
+          <p>
+            This line is located in the tutorial map. It simply deactivates the
+            dropping of items when loading the map.
+          </p>
+        </div>
+        <hr />
+        <div class="code-container">
+          <div class="code_block">
+            <div class="code-content">
+              @ on_step on 10 10<br />
+              set 0 = 20<br />
+              tp to 0 0<br />
+              end
+            </div>
+            <button class="copy-button">Copy</button>
+          </div>
+          <p>
+            This is the script for creating a simple teleporter. If the player
+            steps on 5 5, he is teleported to 20 20. As seen by the trigger,
+            this teleporter is reusable.
+          </p>
+        </div>
+        <hr />
+        More examples are coming soon!
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>&copy; 2024 PyFlat-Studios - Johannes & Jonas</p>
+    </footer>
+
+    <script>
+      document.body.innerHTML = document.body.innerHTML.replaceAll("{", "&lt;");
+      document.body.innerHTML = document.body.innerHTML.replaceAll("}", "&gt;");
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const copyButtons = document.querySelectorAll(".copy-button");
+
+        copyButtons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            const codeContent = this.previousElementSibling.innerText;
+            const originalButtonText = this.textContent;
+
+            navigator.clipboard
+              .writeText(codeContent)
+              .then(() => {
+                this.textContent = "Copied!";
+                this.style.backgroundColor = "#28a745";
+
+                setTimeout(() => {
+                  this.textContent = originalButtonText;
+                  this.style.backgroundColor = "#007bff";
+                }, 1300);
+              })
+              .catch((err) => {
+                console.error("Failed to copy: ", err);
+              });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
