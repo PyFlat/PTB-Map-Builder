@@ -164,10 +164,6 @@ class MainWindow(QMainWindow):
         if texture == 0: return
         curx, cury = self.get_pos()
 
-        if (curx, cury) == (startx, starty):
-            if finish: self.finish_box()
-            return
-
         difference_x = curx - startx
         difference_y = cury - starty
         difference_x = 1 if difference_x == 0 else difference_x
@@ -226,10 +222,6 @@ class MainWindow(QMainWindow):
 
         difference_x = curx - startx
         difference_y = cury - starty
-
-        if (curx, cury) == (startx, starty):
-            if finish: self.finish_line()
-            return
 
         if (curx != startx and self.x_stable is None) or (self.check_x and self.x_stable is not None):
             self.check_y = False
