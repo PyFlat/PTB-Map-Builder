@@ -162,8 +162,10 @@ class MainWindow(QMainWindow):
 
     def update_box(self, startx, starty, texture, finish=False):
         if not self.isActiveWindow():
-            print("Why would you do that?")
-            #self.finish_box()
+            while self.box_images:
+                self.ui.imagePainter.remove_image(self.box_images.pop(0))
+            self.finish_box()
+            return
 
         if texture == 0: return
         curx, cury = self.get_pos()
@@ -220,6 +222,11 @@ class MainWindow(QMainWindow):
         self.ui.imagePainter.mouseReleaseEvent = lambda ev: self.update_line(x,y,texture, True)
 
     def update_line(self, startx, starty, texture, finish = False):
+        if not self.isActiveWindow():
+            while self.line_images:
+                self.ui.imagePainter.remove_image(self.line_images.pop(0))
+            self.finish_line()
+            return
         if texture == 0: return
         curx, cury = self.get_pos()
 
@@ -455,6 +462,11 @@ class MainWindow(QMainWindow):
         self.move_block_id = None
 
     def update_moving_block(self, x, y):
+        if not self.isActiveWindow():
+            if self.move_block_id is not None:
+                self.ui.imagePainter.remove_image(self.move_block_id)
+            self.end_moving(x,y)
+            return
         mx, my = self.get_pos()
         if not (0 < mx < 24 and 0 < my < 24): return
         if self.move_block_id is not None:
@@ -544,6 +556,10 @@ class MainWindow(QMainWindow):
         else: self.texture_right = idx
 
     def update_title(self):
+        ## This has nothing to do with the title update but is essentially to fix another bug!!!
+        if not self.isActiveWindow():
+            self.drawing=False
+        ##
         x,y = self.get_pos()
         if self.current_project is None:
             name_text = "*untitled.ptb"
@@ -570,6 +586,7 @@ class MainWindow(QMainWindow):
         x,y = p
         self.current_texture = self.texture_left if b == Qt.LeftButton else self.texture_right
         self.place(x, y, self.current_texture)
+
 
     def mouseMove(self, event):
         if self.drawing:
