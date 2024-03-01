@@ -18,7 +18,7 @@ class ImagePainterWidget(QWidget):
         if image_path.endswith("10_enemy.png"):
             self.enemys.append((x//20, y//20))
 
-        if image_path.endswith(".gif"):
+        if image_path.endswith(".gif") and opacity==1.0:
             movie = QMovie(image_path)
             movie.frameChanged.connect(self.update)
             movie.start()
@@ -59,7 +59,7 @@ class ImagePainterWidget(QWidget):
                 pixmap = entry['movie'].currentPixmap() if entry['movie'] else QPixmap.fromImage(entry['image'])
 
                 rx, ry = x // 20, y // 20
-                painter.setOpacity(entry['opacity'])
+                #painter.setOpacity(entry['opacity'])
                 painter.drawPixmap(x, y, pixmap)
 
                 if self.highlighted_block_active and (rx, ry) != self.highlighted_block_coords:
