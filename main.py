@@ -223,6 +223,10 @@ class MainWindow(QMainWindow):
         difference_x = curx - startx
         difference_y = cury - starty
 
+        if (curx, cury) == (startx, starty):
+            if finish: self.finish_line()
+            return
+
         if (curx != startx and self.x_stable is None) or (self.check_x and self.x_stable is not None):
             self.check_y = False
             self.x_stable = False
