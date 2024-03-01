@@ -161,6 +161,10 @@ class MainWindow(QMainWindow):
         self.ui.imagePainter.mouseReleaseEvent = lambda ev: self.update_box(x,y,texture, True)
 
     def update_box(self, startx, starty, texture, finish=False):
+        if not self.isActiveWindow():
+            print("Why would you do that?")
+            #self.finish_box()
+
         if texture == 0: return
         curx, cury = self.get_pos()
 
@@ -190,7 +194,6 @@ class MainWindow(QMainWindow):
                 else:
                     block_texture = texture
                 self.box_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], i * 20, j * 20, 0.5))
-
         if finish: self.finish_box()
 
     def finish_box(self):
