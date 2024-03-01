@@ -6,12 +6,11 @@ An app to easily create maps for [Plant-The-Bomb](https://github.com/PyFlat/Plan
 
 1. [Installation](#installation)
 2. [Usage](#usage)
-3. [Features](#features)
+3. [Compatibility](#compatibility)
 4. [License](#license)
 5. [Credits](#credits)
 6. [Contact Information](#contact-information)
-7. [Documentation](#documentation)
-8. [Examples or Screenshots](#examples-or-screenshots)
+7. [Screenshots](#screenshots)
 
 ## Installation
 
@@ -27,7 +26,7 @@ To install the latest version using the Windows installer, follow these steps:
 
 4. Follow the on-screen instructions provided by the installer.
 
-5. Once the installation is complete, you can start using the project!
+5. Once the installation is complete, you can start building maps!
 
 ### Portable Edition
 
@@ -41,7 +40,7 @@ To use the portable edition, follow these steps:
 
 4. Navigate to the extracted folder and run the executable file (`ptb-map-builder.exe`).
 
-5. You can start using the project without the need for installation!
+5. You can start building maps without the need for installation!
 
 ### Using Source Code
 
