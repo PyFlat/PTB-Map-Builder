@@ -11,10 +11,10 @@ class ImagePainterWidget(QWidget):
         self.highlight_enemys = False
         self.enemys = []
 
-    def add_image(self, image_path:str, x, y):
+    def add_image(self, image_path:str, x:int, y:int, opacity:float=1.0):
         self.counter += 1
         image = QImage(image_path)
-        self.image_entries[self.counter] = {'position': (x, y), 'image': image, 'visible': True}
+        self.image_entries[self.counter] = {'position': (x, y), 'image': image, 'visible': True, 'opacity': opacity}
         if image_path.endswith("10_enemy.png"):
             self.enemys.append((x//20, y//20))
 
@@ -59,6 +59,7 @@ class ImagePainterWidget(QWidget):
                 pixmap = entry['movie'].currentPixmap() if entry['movie'] else QPixmap.fromImage(entry['image'])
 
                 rx, ry = x // 20, y // 20
+                painter.setOpacity(entry['opacity'])
                 painter.drawPixmap(x, y, pixmap)
 
                 if self.highlighted_block_active and (rx, ry) != self.highlighted_block_coords:

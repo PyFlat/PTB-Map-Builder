@@ -193,7 +193,7 @@ class MainWindow(QMainWindow):
                     block_texture = 14 if is_even else 15
                 else:
                     block_texture = texture
-                self.box_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], i * 20, j * 20))
+                self.box_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], i * 20, j * 20, 0.5))
 
         if finish: self.finish_box()
 
@@ -269,7 +269,7 @@ class MainWindow(QMainWindow):
             else:
                 block_texture = texture
 
-            self.line_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], x * 20, y * 20))
+            self.line_images.append(self.ui.imagePainter.add_image(self.textures[block_texture], x * 20, y * 20, 0.5))
 
         if finish: self.finish_line()
 
@@ -460,7 +460,7 @@ class MainWindow(QMainWindow):
         if not (0 < mx < 24 and 0 < my < 24): return
         if self.move_block_id is not None:
             self.ui.imagePainter.remove_image(self.move_block_id)
-        self.move_block_id = self.ui.imagePainter.add_image(self.textures[self.blocks[x][y].get_block()], mx*20, my*20)
+        self.move_block_id = self.ui.imagePainter.add_image(self.textures[self.blocks[x][y].get_block()], mx*20, my*20, 0.5)
 
     def start_moving(self, event):
         posx, posy = self.get_pos()
