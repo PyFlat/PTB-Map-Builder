@@ -85,15 +85,15 @@ If you want to create maps for older versions you have to use **`Pic-To-Text`**.
 
 ## License
 
-<ToDo>
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
 
 ## Credits
 
-<ToDo>
+Some of the textures are inspired by images from [Freepik](https://de.freepik.com/icons).
 
 ## Contact Information
 
-<ToDo>
+If you have any questions, feedback, or suggestions regarding this project, feel free to join our [Discord](https://discord.gg/6mXYrTqf9V) server.
 
 ## Screenshots
 
