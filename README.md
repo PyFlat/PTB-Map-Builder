@@ -96,4 +96,8 @@ If you have any questions, feedback, or suggestions regarding this project, feel
 
 ## Screenshots
 
-<ToDo>
+![Main](images/main.png)
+
+![Script Editor](images/script-editor.png)
+
+![Text Editor](images/text-editor.png)
