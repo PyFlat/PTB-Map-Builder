@@ -68,7 +68,35 @@ If you want to use the source code directly, follow these steps:
 
 ## Usage
 
-<ToDo>
+The Plant-The-Bomb Map Builder simplifies the process of creating maps for the Plant-The-Bomb game. Follow these steps to effectively use the application:
+
+1. **Launch the Application**:
+
+   - Depending on your chosen installation method (Windows installer, portable edition, or source code), launch the application accordingly.
+
+2. **Explore the Interface**:
+
+   - Familiarize yourself with the main interface of the Map Builder. It usually consists of various tools and control panels that help with map creation.
+
+3. **Create a New Map**:
+
+   - To start a new map, navigate to the File menu and select "New Map" (Strg+N).
+
+4. **Save Your Progress**:
+
+   - Periodically save your work to avoid losing progress. Navigate to the File menu and choose "Save" or "Save As" to save your map file to a preferred location on your computer.
+
+5. **Export the Map**:
+
+   - When satisfied with your map design, export the map file in the _.ptb_ format.
+
+6. **Test and Iterate**:
+
+   - Once your map is designed, consider testing it within the Plant-The-Bomb game environment to ensure balanced gameplay.
+
+7. **Share Your Creations**:
+
+   - Share your finished maps with the Plant-The-Bomb community, get feedback and maybe your level will end up in the game.
 
 ## Compatibility
 
