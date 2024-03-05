@@ -19,7 +19,7 @@ COMMANDS = [
     f"{START}divide {ARG_LONG} , {ARG_LONG} => {ARG_LONG}{END}",
     f"{START}set {ARG_LONG} = {ARG_SHORT}{END}",
     f"{START}reset {ARG_LONG}{END}",
-    f"{START}store {enum(['player.health','player.bombs','player.range','player.dynamite','player.timed_bombs','player.damage','player.nukes'])} to {ARG_LONG}{END}",
+    f"{START}store {enum(['player.health','player.bombs','player.range','player.dynamite','player.timed_bombs','player.damage','player.nukes','player.x','player.y'])} to {ARG_LONG}{END}",
     f"{START}set_item {enum(['player.health','player.bombs','player.range','player.dynamite','player.timed_bombs','player.damage','player.nukes'])} = {ARG_LONG}{END}",
     f"{START}win{END}",
     f"{START}loose{END}",

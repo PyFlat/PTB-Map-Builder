@@ -275,7 +275,9 @@ class compiler:
                 "player.dynamite",
                 "player.timed_bombs",
                 "player.damage",
-                "player.nukes",
+                "player.nukes",                
+                "player.x",
+                "player.y"
             ],
             [
                 None,
@@ -411,6 +413,8 @@ class compiler:
             "player.timed_bombs",
             "player.damage",
             "player.nukes",
+            "player.x",
+            "player.y"
         ]
         i = util.validateEnum(attrs[1], values, line, [None])
         m = util.validateInteger(attrs[3], 65535, line, self.logfile)
